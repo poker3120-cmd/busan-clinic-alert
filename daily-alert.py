@@ -219,9 +219,9 @@ def main():
                     if not (is_opening and is_medical):
                         continue
 
-                # 채용 사이트는 의료기관 관련 단서가 필요
+                # 채용 사이트 검색 결과는 별도로 넓게 수집
                 if plan["kind"] == "job":
-                    if not (is_medical and (is_job or is_opening)):
+                    if not (is_job or is_medical or is_opening):
                         continue
 
                 # 게시일 확인
