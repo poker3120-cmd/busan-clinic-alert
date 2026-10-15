@@ -1,0 +1,178 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>부산3지점 대시보드</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,"Malgun Gothic",sans-serif;background:#f3f6fb;color:#172033}
+header{background:#142b4a;color:white;padding:26px 20px}
+header h1{margin:0 0 8px;font-size:25px}
+header p{margin:0;color:#d4e1f2;font-size:14px}
+main{max-width:1100px;margin:auto;padding:22px 16px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px}
+.card,.panel{background:white;border-radius:14px;padding:20px;box-shadow:0 2px 10px #182a4410}
+.card span{color:#64748b;font-size:14px}
+.card strong{display:block;font-size:27px;margin-top:10px}
+.panel h2{font-size:18px;margin:0 0 16px}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+button,select,input{border:1px solid #d5deea;border-radius:8px;padding:10px 12px;background:white;font-size:14px}
+button{cursor:pointer}
+button.active,button.primary{background:#2459a9;color:white;border-color:#2459a9}
+input{flex:1;min-width:180px}
+.results{display:grid;gap:12px}
+.result{border:1px solid #e5eaf2;border-radius:10px;padding:15px}
+.result h3{margin:8px 0;font-size:16px}
+.tag{display:inline-block;padding:4px 8px;border-radius:6px;background:#e9f1ff;color:#2459a9;font-size:12px;margin-right:5px}
+.result p{color:#64748b;font-size:13px;line-height:1.6}
+.result a{color:#2459a9;text-decoration:none;font-weight:bold}
+.notice{color:#64748b;font-size:13px;line-height:1.6}
+footer{text-align:center;padding:24px;color:#718096;font-size:12px}
+@media(max-width:650px){.cards{grid-template-columns:1fr}header h1{font-size:21px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>🏥 부산3지점 대시보드</h1>
+  <p>신규 개원 · 의료기관 채용 정보 | 김해 · 부산 서부권</p>
+</header>
+<main>
+  <section class="cards">
+    <div class="card"><span>현재 표시 중인 공고</span><strong id="total">불러오는 중</strong></div>
+    <div class="card"><span>검색 대상 지역</span><strong>4개 지역</strong></div>
+    <div class="card"><span>최근 갱신</span><strong id="updated" style="font-size:16px">확인 중</strong></div>
+  </section>
+  <section class="panel">
+    <h2>지역별 공고 검색</h2>
+    <div class="filters" id="regions">
+      <button class="active" data-region="전체">전체 지역</button>
+      <button data-region="김해">김해시</button>
+      <button data-region="부산 강서구">강서구</button>
+      <button data-region="부산 사하구">사하구</button>
+      <button data-region="부산 사상구">사상구</button>
+    </div>
+    <div class="filters">
+      <input id="keyword" placeholder="병원명, 직종, 공고 제목 검색">
+      <button class="primary" id="searchBtn">검색</button>
+    </div>
+    <h2>공고 목록</h2>
+    <div id="status" class="notice">검색 데이터를 불러오고 있습니다.</div>
+    <div id="results" class="results"></div>
+    <p class="notice">검색엔진 색인 기반 후보입니다. 실제 개원 여부, 채용 상태 및 게시일은 원문에서 확인해 주세요.</p>
+  </section>
+</main>
+<footer>부산3지점 내부 업무 참고용 대시보드</footer>
+<script>
+let allResults = [];
+let selectedRegion = "전체";
+
+const list = document.getElementById("results");
+const keyword = document.getElementById("keyword");
+const statusBox = document.getElementById("status");
+
+function regionName(value) {
+  return (value || "").replace("시", "").trim();
+}
+
+function render() {
+  const q = keyword.value.trim().toLocaleLowerCase("ko");
+  const filtered = allResults.filter(item => {
+    const region = regionName(item.region);
+    const regionOK = selectedRegion === "전체" ||
+      region.includes(regionName(selectedRegion));
+    const text = [
+      item.title, item.region, item.source, item.date
+    ].join(" ").toLocaleLowerCase("ko");
+    return regionOK && (!q || text.includes(q));
+  });
+
+  document.getElementById("total").textContent = filtered.length + "건";
+  list.innerHTML = "";
+
+  if (!filtered.length) {
+    list.innerHTML = '<div class="result"><h3>표시할 공고가 없습니다.</h3><p>다른 지역이나 검색어를 선택해 주세요.</p></div>';
+    return;
+  }
+
+  filtered.forEach(item => {
+    const card = document.createElement("article");
+    card.className = "result";
+
+    const tags = document.createElement("div");
+    const regionTag = document.createElement("span");
+    regionTag.className = "tag";
+    regionTag.textContent = item.region || "지역 확인 필요";
+    tags.appendChild(regionTag);
+
+    const categoryTag = document.createElement("span");
+    categoryTag.className = "tag";
+    categoryTag.textContent = item.opening ? "개원 관련 단서" : "채용 후보";
+    tags.appendChild(categoryTag);
+    card.appendChild(tags);
+
+    const title = document.createElement("h3");
+    title.textContent = item.title || "제목 확인 필요";
+    card.appendChild(title);
+
+    const meta = document.createElement("p");
+    meta.textContent = "게시일: " + (item.date || "확인 필요") +
+      " · 출처: " + (item.source || "미상");
+    card.appendChild(meta);
+
+    const link = document.createElement("a");
+    link.href = item.link;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.textContent = "원문 공고 열기 ↗";
+    card.appendChild(link);
+
+    list.appendChild(card);
+  });
+}
+
+document.querySelectorAll("#regions button").forEach(button => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll("#regions button").forEach(b => b.classList.remove("active"));
+    button.classList.add("active");
+    selectedRegion = button.dataset.region;
+    render();
+  });
+});
+
+document.getElementById("searchBtn").addEventListener("click", render);
+keyword.addEventListener("keydown", event => {
+  if (event.key === "Enter") render();
+});
+
+async function loadData() {
+  try {
+    const response = await fetch("./results.json?ts=" + Date.now(), {
+      cache: "no-store"
+    });
+    if (!response.ok) throw new Error("HTTP " + response.status);
+
+    const data = await response.json();
+    allResults = Array.isArray(data.results) ? data.results : [];
+
+    document.getElementById("updated").textContent =
+      data.updated_at
+        ? new Date(data.updated_at).toLocaleString("ko-KR")
+        : "날짜 확인 필요";
+
+    statusBox.textContent = "검색 결과 " + allResults.length + "건을 불러왔습니다.";
+    render();
+  } catch (error) {
+    document.getElementById("total").textContent = "오류";
+    statusBox.textContent =
+      "데이터를 불러오지 못했습니다. docs/results.json 위치와 GitHub Pages 배포 설정을 확인해 주세요. (" +
+      error.message + ")";
+    list.innerHTML = "";
+  }
+}
+
+loadData();
+</script>
+</body>
+</html>
