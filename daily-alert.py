@@ -11,14 +11,11 @@ TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
 CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
 
 REGIONS = ["김해", "부산 강서구", "부산 사하구", "부산 사상구"]
-
 OPENING_WORDS = [
-    "신규 개원", "신규개원", "개원 예정", "개원예정",
-    "개원 멤버", "개원멤버", "개원 준비", "개원준비",
-    "개원 직원", "개원직원", "오픈 예정", "오픈예정",
-    "신규 오픈", "신규오픈", "개원합니다", "개원팀"
+    "개원", "오픈 예정", "오픈예정", "신규 개원", "신규개원",
+    "개원 예정", "개원예정", "개원 멤버", "개원멤버",
+    "개원 준비", "개원준비", "개원 직원", "개원직원"
 ]
-
 JOB_WORDS = [
     "간호사", "임상병리사", "방사선사", "간호조무사",
     "원무", "코디네이터", "채용", "구인", "모집", "직원"
@@ -26,19 +23,14 @@ JOB_WORDS = [
 
 def clean(text):
     text = html.unescape(text or "")
-    return " ".join(text.replace("<b>", "").replace("</b>", "").split()).lower()
+    return " ".join(text.split()).lower()
 
 def search(query):
     params = urllib.parse.urlencode({
-        "q": query,
-        "hl": "ko",
-        "gl": "KR",
-        "ceid": "KR:ko"
+        "q": query, "hl": "ko", "gl": "KR", "ceid": "KR:ko"
     })
     url = "https://news.google.com/rss/search?" + params
-    req = urllib.request.Request(
-        url, headers={"User-Agent": "Mozilla/5.0"}
-    )
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
     with urllib.request.urlopen(req, timeout=25) as response:
         return ET.fromstring(response.read())
 
@@ -88,19 +80,29 @@ def main():
                         continue
 
                     results[link] = (region, title, link)
+
             except Exception as exc:
                 errors += 1
                 print(f"검색 오류 ({region}, {phrase}): {exc}")
 
-    lines = [
-        "🏥 부산 신규개원 알리미",
-        "검색 범위: 최근 30일",
-        ""
-    ]
+    lines = ["부산 신규개원 알리미", "검색 범위: 최근 30일", ""]
 
     if results:
         for region, title, link in results.values():
-            lines.append(f"📍 {region}\n{title}\n{link}\n")
+            lines.append(f"[{region}]\n{title}\n{link}\n")
     else:
         lines.append("조건에 맞는 공고가 없습니다.")
-        lines.append("검색 오류가 없다면 검색엔진에 노출된 결과가 없을 수 있습니다.")
+        lines.append("검색 결과가 0건이어도 실제 공고가 없다는 뜻은 아닙니다.")
+
+    lines.append(f"검색 결과: {len(results)}건")
+    lines.append(f"검색 오류: {errors}건")
+    lines.append("※ Google 뉴스 검색 기반으로 모든 채용 사이트를 전수 검색하지는 않습니다.")
+
+    message = "\n".join(lines)
+    for start in range(0, len(message), 3500):
+        send(message[start:start + 3500])
+
+    print(f"전송 완료: {len(results)}건, 검색 오류: {errors}건")
+
+if __name__ == "__main__":
+    main()
