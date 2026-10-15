@@ -166,6 +166,7 @@ def main():
     cutoff = datetime.now().astimezone() - timedelta(days=30)
     plans = build_search_plans()
 
+
     for plan in plans:
         region = plan["region"]
         source = plan["source"]
@@ -196,65 +197,67 @@ def main():
 
                 combined = clean(title + " " + description)
 
+                is_opening = any(
+                    word in combined for word in OPENING_WORDS
+                )
+                is_job = any(
+                    word in combined for word in JOB_WORDS
+                )
                 is_medical = any(
-    word in combined for word in MEDICAL_WORDS
-)
-is_nonmedical = any(
-    word in combined for word in NON_MEDICAL_WORDS
-)
+                    word in combined for word in MEDICAL_WORDS
+                )
+                is_nonmedical = any(
+                    word in combined for word in NON_MEDICAL_WORDS
+                )
 
-# 정치·행정 관련 개원 표현은 제외
-if is_nonmedical:
-    continue
+                # 정치·행정 관련 개원 기사는 제외
+                if is_nonmedical:
+                    continue
 
-# 뉴스는 개원 단서와 의료기관 단서를 모두 요구
-if plan["kind"] == "news":
-    if not (is_opening and is_medical):
-        continue
+                # 뉴스는 개원 단서와 의료기관 단서가 모두 필요
+                if plan["kind"] == "news":
+                    if not (is_opening and is_medical):
+                        continue
 
-# 채용 사이트는 의료기관 관련 채용 또는 개원 단서가 필요
-if plan["kind"] == "job":
-    if not (is_medical and (is_job or is_opening)):
-        continue
+                # 채용 사이트는 의료기관 관련 단서가 필요
+                if plan["kind"] == "job":
+                    if not (is_medical and (is_job or is_opening)):
+                        continue
+
+                # 게시일 확인
+                published = None
 
                 try:
-                    if pub_date:
-                        published = parsedate_to_datetime(pub_date)
-
-                        if published.tzinfo is None:
-                            published = published.astimezone()
-
-                        if published < cutoff:
-                            continue
-                    else:
+                    if not pub_date:
                         unknown_dates += 1
+                        continue
+
+                    published = parsedate_to_datetime(pub_date)
+
+                    if published.tzinfo is None:
+                        published = published.astimezone()
+
+                    if published < cutoff:
+                        continue
 
                 except (TypeError, ValueError, OverflowError):
-                    published = None
                     unknown_dates += 1
+                    continue
 
                 results[link] = {
                     "region": region,
                     "source": source,
                     "title": title,
                     "link": link,
-                    "date": (
-                        published.astimezone().strftime("%Y-%m-%d")
-                        if published else "게시일 확인 필요"
-                    ),
-                    "timestamp": (
-                        published.timestamp() if published else 0
-                    ),
+                    "date": published.astimezone().strftime("%Y-%m-%d"),
+                    "timestamp": published.timestamp(),
                     "opening": is_opening
                 }
 
         except Exception as exc:
             errors += 1
-            print(
-                f"검색 오류 ({source}, {region}): {exc}"
-            )
+            print(f"검색 오류 ({source}, {region}): {exc}")
 
-    # 개원 징후가 뚜렷한 자료를 먼저 표시
     sorted_results = sorted(
         results.values(),
         key=lambda x: (x["opening"], x["timestamp"]),
