@@ -1,11 +1,10 @@
 
 import os
+import re
 import json
 import html
-import re
 import urllib.request
 import urllib.parse
-import urllib.error
 import xml.etree.ElementTree as ET
 
 from datetime import datetime, timedelta
@@ -16,38 +15,39 @@ from zoneinfo import ZoneInfo
 
 
 # =========================================================
-# 부산3지점 대시보드 - 검색 정확도 개선 버전
+# 부산3지점 대시보드 - 전체 교체 버전
 # =========================================================
 
 TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
 CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
-SEOUL_TZ = ZoneInfo("Asia/Seoul")
+
+SEOUL = ZoneInfo("Asia/Seoul")
 DAYS_BACK = 30
 
 REGIONS = [
     {
         "label": "김해시",
-        "query": '("김해" OR "김해시" OR "경남 김해")',
+        "query": '"김해" OR "김해시"',
         "terms": ["김해", "김해시"],
     },
     {
-        "label": "부산 강서구",
-        "query": '("부산 강서구" OR "부산강서구" OR "강서구 부산")',
-        "terms": ["부산 강서구", "부산강서구", "강서구 부산"],
+        "label": "강서구",
+        "query": '"부산 강서구" OR "부산강서구"',
+        "terms": ["부산 강서구", "부산강서구"],
     },
     {
-        "label": "부산 사하구",
-        "query": '("부산 사하구" OR "부산사하구" OR "사하구 부산")',
-        "terms": ["부산 사하구", "부산사하구", "사하구 부산"],
+        "label": "사하구",
+        "query": '"부산 사하구" OR "부산사하구"',
+        "terms": ["부산 사하구", "부산사하구"],
     },
     {
-        "label": "부산 사상구",
-        "query": '("부산 사상구" OR "부산사상구" OR "사상구 부산")',
-        "terms": ["부산 사상구", "부산사상구", "사상구 부산"],
+        "label": "사상구",
+        "query": '"부산 사상구" OR "부산사상구"',
+        "terms": ["부산 사상구", "부산사상구"],
     },
 ]
 
-# 검색할 채용 사이트와 허용 도메인
+# 채용 사이트: 실제 링크 도메인으로 출처를 검증합니다.
 SOURCES = [
     ("사람인", "saramin.co.kr"),
     ("잡코리아", "jobkorea.co.kr"),
@@ -57,66 +57,66 @@ SOURCES = [
 ]
 
 JOB_WORDS = [
-    "간호사", "간호조무사", "임상병리사", "방사선사",
-    "치위생사", "원무", "코디네이터", "채용", "구인",
-    "모집", "직원", "의료진", "간호직", "스탭", "스텝",
-    "급구", "정규직", "계약직", "물리치료사", "요양보호사",
+    "채용", "구인", "모집", "간호사", "간호조무사",
+    "임상병리사", "방사선사", "치위생사", "원무",
+    "코디네이터", "의료진", "직원", "급구",
+    "물리치료사", "요양보호사", "검사실",
 ]
 
 MEDICAL_WORDS = [
-    "병원", "의원", "의료기관", "간호사", "간호조무사",
-    "임상병리사", "방사선사", "치위생사", "검진센터",
-    "내과", "치과", "한의원", "피부과", "정형외과",
-    "건강검진", "의료진", "산부인과", "이비인후과",
-    "소아과", "비뇨기과", "재활의학", "요양병원",
-    "정신건강의학과",
+    "병원", "의원", "의료", "간호", "임상병리",
+    "방사선", "치과", "내과", "피부과", "한의원",
+    "검진센터", "재활의학", "요양병원", "원무",
+    "치위생", "물리치료", "검사실",
 ]
 
 OPENING_WORDS = [
     "개원", "신규 개원", "신규개원", "개원 예정",
     "개원예정", "개원 멤버", "개원멤버", "개원 준비",
-    "개원준비", "오픈 예정", "오픈예정", "신설 의원",
-    "신설 병원", "개소 예정", "개소예정",
-    "진료 개시", "진료개시", "병원 이전", "의원 이전",
+    "개원준비", "오픈 예정", "오픈예정", "신설 병원",
+    "신설 의원", "개소 예정", "개소예정", "진료 개시",
+    "진료개시", "병원 이전", "의원 이전",
 ]
 
 NON_MEDICAL_WORDS = [
-    "의회", "국회", "군의회", "시의회", "구의회",
-    "정례회", "본회의", "행정사무감사", "국회의원",
-    "정당", "선거", "의원 발의", "의회 개원",
+    "국회의원", "시의회", "구의회", "군의회",
+    "의회 개원", "본회의", "행정사무감사",
+    "의원 발의", "정당", "선거",
+]
+
+# 다른 지역이 명확하게 표시된 결과를 거르는 용도입니다.
+OTHER_REGION_WORDS = [
+    "서울", "인천", "대구", "대전", "광주", "울산",
+    "세종", "수원", "용인", "성남", "고양", "부천",
+    "안양", "평택", "천안", "청주", "포항", "전주",
+    "제주", "강원도", "충청북도", "충청남도",
+    "전라북도", "전라남도",
 ]
 
 
 def clean(value):
-    """HTML 태그와 엔티티를 정리하고 소문자로 변환합니다."""
     value = html.unescape(value or "")
-    value = re.sub(r"<[^>]+>", " ", value)
-    return " ".join(value.split()).lower()
+    value = re.sub(r"<[^>]*>", " ", value)
+    return " ".join(value.split()).strip()
 
 
-def normalize_title(value):
-    """제목 중복 비교를 위한 정규화."""
-    value = clean(value)
-    return re.sub(r"[^가-힣a-z0-9]", "", value)
+def compact(value):
+    return re.sub(r"[\s\W_]+", "", clean(value).lower())
 
 
 def fetch_rss(url):
     request = urllib.request.Request(
         url,
         headers={
-            "User-Agent": (
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                "AppleWebKit/537.36 Chrome/128.0 Safari/537.36"
-            ),
+            "User-Agent": "Mozilla/5.0 (compatible; Busan3Dashboard/1.0)",
             "Accept": "application/rss+xml, application/xml, text/xml, */*",
         },
     )
-
     with urllib.request.urlopen(request, timeout=25) as response:
         return ET.fromstring(response.read())
 
 
-def search_web(query):
+def search_bing(query):
     params = urllib.parse.urlencode({
         "q": query,
         "format": "rss",
@@ -126,7 +126,7 @@ def search_web(query):
     return fetch_rss("https://www.bing.com/search?" + params)
 
 
-def search_news(query):
+def search_google_news(query):
     params = urllib.parse.urlencode({
         "q": query,
         "hl": "ko",
@@ -136,145 +136,156 @@ def search_news(query):
     return fetch_rss("https://news.google.com/rss/search?" + params)
 
 
-def send(message):
-    url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
-    data = urllib.parse.urlencode({
-        "chat_id": CHAT_ID,
-        "text": message,
-        "disable_web_page_preview": "true",
-    }).encode("utf-8")
-
-    request = urllib.request.Request(url, data=data)
-
-    with urllib.request.urlopen(request, timeout=25) as response:
-        result = json.load(response)
-
-    if not result.get("ok"):
-        raise RuntimeError("텔레그램 전송 실패")
-
-
 def parse_date(value):
     if not value:
         return None
-
     try:
-        parsed = parsedate_to_datetime(value)
-        if parsed.tzinfo is None:
-            parsed = parsed.replace(tzinfo=SEOUL_TZ)
-        return parsed.astimezone(SEOUL_TZ)
-    except (TypeError, ValueError, OverflowError):
+        dt = parsedate_to_datetime(value)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=SEOUL)
+        return dt.astimezone(SEOUL)
+    except (ValueError, TypeError, OverflowError):
         return None
 
 
-def region_matches(text, region):
-    """제목 또는 요약에 관할 지역명이 실제로 있는지 확인."""
-    normalized = clean(text).replace(" ", "")
-    return any(
-        term.replace(" ", "").lower() in normalized
-        for term in region["terms"]
-    )
+def get_host(url):
+    try:
+        return (urlparse(url).hostname or "").lower()
+    except ValueError:
+        return ""
 
 
-def allowed_source_url(url, expected_domain):
-    """검색한 채용 사이트와 실제 URL 도메인이 일치하는지 검사."""
+def source_url_matches(url, domain):
+    host = get_host(url)
+    return host == domain or host.endswith("." + domain)
+
+
+def region_match(text, region):
+    value = compact(text)
+    return any(compact(term) in value for term in region["terms"])
+
+
+def other_region_match(text):
+    value = compact(text)
+    return any(compact(term) in value for term in OTHER_REGION_WORDS)
+
+
+def is_generic_page(url):
+    """검색 결과가 사이트 홈페이지 자체인 경우 제외합니다."""
     try:
         parsed = urlparse(url)
-        host = (parsed.hostname or "").lower()
-        return (
-            parsed.scheme in ("http", "https")
-            and (
-                host == expected_domain
-                or host.endswith("." + expected_domain)
-            )
-        )
+        path = parsed.path.strip("/")
+        return not path
     except ValueError:
-        return False
+        return True
 
 
-def build_search_plans(cutoff_date):
+def parse_google_source(item):
+    """Google 뉴스 RSS가 제공한 언론사 이름을 가져옵니다."""
+    source_node = item.find("source")
+    if source_node is not None and source_node.text:
+        return clean(source_node.text)
+    return "Google 뉴스(원문 중계)"
+
+
+def make_search_plans():
     plans = []
 
-    role_query = (
-        '(간호사 OR 간호조무사 OR 임상병리사 OR 방사선사 '
-        'OR 치위생사 OR 원무 OR 코디네이터 OR 채용 OR 구인 OR 모집)'
+    job_terms = (
+        '(채용 OR 구인 OR 모집 OR 간호사 OR 간호조무사 '
+        'OR 임상병리사 OR 방사선사 OR 치위생사 OR 원무)'
+    )
+
+    opening_terms = (
+        '(개원 OR "개원 예정" OR 신규개원 OR "개원 멤버" '
+        'OR "오픈 예정" OR "신설 병원" OR "병원 이전")'
     )
 
     for region in REGIONS:
-        for source_name, domain in SOURCES:
-            query = (
-                f"site:{domain} {region['query']} "
-                f"{role_query} after:{cutoff_date}"
-            )
+        for name, domain in SOURCES:
             plans.append({
-                "region": region,
                 "kind": "job",
-                "source": source_name,
+                "region": region,
+                "source": name,
                 "domain": domain,
-                "query": query,
+                "query": (
+                    f'site:{domain} ({region["query"]}) '
+                    f'{job_terms}'
+                ),
             })
 
-        news_query = (
-            f"{region['query']} "
-            '(개원 OR "개원 예정" OR 신규개원 OR "개원 멤버" '
-            'OR "오픈 예정" OR "신설 병원" OR "병원 이전") when:30d'
-        )
         plans.append({
-            "region": region,
             "kind": "news",
+            "region": region,
             "source": "Google 뉴스",
             "domain": None,
-            "query": news_query,
+            "query": f'({region["query"]}) {opening_terms} when:30d',
         })
 
     return plans
 
 
-def is_duplicate(item, existing_items):
-    """같은 URL 또는 사실상 같은 제목의 결과를 중복으로 판단."""
-    if item["link"] in existing_items:
+def is_duplicate(result, results):
+    if result["link"] in results:
         return True
 
-    new_title = normalize_title(item["title"])
-    if len(new_title) < 10:
+    title = compact(result["title"])
+    if len(title) < 8:
         return False
 
-    for old in existing_items.values():
-        if old["region"] != item["region"]:
-            continue
+    for old in results.values():
+        if compact(old["title"]) == title:
+            return True
 
-        old_title = normalize_title(old["title"])
-        if not old_title:
-            continue
-
-        # 제목이 거의 같으면 중복으로 처리
-        if SequenceMatcher(None, new_title, old_title).ratio() >= 0.92:
+        old_title = compact(old["title"])
+        if (
+            len(title) >= 15
+            and len(old_title) >= 15
+            and SequenceMatcher(None, title, old_title).ratio() >= 0.94
+        ):
             return True
 
     return False
 
 
-def main():
-    now = datetime.now(SEOUL_TZ)
-    cutoff = now - timedelta(days=DAYS_BACK)
-    cutoff_date = cutoff.strftime("%Y-%m-%d")
+def send_telegram(message):
+    url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
+    payload = urllib.parse.urlencode({
+        "chat_id": CHAT_ID,
+        "text": message,
+        "disable_web_page_preview": "true",
+    }).encode("utf-8")
 
-    plans = build_search_plans(cutoff_date)
+    request = urllib.request.Request(url, data=payload)
+    with urllib.request.urlopen(request, timeout=25) as response:
+        result = json.load(response)
+
+    if not result.get("ok"):
+        raise RuntimeError("텔레그램 메시지 전송에 실패했습니다.")
+
+
+def main():
+    now = datetime.now(SEOUL)
+    cutoff = now - timedelta(days=DAYS_BACK)
+
+    plans = make_search_plans()
     results = {}
-    errors = 0
+
     raw_count = 0
     rejected_region = 0
     rejected_source = 0
     rejected_content = 0
+    errors = 0
+    uncertain_region = 0
 
     for plan in plans:
         region = plan["region"]
 
         try:
             if plan["kind"] == "news":
-                root = search_news(plan["query"])
+                root = search_google_news(plan["query"])
             else:
-                root = search_web(plan["query"])
-
+                root = search_bing(plan["query"])
         except Exception as exc:
             errors += 1
             print(
@@ -287,79 +298,82 @@ def main():
         raw_count += len(items)
 
         for item in items:
-            title = html.unescape(
-                item.findtext("title", "")
-            ).strip()
-            link = item.findtext("link", "").strip()
-            description = item.findtext("description", "")
+            title = clean(item.findtext("title", ""))
+            link = clean(item.findtext("link", ""))
+            description = clean(item.findtext("description", ""))
             pub_date = item.findtext("pubDate", "")
 
             if not title or not link:
                 continue
 
-            combined = clean(title + " " + description)
-
-            # 1. 지역이 실제로 확인되지 않는 결과는 제외
-            if not region_matches(combined, region):
-                rejected_region += 1
-                continue
-
-            # 2. 정치·의회 관련 오탐 제외
-            if any(word in combined for word in NON_MEDICAL_WORDS):
+            if is_generic_page(link):
                 rejected_content += 1
                 continue
 
-            is_opening = any(
-                word in combined for word in OPENING_WORDS
-            )
-            is_job = any(
-                word in combined for word in JOB_WORDS
-            )
-            is_medical = any(
-                word in combined for word in MEDICAL_WORDS
-            )
+            text = clean(title + " " + description)
+            is_opening = any(word in text for word in OPENING_WORDS)
+            is_job = any(word in text for word in JOB_WORDS)
+            is_medical = any(word in text for word in MEDICAL_WORDS)
 
-            # 3. 채용 결과는 지정한 사이트의 실제 도메인과 일치해야 함
+            # 정치·의회 관련 오탐 제외
+            if any(word in text for word in NON_MEDICAL_WORDS):
+                rejected_content += 1
+                continue
+
+            # 채용 검색은 실제 채용 사이트 도메인인지 확인
             if plan["kind"] == "job":
-                if not allowed_source_url(link, plan["domain"]):
+                if not source_url_matches(link, plan["domain"]):
                     rejected_source += 1
                     continue
 
-                if not (is_job and is_medical):
+                if not is_job:
+                    rejected_content += 1
+                    continue
+
+                if not (is_medical or is_job):
                     rejected_content += 1
                     continue
 
                 source = plan["source"]
 
             else:
-                # 뉴스는 개원 단서와 의료기관 단서가 모두 있어야 함
-                if not (is_opening and is_medical):
+                if not is_opening or not is_medical:
                     rejected_content += 1
                     continue
 
-                # Google 뉴스 링크는 Google 뉴스 중계 링크임을 명시
-                host = (urlparse(link).hostname or "").lower()
-                if host != "news.google.com":
-                    # 예상하지 못한 외부 URL은 출처를 실제 도메인으로 표시
-                    source = host or "출처 확인 필요"
-                else:
-                    source = "Google 뉴스(원문 중계)"
+                source = parse_google_source(item)
+
+            # 지역 분류:
+            # 1) 대상 지역이 제목·요약에 있으면 해당 지역으로 분류
+            # 2) 다른 지역이 명확하면 제외
+            # 3) 어느 지역인지 확실하지 않으면 확인 필요로 표시
+            if region_match(text, region):
+                region_label = region["label"]
+                region_confirmed = True
+            elif other_region_match(text):
+                rejected_region += 1
+                continue
+            else:
+                region_label = "지역 확인 필요"
+                region_confirmed = False
+                uncertain_region += 1
 
             published = parse_date(pub_date)
 
             if published and published < cutoff:
                 continue
 
-            date_unknown = published is None
-            if date_unknown:
-                date_text = "게시일 확인 필요"
-                timestamp = 0
-            else:
+            if published:
                 date_text = published.strftime("%Y-%m-%d")
                 timestamp = int(published.timestamp())
+                date_unknown = False
+            else:
+                date_text = "게시일 확인 필요"
+                timestamp = 0
+                date_unknown = True
 
             result = {
-                "region": region["label"],
+                "region": region_label,
                 "source": source,
                 "title": title,
                 "link": link,
@@ -367,7 +381,7 @@ def main():
                 "timestamp": timestamp,
                 "opening": is_opening,
                 "date_unknown": date_unknown,
-                "region_matched": True,
+                "region_matched": region_confirmed,
             }
 
             if is_duplicate(result, results):
@@ -378,6 +392,7 @@ def main():
     sorted_results = sorted(
         results.values(),
         key=lambda item: (
+            item["region_matched"],
             item["opening"],
             not item["date_unknown"],
             item["timestamp"],
@@ -385,14 +400,12 @@ def main():
         reverse=True,
     )
 
-    # 대시보드 데이터 저장
-    dashboard_dir = os.path.join(
-        os.path.dirname(os.path.abspath(__file__)),
-        "docs",
-    )
-    os.makedirs(dashboard_dir, exist_ok=True)
+    # 대시보드 JSON 저장
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    docs_dir = os.path.join(base_dir, "docs")
+    os.makedirs(docs_dir, exist_ok=True)
 
-    dashboard_data = {
+    data = {
         "updated_at": now.isoformat(timespec="seconds"),
         "summary": {
             "total": len(sorted_results),
@@ -402,54 +415,57 @@ def main():
             "rejected_region": rejected_region,
             "rejected_source": rejected_source,
             "rejected_content": rejected_content,
+            "uncertain_region": uncertain_region,
         },
         "results": sorted_results,
     }
 
-    dashboard_path = os.path.join(dashboard_dir, "results.json")
-    with open(dashboard_path, "w", encoding="utf-8") as file:
-        json.dump(
-            dashboard_data,
-            file,
-            ensure_ascii=False,
-            indent=2,
-        )
+    output_path = os.path.join(docs_dir, "results.json")
+    with open(output_path, "w", encoding="utf-8") as file:
+        json.dump(data, file, ensure_ascii=False, indent=2)
 
-    print(f"대시보드 데이터 저장 완료: {dashboard_path}")
+    print(f"대시보드 데이터 저장 완료: {output_path}")
     print(f"검색 요청: {len(plans)}건")
     print(f"원시 검색 결과: {raw_count}건")
     print(f"지역 불일치 제외: {rejected_region}건")
     print(f"출처 도메인 불일치 제외: {rejected_source}건")
     print(f"내용 불일치 제외: {rejected_content}건")
+    print(f"지역 확인 필요 후보: {uncertain_region}건")
     print(f"최종 공고: {len(sorted_results)}건")
     print(f"검색 오류: {errors}건")
 
-    # 텔레그램 알림
+    # 텔레그램 메시지 작성
     header = [
         "부산3지점 신규개원·채용 알리미",
-        f"갱신 시각: {now.strftime('%Y-%m-%d %H:%M')}",
-        f"검색 기준: 최근 {DAYS_BACK}일",
+        f"갱신: {now.strftime('%Y-%m-%d %H:%M')}",
+        f"검색 기간: 최근 {DAYS_BACK}일",
         "대상: 김해시·부산 강서구·사하구·사상구",
-        f"검색 결과: {len(sorted_results)}건",
-        f"지역 불일치 제외: {rejected_region}건",
-        f"출처 불일치 제외: {rejected_source}건",
+        f"최종 후보: {len(sorted_results)}건",
+        f"지역 확인 필요: {uncertain_region}건",
         "",
     ]
 
     blocks = []
-    for item in sorted_results:
-        category = "개원 관련 단서" if item["opening"] else "채용 후보"
+
+    for result in sorted_results:
+        category = "개원 관련 단서" if result["opening"] else "채용 후보"
+        region_note = (
+            ""
+            if result["region_matched"]
+            else " (지역 원문 확인 필요)"
+        )
 
         blocks.append(
-            f"[{category} | {item['region']} | {item['source']}]\n"
-            f"게시일: {item['date']}\n"
-            f"{item['title']}\n"
-            f"{item['link']}"
+            f"[{category}] {result['region']}{region_note}\n"
+            f"标题: {result['title']}\n"
+            f"게시일: {result['date']}\n"
+            f"출처: {result['source']}\n"
+            f"{result['link']}"
         )
 
     if not blocks:
         blocks = [
-            "현재 조건에 맞는 공고를 찾지 못했습니다.",
+            "조건에 맞는 결과가 없습니다.",
             "검색 결과 0건은 실제 공고가 없다는 뜻은 아닙니다.",
         ]
 
@@ -467,7 +483,7 @@ def main():
         messages.append(current)
 
     for message in messages:
-        send(message)
+        send_telegram(message)
 
     print("텔레그램 알림 전송 완료")
 
