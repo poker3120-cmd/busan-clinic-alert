@@ -42,8 +42,22 @@ SOURCES = [
 JOB_WORDS = [
     "간호사", "간호조무사", "임상병리사", "방사선사",
     "원무", "코디네이터", "채용", "구인", "모집",
-    "직원", "의료진", "진료실", "검진센터",
-    "의원", "병원", "의료기관", "간호직"
+    "직원", "의료진", "간호직", "스탭", "스텝",
+    "급구", "정규직", "계약직", "인력 충원"
+]
+
+MEDICAL_WORDS = [
+    "병원", "의원", "의료기관", "간호사", "간호조무사",
+    "임상병리사", "방사선사", "진료", "검진센터",
+    "내과", "치과", "한의원", "피부과", "정형외과",
+    "외래", "건강검진", "의료진"
+]
+
+NON_MEDICAL_WORDS = [
+    "의회", "국회", "군의회", "시의회", "구의회",
+    "정례회", "본회의", "행정사무감사",
+    "국회의원", "의원 발의", "정당", "선거",
+    "개원 후 첫 정례회"
 ]
 
 OPENING_WORDS = [
@@ -182,23 +196,26 @@ def main():
 
                 combined = clean(title + " " + description)
 
-                is_opening = any(
-                    word in combined for word in OPENING_WORDS
-                )
-                is_job = any(
-                    word in combined for word in JOB_WORDS
-                )
+                is_medical = any(
+    word in combined for word in MEDICAL_WORDS
+)
+is_nonmedical = any(
+    word in combined for word in NON_MEDICAL_WORDS
+)
 
-                # 뉴스는 개원 관련 단서가 있는 경우만 수집
-                if plan["kind"] == "news" and not is_opening:
-                    continue
+# 정치·행정 관련 개원 표현은 제외
+if is_nonmedical:
+    continue
 
-                # 채용 사이트 결과는 의료·채용 관련 단서가 필요
-                if plan["kind"] == "job" and not (is_job or is_opening):
-                    continue
+# 뉴스는 개원 단서와 의료기관 단서를 모두 요구
+if plan["kind"] == "news":
+    if not (is_opening and is_medical):
+        continue
 
-                # 검색 결과에 게시일이 있으면 최근 30일 기준 적용
-                published = None
+# 채용 사이트는 의료기관 관련 채용 또는 개원 단서가 필요
+if plan["kind"] == "job":
+    if not (is_medical and (is_job or is_opening)):
+        continue
 
                 try:
                     if pub_date:
