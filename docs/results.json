@@ -1,13 +1,13 @@
 {
-  "updated_at": "2026-10-15T18:50:53+09:00",
+  "updated_at": "2026-10-16T08:22:34+09:00",
   "summary": {
     "total": 2,
     "search_requests": 24,
-    "raw_count": 112,
+    "raw_count": 144,
     "errors": 0,
     "rejected_region": 0,
-    "rejected_source": 58,
-    "rejected_content": 52,
+    "rejected_source": 107,
+    "rejected_content": 35,
     "uncertain_region": 2
   },
   "results": [
