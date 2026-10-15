@@ -104,4 +104,4 @@ def main():
             lines.append(f"📍 {region}\n{title}\n{link}\n")
     else:
         lines.append("조건에 맞는 공고가 없습니다.")
-        lines.append("검색 오류가 없다면 검색엔진에 노출된 결과가
+        lines.append("검색 오류가 없다면 검색엔진에 노출된 결과가 없을 수 있습니다.")
