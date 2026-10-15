@@ -383,6 +383,40 @@ def main():
         ),
         reverse=True,
     )
+    
+    # 대시보드용 검색 결과 JSON 저장
+    dashboard_dir = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "docs"
+    )
+    os.makedirs(dashboard_dir, exist_ok=True)
+
+    dashboard_data = {
+        "updated_at": now.isoformat(timespec="seconds"),
+        "summary": {
+            "total": len(sorted_results),
+            "search_requests": len(plans),
+            "raw_count": raw_count,
+            "errors": errors,
+            "fallback_count": fallback_count,
+        },
+        "results": sorted_results,
+    }
+
+    dashboard_path = os.path.join(
+        dashboard_dir,
+        "results.json"
+    )
+
+    with open(dashboard_path, "w", encoding="utf-8") as f:
+        json.dump(
+            dashboard_data,
+            f,
+            ensure_ascii=False,
+            indent=2
+        )
+
+    print(f"대시보드 데이터 저장 완료: {dashboard_path}")
 
     header = [
         "부산 신규개원 알리미",
