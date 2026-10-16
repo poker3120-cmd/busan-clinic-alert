@@ -523,27 +523,8 @@ def main():
             # 채용 사이트 결과
             if plan["kind"] == "job":
                 if not source_url_matches(link, plan["domain"]):
-                    # Bing이 중계 주소를 반환한 경우 최종 주소를 한 번 더 확인
-                    resolved_link = resolve_redirect(link)
-
-                    if not source_url_matches(
-    resolved_link, plan["domain"]
-):
-    rejected_source += 1
-
-    if rejected_source <= 8:
-        print(
-            f"[출처 제외 샘플 {rejected_source}] "
-            f"검색출처={plan['source']} / "
-            f"기대도메인={plan['domain']} / "
-            f"제목={title} / "
-            f"검색링크={link} / "
-            f"최종링크={resolved_link}"
-        )
-
-    continue
-
-                    link = resolved_link
+                    rejected_source += 1
+                    continue
 
                 if not is_job or not is_medical:
                     rejected_content += 1
@@ -566,7 +547,6 @@ def main():
                     continue
 
                 source = parse_google_source(item)
-
             # 지역 분류
             if region_match(text, region):
                 region_label = region["label"]
