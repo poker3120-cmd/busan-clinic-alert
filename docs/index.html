@@ -509,5 +509,38 @@ ${detail[2]}
 })();
 </script>
 <!-- 부산3지점 제안서 자동 생성 기능 끝 -->
+
+<script>
+(function () {
+  const fileInput = document.getElementById('b3p-files');
+  const status = document.getElementById('b3p-files-status');
+
+  if (!fileInput || !status) return;
+
+  fileInput.addEventListener('change', function () {
+    const files = Array.from(fileInput.files || []);
+
+    if (files.length === 0) {
+      status.textContent = '선택된 파일이 없습니다.';
+      return;
+    }
+
+    const allowedExtensions = /\.(pdf|ppt|pptx)$/i;
+    const invalidFiles = files.filter(file => !allowedExtensions.test(file.name));
+
+    if (invalidFiles.length > 0) {
+      status.textContent = 'PDF, PPT, PPTX 파일만 선택해 주세요.';
+      fileInput.value = '';
+      return;
+    }
+
+    status.textContent =
+      '선택된 파일 ' + files.length + '개: ' +
+      files.map(file => file.name).join(', ');
+  });
+})();
+</script>
+</escape>
+
 </body>
 </html>
