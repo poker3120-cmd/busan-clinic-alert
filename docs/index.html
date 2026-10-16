@@ -174,5 +174,327 @@ async function loadData() {
 
 loadData();
 </script>
+
+<!-- 부산3지점 제안서 자동 생성 기능 시작 -->
+<style>
+#b3p-proposal-launcher {
+  position:fixed; right:22px; bottom:22px; z-index:9998;
+  border:0; border-radius:12px; padding:15px 20px;
+  color:#fff; background:#17365d; font-size:15px;
+  font-weight:700; cursor:pointer;
+  box-shadow:0 4px 16px #0003;
+}
+#b3p-proposal-overlay {
+  display:none; position:fixed; inset:0; z-index:9999;
+  background:#1119; padding:18px; overflow-y:auto;
+}
+#b3p-proposal-overlay.b3p-open { display:block; }
+#b3p-proposal-panel {
+  max-width:850px; margin:25px auto; padding:24px;
+  border-radius:16px; background:#fff; color:#222;
+  font-family:Arial,"Malgun Gothic",sans-serif;
+}
+#b3p-proposal-panel * { box-sizing:border-box; }
+#b3p-proposal-panel h2 { margin:0 0 8px; color:#17365d; }
+#b3p-proposal-panel .b3p-muted { color:#666; font-size:13px; }
+#b3p-proposal-panel .b3p-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:14px;
+  margin-top:20px;
+}
+#b3p-proposal-panel label {
+  display:block; font-size:13px; font-weight:700; margin-bottom:6px;
+}
+#b3p-proposal-panel input,
+#b3p-proposal-panel select,
+#b3p-proposal-panel textarea {
+  width:100%; padding:10px; border:1px solid #ccd2db;
+  border-radius:7px; font:inherit; background:#fff;
+}
+#b3p-proposal-panel textarea { resize:vertical; }
+#b3p-proposal-panel .b3p-full { grid-column:1/-1; }
+#b3p-proposal-panel .b3p-actions {
+  display:flex; flex-wrap:wrap; gap:8px; margin:16px 0;
+}
+#b3p-proposal-panel button {
+  cursor:pointer; border:0; border-radius:7px;
+  padding:11px 15px; font-weight:700;
+}
+#b3p-proposal-panel .b3p-primary { background:#17365d; color:#fff; }
+#b3p-proposal-panel .b3p-secondary { background:#edf1f6; color:#17365d; }
+#b3p-proposal-panel .b3p-close { float:right; background:#edf1f6; }
+#b3p-proposal-panel #b3p-output { min-height:340px; line-height:1.7; }
+@media(max-width:600px) {
+  #b3p-proposal-panel .b3p-grid { grid-template-columns:1fr; }
+  #b3p-proposal-panel .b3p-full { grid-column:auto; }
+  #b3p-proposal-panel { padding:16px; }
+  #b3p-proposal-launcher { right:12px; bottom:12px; }
+}
+</style>
+
+<button id="b3p-proposal-launcher" type="button">
+  ✚ 제안서 자동 생성
+</button>
+
+<div id="b3p-proposal-overlay" aria-hidden="true">
+  <section id="b3p-proposal-panel" role="dialog"
+    aria-modal="true" aria-labelledby="b3p-proposal-title">
+    <button id="b3p-proposal-close" class="b3p-close"
+      type="button">닫기 ✕</button>
+
+    <h2 id="b3p-proposal-title">부산3지점 영업 제안서 제작</h2>
+    <p class="b3p-muted">
+      병원 정보를 입력하고 제안서 초안을 생성하세요.
+      생성 결과는 직접 수정할 수 있습니다.
+    </p>
+
+    <div class="b3p-grid">
+      <div>
+        <label for="b3p-clinic">병원명 *</label>
+        <input id="b3p-clinic" placeholder="예: ○○내과의원">
+      </div>
+      <div>
+        <label for="b3p-area">지역</label>
+        <select id="b3p-area">
+          <option>김해시</option>
+          <option>부산 강서구</option>
+          <option>부산 사하구</option>
+          <option>부산 사상구</option>
+          <option>기타</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="b3p-department">진료과목</label>
+        <input id="b3p-department" placeholder="예: 내과, 정형외과">
+      </div>
+      <div>
+        <label for="b3p-type">제안 유형 *</label>
+        <select id="b3p-type">
+          <option value="opening">신규 개원 병원</option>
+          <option value="conversion">검사 수탁 전환</option>
+          <option value="highprofit">고수익·특수검사 확대</option>
+          <option value="support">검사실 운영 지원</option>
+          <option value="renewal">재계약 및 거래처 유지</option>
+        </select>
+      </div>
+
+      <div class="b3p-full">
+        <label for="b3p-needs">병원 상황 및 제안할 내용</label>
+        <textarea id="b3p-needs" rows="3"
+          placeholder="예: 신규 개원 예정, 검체 수거 일정 협의 필요, 특정 검사 확대 검토 등"></textarea>
+      </div>
+
+      <div>
+        <label for="b3p-manager">담당 영업사원</label>
+        <input id="b3p-manager" placeholder="담당자 이름">
+      </div>
+      <div>
+        <label for="b3p-date">제안일</label>
+        <input id="b3p-date" type="date">
+      </div>
+    </div>
+
+    <div class="b3p-actions">
+      <button id="b3p-generate" class="b3p-primary" type="button">
+        제안서 초안 생성
+      </button>
+      <button id="b3p-copy" class="b3p-secondary" type="button">
+        내용 복사
+      </button>
+      <button id="b3p-download" class="b3p-secondary" type="button">
+        Word 문서 저장
+      </button>
+    </div>
+
+    <label for="b3p-output">생성된 제안서 (자유롭게 수정 가능)</label>
+    <textarea id="b3p-output" rows="18"
+      placeholder="위 정보를 입력하고 '제안서 초안 생성'을 눌러주세요."></textarea>
+    <p class="b3p-muted">
+      안내: 실제 검사 가능 항목, 수거 일정, 비용 및 지원 조건은
+      재단의 최신 기준과 내부 승인 사항을 확인한 뒤 사용하세요.
+    </p>
+  </section>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  const $ = id => document.getElementById(id);
+  const overlay = $("b3p-proposal-overlay");
+  const output = $("b3p-output");
+
+  $("b3p-date").value = new Date().toLocaleDateString("sv-SE");
+
+  function openPanel() {
+    overlay.classList.add("b3p-open");
+    overlay.setAttribute("aria-hidden", "false");
+  }
+
+  function closePanel() {
+    overlay.classList.remove("b3p-open");
+    overlay.setAttribute("aria-hidden", "true");
+  }
+
+  $("b3p-proposal-launcher").addEventListener("click", openPanel);
+  $("b3p-proposal-close").addEventListener("click", closePanel);
+
+  overlay.addEventListener("click", function (event) {
+    if (event.target === overlay) closePanel();
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") closePanel();
+  });
+
+  const proposalDetails = {
+    opening: [
+      "신규 개원에 따른 검사 운영체계 사전 준비",
+      "개원 일정과 진료과목에 맞춰 필요한 검사 항목을 검토하고, 검체 의뢰 및 결과 확인 절차를 협의합니다.",
+      "개원 일정 확인 → 검사 항목 협의 → 검체 수거 및 결과 확인 절차 점검 → 운영 개시 전 최종 확인"
+    ],
+    conversion: [
+      "검사 수탁 서비스 비교 및 전환 검토",
+      "현재 이용 중인 검사 항목, 검체 수거 일정, 결과 보고 방식, 비용 조건 및 전환 시 필요한 업무를 확인하여 비교 검토 자료를 마련합니다.",
+      "현행 운영 확인 → 검사 항목 및 조건 비교 → 전환 범위와 일정 협의 → 적용 후 불편 사항 점검"
+    ],
+    highprofit: [
+      "고수익·특수검사 항목 확대 검토",
+      "병원의 진료과목과 실제 진료 흐름에 적합한 검사 항목을 검토합니다. 적용 전 검사 적응증, 급여 기준, 환자 안내 및 비용 조건을 확인합니다.",
+      "진료 특성 확인 → 후보 검사 항목 선정 → 검사 목적 및 적용 기준 검토 → 의료진 협의 후 시행 여부 결정"
+    ],
+    support: [
+      "검사실 운영 효율화 지원 검토",
+      "검체 처리 과정, 검사 의뢰 절차, 수거 일정 및 결과 확인 과정에서 개선이 필요한 부분을 파악합니다. 장비·교육 등 지원 사항은 내부 기준과 승인 가능 범위를 확인해 협의합니다.",
+      "운영 현황 확인 → 개선 과제 도출 → 지원 가능 범위 확인 → 실행 일정 및 사후 점검 협의"
+    ],
+    renewal: [
+      "기존 거래처 서비스 점검 및 재계약 협의",
+      "기존 이용 현황과 검사 항목, 업무상 불편 사항 및 서비스 개선 요청을 확인하여 향후 협력 방향을 협의합니다.",
+      "이용 현황 확인 → 개선 요청 수렴 → 적용 가능한 개선안 협의 → 계약 조건 및 향후 일정 확인"
+    ]
+  };
+
+  $("b3p-generate").addEventListener("click", function () {
+    const clinic = $("b3p-clinic").value.trim();
+    const area = $("b3p-area").value;
+    const dept = $("b3p-department").value.trim() || "미기재";
+    const type = $("b3p-type").value;
+    const needs = $("b3p-needs").value.trim();
+    const manager = $("b3p-manager").value.trim() || "부산3지점 담당자";
+    const date = $("b3p-date").value || new Date().toLocaleDateString("sv-SE");
+    const detail = proposalDetails[type];
+
+    if (!clinic) {
+      alert("병원명을 입력해 주세요.");
+      $("b3p-clinic").focus();
+      return;
+    }
+
+    output.value =
+`씨젠의료재단 부산3지점
+영업 제안서
+
+수신: ${clinic} 귀중
+소재지: ${area}
+진료과목: ${dept}
+제안일: ${date}
+담당자: ${manager}
+
+제목: ${detail[0]}
+
+1. 제안 목적
+귀원의 진료 환경과 검사 운영 상황을 확인하고, 병원 운영에 적합한 검사 수탁 서비스 및 업무 개선 방향을 협의하고자 합니다.
+
+2. 주요 제안 내용
+${detail[1]}
+
+3. 귀원 맞춤 검토 사항
+${needs || "초기 상담을 통해 귀원의 운영 현황과 우선 검토 사항을 확인한 후 구체적인 제안 내용을 협의합니다."}
+
+4. 추진 절차
+${detail[2]}
+
+5. 후속 협의 사항
+- 세부 검사 항목 및 검사 가능 여부 확인
+- 검체 수거 일정과 결과 확인 절차 협의
+- 적용 기준, 비용 및 계약 조건 확인
+- 필요한 지원 사항과 시행 일정 협의
+
+6. 맺음말
+귀원의 진료 및 검사 운영 환경을 충분히 고려하여 실질적인 도움이 될 수 있는 협력 방안을 함께 검토하겠습니다. 구체적인 적용 사항은 상호 협의 및 관련 기준 확인 후 확정하겠습니다.
+
+씨젠의료재단 부산3지점
+담당: ${manager}
+
+※ 본 문서는 영업 제안 초안입니다. 검사 항목, 수거 일정, 급여 기준, 가격 및 장비 지원 등은 최신 내부 기준과 승인 여부를 확인한 후 확정해 주세요.`;
+
+    output.focus();
+  });
+
+  $("b3p-copy").addEventListener("click", async function () {
+    if (!output.value.trim()) {
+      alert("먼저 제안서 초안을 생성해 주세요.");
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(output.value);
+      alert("제안서 내용을 복사했습니다.");
+    } catch (error) {
+      output.focus();
+      output.select();
+      const copied = document.execCommand("copy");
+      alert(copied
+        ? "제안서 내용을 복사했습니다."
+        : "내용을 선택했습니다. Ctrl+C를 눌러 복사해 주세요.");
+    }
+  });
+
+  $("b3p-download").addEventListener("click", function () {
+    if (!output.value.trim()) {
+      alert("먼저 제안서 초안을 생성해 주세요.");
+      return;
+    }
+
+    function escapeHTML(value) {
+      return value.replace(/[&<>"]/g, function (char) {
+        return {
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;"
+        }[char];
+      });
+    }
+
+    const html =
+      '<!doctype html><html><head><meta charset="utf-8">' +
+      '<title>부산3지점 영업 제안서</title></head>' +
+      '<body><pre style="font-family:Malgun Gothic,Arial,sans-serif;' +
+      'white-space:pre-wrap;font-size:11pt;line-height:1.8;">' +
+      escapeHTML(output.value) +
+      '</pre></body></html>';
+
+    const blob = new Blob(["\ufeff", html], {
+      type: "application/msword"
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const clinic = $("b3p-clinic").value.trim()
+      .replace(/[\\/:*?"<>|]/g, "_");
+
+    link.href = url;
+    link.download = (clinic || "병원") + "_영업제안서.doc";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(function () {
+      URL.revokeObjectURL(url);
+    }, 1500);
+  });
+})();
+</script>
+<!-- 부산3지점 제안서 자동 생성 기능 끝 -->
 </body>
 </html>
