@@ -526,7 +526,7 @@ def main():
                     rejected_source += 1
                     continue
 
-                if not is_job or not is_medical:
+                if not is_job:
                     rejected_content += 1
                     continue
 
