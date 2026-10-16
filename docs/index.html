@@ -283,7 +283,20 @@ loadData();
         <textarea id="b3p-needs" rows="3"
           placeholder="예: 신규 개원 예정, 검체 수거 일정 협의 필요, 특정 검사 확대 검토 등"></textarea>
       </div>
-
+     
+        <div class="b3p-full">
+        <label for="b3p-files">회사 마케팅 자료 첨부 (PDF / PPT / PPTX)</label>
+        <input
+          id="b3p-files"
+          type="file"
+          accept=".pdf,.ppt,.pptx,application/pdf,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation"
+          multiple
+        >
+        <small id="b3p-files-status" style="display:block;margin-top:6px;color:#666;">
+          검사 소개서, 제품 안내서, 마케팅팀 공식 자료를 선택해 주세요.
+        </small>
+      </div>
+      
       <div>
         <label for="b3p-manager">담당 영업사원</label>
         <input id="b3p-manager" placeholder="담당자 이름">
