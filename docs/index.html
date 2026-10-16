@@ -534,9 +534,19 @@ ${detail[2]}
       return;
     }
 
-    status.textContent =
-      '선택된 파일 ' + files.length + '개: ' +
-      files.map(file => file.name).join(', ');
+    status.textContent = '';
+
+const message = document.createElement('div');
+message.textContent = '선택된 파일 ' + files.length + '개';
+status.appendChild(message);
+
+files.forEach(function (file) {
+  const fileName = document.createElement('div');
+  fileName.textContent = '📎 ' + file.name;
+  fileName.style.cssText =
+    'margin-top:6px;overflow-wrap:anywhere;color:#333;';
+  status.appendChild(fileName);
+});
   });
 })();
 </script>
