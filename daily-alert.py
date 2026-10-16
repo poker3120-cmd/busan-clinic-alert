@@ -293,30 +293,45 @@ def region_match(text, region):
 def make_search_plans():
     plans = []
 
-    job_terms = (
-        '(채용 OR 구인 OR 모집 OR 간호사 OR 간호조무사 '
-        'OR 임상병리사 OR 방사선사 OR 치위생사 OR 원무 '
-        'OR 물리치료사 OR 코디네이터)'
-    )
+    # 채용 검색을 직종별 두 그룹으로 분리합니다.
+    job_groups = [
+        '(간호사 OR 간호조무사 OR 의료진 OR 채용 OR 구인 OR 모집)',
+        '(임상병리사 OR 방사선사 OR 치위생사 OR 물리치료사 OR 원무 OR 코디네이터 OR 검사실)',
+    ]
 
     opening_terms = (
-        '(개원 OR "개원 예정" OR 신규개원 OR "개원 멤버" '
-        'OR "오픈 예정" OR "신설 병원" OR "병원 이전" '
-        'OR "새 단장해")'
+        '(개원 OR "개원 예정" OR 신규개원 '
+        'OR "오픈 예정" OR "신설 병원" '
+        'OR "병원 이전" OR "새 단장")'
+    )
+
+    job_news_terms = (
+        '(채용 OR 구인 OR 모집 OR 간호사 '
+        'OR 간호조무사 OR 임상병리사 OR 방사선사 '
+        'OR 치위생사 OR 물리치료사 OR 원무)'
     )
 
     for region in REGIONS:
-        # 구인 사이트별 검색
+        if region["label"] == "김해시":
+            region_query = '("김해" OR "김해시")'
+        else:
+            district = region["district"]
+            region_query = (
+                f'("부산 {district}" OR "{district}" OR "부산{district}")'
+            )
+
+        # 의료기관 채용 사이트: 직종별로 검색
         for name, domain in SOURCES:
-            plans.append({
-                "kind": "job",
-                "region": region,
-                "source": name,
-                "domain": domain,
-                "query": (
-                    f'site:{domain} {region["query"]} {job_terms}'
-                ),
-            })
+            for job_terms in job_groups:
+                plans.append({
+                    "kind": "job",
+                    "region": region,
+                    "source": name,
+                    "domain": domain,
+                    "query": (
+                        f'site:{domain} {region_query} {job_terms}'
+                    ),
+                })
 
         # 개원 관련 뉴스
         plans.append({
@@ -325,19 +340,19 @@ def make_search_plans():
             "source": "Google 뉴스",
             "domain": None,
             "query": (
-                f'{region["query"]} {opening_terms} when:30d'
+                f'{region_query} {opening_terms} when:30d'
             ),
         })
 
-        # 채용 관련 뉴스도 별도로 검색
+        # 병의원 채용 관련 뉴스
         plans.append({
             "kind": "news_job",
             "region": region,
             "source": "Google 뉴스",
             "domain": None,
             "query": (
-                f'{region["query"]} {job_terms} '
-                f'(병원 OR 의원 OR 의료 OR 간호) when:30d'
+                f'{region_query} {job_news_terms} '
+                '(병원 OR 의원 OR 의료 OR 간호) when:30d'
             ),
         })
 
