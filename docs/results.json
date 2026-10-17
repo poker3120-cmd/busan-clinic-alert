@@ -1,13 +1,13 @@
 {
-  "updated_at": "2026-10-17T08:22:49+09:00",
+  "updated_at": "2026-10-18T08:19:23+09:00",
   "summary": {
     "total": 1,
     "search_requests": 44,
-    "raw_count": 262,
+    "raw_count": 245,
     "errors": 0,
     "rejected_region": 0,
-    "rejected_source": 195,
-    "rejected_content": 65,
+    "rejected_source": 174,
+    "rejected_content": 69,
     "uncertain_region": 1,
     "job_site_matches": 0,
     "opening_news_matches": 2
@@ -19,7 +19,7 @@
       "title": "올고다병원, 사하구 프라임병원 새 단장해 10월 1일 개원 - 인더스트리뉴스",
       "link": "https://news.google.com/rss/articles/CBMickFVX3lxTE14SzNrVjBad3F6TFVHcy1haTNDSV9Zb3RnNWVmeXJYS212bEozeVdLYnU4RVpFTi1iYmNXYjFtOFVBQ1huQnFUeTh1ZlA3VExJUGM2YWdxMTduSmlqcFhqeVdRYWoxeHNSa3JyZFVzbnlEZw?oc=5",
       "date": "2026-09-29",
-      "timestamp": 1790665219,
+      "timestamp": 1790665200,
       "opening": true,
       "date_unknown": false,
       "region_matched": true
