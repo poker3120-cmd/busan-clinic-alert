@@ -552,5 +552,92 @@ files.forEach(function (file) {
 </script>
 </escape>
 
+<script type="module">
+(async function () {
+  const input = document.getElementById("b3p-files");
+  const status = document.getElementById("b3p-files-status");
+
+  if (!input || !status) return;
+
+  try {
+    const pdfjs = await import("./docs/vendor/pdf.mjs");
+    pdfjs.GlobalWorkerOptions.workerSrc =
+      "./docs/vendor/pdf.worker.mjs";
+
+    input.addEventListener("change", async function () {
+      const files = Array.from(input.files || []);
+      const pdfFiles = files.filter(
+        file => file.name.toLowerCase().endsWith(".pdf")
+      );
+
+      if (files.length === 0) {
+        status.textContent = "선택된 파일이 없습니다.";
+        return;
+      }
+
+      if (pdfFiles.length === 0) {
+        status.textContent =
+          "선택한 파일에서 PDF를 찾지 못했습니다. PPT/PPTX 추출은 다음 단계에서 연결합니다.";
+        return;
+      }
+
+      status.textContent = "PDF 자료의 글자를 추출하고 있습니다...";
+
+      try {
+        const results = [];
+
+        for (const file of pdfFiles) {
+          const buffer = await file.arrayBuffer();
+          const pdf = await pdfjs.getDocument({
+            data: new Uint8Array(buffer)
+          }).promise;
+
+          const pages = [];
+
+          for (let pageNo = 1; pageNo <= pdf.numPages; pageNo++) {
+            const page = await pdf.getPage(pageNo);
+            const content = await page.getTextContent();
+            const text = content.items
+              .map(item => item.str || "")
+              .join(" ");
+
+            pages.push("[페이지 " + pageNo + "]\n" + text);
+          }
+
+          results.push(
+            "===== " + file.name + " =====\n" + pages.join("\n\n")
+          );
+        }
+
+        let output = document.getElementById("b3p-extracted-text");
+
+        if (!output) {
+          output = document.createElement("textarea");
+          output.id = "b3p-extracted-text";
+          output.rows = 10;
+          output.style.cssText =
+            "display:block;width:100%;box-sizing:border-box;margin-top:12px;padding:10px;";
+          output.placeholder = "추출된 공식 마케팅 자료가 여기에 표시됩니다.";
+          output.setAttribute("aria-label", "추출된 마케팅 자료");
+          status.insertAdjacentElement("afterend", output);
+        }
+
+        output.value = results.join("\n\n");
+        status.textContent =
+          "PDF 글자 추출 완료 (" + pdfFiles.length + "개). 아래 내용이 추출되었습니다.";
+      } catch (error) {
+        console.error(error);
+        status.textContent =
+          "PDF 추출에 실패했습니다. vendor 파일 경로와 브라우저 오류를 확인해 주세요.";
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    status.textContent =
+      "PDF 기능을 불러오지 못했습니다. 라이브러리 경로를 확인해 주세요.";
+  }
+})();
+</script>
+
 </body>
 </html>
