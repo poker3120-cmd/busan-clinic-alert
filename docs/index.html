@@ -4,640 +4,897 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>부산3지점 대시보드</title>
+<title>부산3지점 통합 영업 대시보드</title>
 <style>
-*{box-sizing:border-box}
-body{margin:0;font-family:Arial,"Malgun Gothic",sans-serif;background:#f3f6fb;color:#172033}
-header{background:#142b4a;color:white;padding:26px 20px}
-header h1{margin:0 0 8px;font-size:25px}
-header p{margin:0;color:#d4e1f2;font-size:14px}
-main{max-width:1100px;margin:auto;padding:22px 16px}
-.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px}
-.card,.panel{background:white;border-radius:14px;padding:20px;box-shadow:0 2px 10px #182a4410}
-.card span{color:#64748b;font-size:14px}
-.card strong{display:block;font-size:27px;margin-top:10px}
-.panel h2{font-size:18px;margin:0 0 16px}
-.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
-button,select,input{border:1px solid #d5deea;border-radius:8px;padding:10px 12px;background:white;font-size:14px}
-button{cursor:pointer}
-button.active,button.primary{background:#2459a9;color:white;border-color:#2459a9}
-input{flex:1;min-width:180px}
-.results{display:grid;gap:12px}
-.result{border:1px solid #e5eaf2;border-radius:10px;padding:15px}
-.result h3{margin:8px 0;font-size:16px}
-.tag{display:inline-block;padding:4px 8px;border-radius:6px;background:#e9f1ff;color:#2459a9;font-size:12px;margin-right:5px}
-.result p{color:#64748b;font-size:13px;line-height:1.6}
-.result a{color:#2459a9;text-decoration:none;font-weight:bold}
-.notice{color:#64748b;font-size:13px;line-height:1.6}
-footer{text-align:center;padding:24px;color:#718096;font-size:12px}
-@media(max-width:650px){.cards{grid-template-columns:1fr}header h1{font-size:21px}}
+:root {
+  --navy:#17365d;
+  --blue:#2563eb;
+  --bg:#f3f6fb;
+  --line:#e1e7ef;
+  --text:#1f2937;
+  --muted:#64748b;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  font-family:Arial,"Malgun Gothic",sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+header {
+  background:var(--navy);
+  color:white;
+  padding:24px max(18px,calc((100% - 1200px)/2));
+}
+header h1 { margin:0 0 8px; font-size:25px; }
+header p { margin:0; color:#dbeafe; font-size:14px; }
+nav {
+  display:flex;
+  gap:7px;
+  flex-wrap:wrap;
+  background:white;
+  padding:12px max(12px,calc((100% - 1200px)/2));
+  border-bottom:1px solid var(--line);
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+button,.navbtn {
+  font:inherit;
+  cursor:pointer;
+}
+.navbtn {
+  border:0;
+  border-radius:8px;
+  background:#eef2f7;
+  color:#334155;
+  padding:11px 15px;
+  font-weight:700;
+}
+.navbtn.active { background:var(--navy); color:white; }
+main { max-width:1200px; margin:auto; padding:22px 16px 50px; }
+.page { display:none; }
+.page.active { display:block; }
+h2 { margin:0 0 8px; font-size:23px; }
+.subtitle { margin:0 0 20px; color:var(--muted); font-size:14px; }
+.grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:15px;
+}
+.grid3 { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.card {
+  background:white;
+  border:1px solid var(--line);
+  border-radius:13px;
+  padding:19px;
+  min-width:0;
+}
+.card h3 { margin:0 0 9px; font-size:17px; }
+.card p { color:var(--muted); font-size:14px; line-height:1.6; }
+.launch {
+  display:block;
+  width:100%;
+  margin-top:13px;
+  border:0;
+  border-radius:8px;
+  background:var(--navy);
+  color:white;
+  padding:12px;
+  font-weight:700;
+}
+.stat { font-size:30px; font-weight:800; color:var(--navy); }
+label { display:block; font-size:13px; font-weight:700; margin:13px 0 6px; }
+input,select,textarea {
+  width:100%;
+  border:1px solid #cbd5e1;
+  border-radius:8px;
+  padding:11px;
+  background:white;
+  color:var(--text);
+  font:inherit;
+  font-size:14px;
+}
+textarea { min-height:95px; resize:vertical; }
+.row {
+  display:flex;
+  gap:10px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+.row > * { flex:1; min-width:130px; }
+.btn {
+  border:0;
+  border-radius:8px;
+  background:var(--blue);
+  color:white;
+  padding:11px 15px;
+  font-weight:700;
+}
+.btn.secondary { background:#e8edf5; color:#334155; }
+.btn.danger { background:#b91c1c; }
+.btn.small { padding:7px 10px; font-size:12px; }
+.toolbar { display:flex; gap:8px; flex-wrap:wrap; margin:14px 0; }
+.toolbar > * { flex:1; min-width:140px; }
+.item {
+  background:white;
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:15px;
+  margin:10px 0;
+  overflow-wrap:anywhere;
+}
+.item h3 { margin:0 0 8px; font-size:16px; }
+.item p { margin:6px 0; font-size:14px; line-height:1.55; }
+.meta { font-size:12px; color:var(--muted); }
+.pill {
+  display:inline-block;
+  background:#eaf1ff;
+  color:#1d4ed8;
+  border-radius:20px;
+  padding:4px 9px;
+  font-size:12px;
+  margin:2px 4px 2px 0;
+}
+.empty {
+  padding:25px;
+  background:white;
+  border:1px dashed #cbd5e1;
+  border-radius:10px;
+  text-align:center;
+  color:var(--muted);
+  line-height:1.7;
+}
+.notice {
+  background:#eff6ff;
+  border:1px solid #bfdbfe;
+  padding:12px;
+  border-radius:8px;
+  color:#1e40af;
+  font-size:13px;
+  line-height:1.6;
+  margin:12px 0;
+}
+footer {
+  text-align:center;
+  padding:22px;
+  color:var(--muted);
+  font-size:12px;
+}
+#proposalPreview {
+  background:white;
+  padding:24px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  line-height:1.8;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  min-height:120px;
+}
+@media(max-width:700px) {
+  header h1 { font-size:21px; }
+  .grid,.grid3 { grid-template-columns:1fr; }
+  nav { position:static; }
+  .navbtn { flex:1 1 40%; }
+  main { padding:16px 12px 35px; }
+}
 </style>
 </head>
 <body>
+
 <header>
-  <h1>🏥 부산3지점 대시보드</h1>
-  <p>신규 개원 · 의료기관 채용 정보 | 김해 · 부산 서부권</p>
+  <h1>부산3지점 통합 영업 대시보드</h1>
+  <p>영업기회 발굴부터 거래처 관리까지 | 김해 · 부산 서부권</p>
 </header>
+
+<nav>
+  <button class="navbtn active" data-page="home">홈</button>
+  <button class="navbtn" data-page="proposal">제안서 자동생성</button>
+  <button class="navbtn" data-page="crm">숙성영업 관리</button>
+  <button class="navbtn" data-page="market">시장조사</button>
+  <button class="navbtn" data-page="jobs">개원·채용정보</button>
+</nav>
+
 <main>
-  <section class="cards">
-    <div class="card"><span>현재 표시 중인 공고</span><strong id="total">불러오는 중</strong></div>
-    <div class="card"><span>검색 대상 지역</span><strong>4개 지역</strong></div>
-    <div class="card"><span>최근 갱신</span><strong id="updated" style="font-size:16px">확인 중</strong></div>
-  </section>
-  <section class="panel">
-    <h2>지역별 공고 검색</h2>
-    <div class="filters" id="regions">
-      <button class="active" data-region="전체">전체 지역</button>
-      <button data-region="김해">김해시</button>
-      <button data-region="부산 강서구">강서구</button>
-      <button data-region="부산 사하구">사하구</button>
-      <button data-region="부산 사상구">사상구</button>
+
+<!-- 홈 -->
+<section class="page active" id="home">
+  <h2>영업 현황</h2>
+  <p class="subtitle">부산3지점 영업 업무를 한 화면에서 관리합니다.</p>
+
+  <div class="grid grid3">
+    <div class="card">
+      <h3>숙성영업 거래처</h3>
+      <div class="stat" id="statCrm">0</div>
+      <p>등록된 영업 대상 거래처</p>
     </div>
-    <div class="filters">
-      <input id="keyword" placeholder="병원명, 직종, 공고 제목 검색">
-      <button class="primary" id="searchBtn">검색</button>
+    <div class="card">
+      <h3>후속 연락 예정</h3>
+      <div class="stat" id="statFollow">0</div>
+      <p>오늘 이전 또는 오늘이 연락 예정일인 거래처</p>
     </div>
-    <h2>공고 목록</h2>
-    <div id="status" class="notice">검색 데이터를 불러오고 있습니다.</div>
-    <div id="results" class="results"></div>
-    <p class="notice">검색엔진 색인 기반 후보입니다. 실제 개원 여부, 채용 상태 및 게시일은 원문에서 확인해 주세요.</p>
-  </section>
-</main>
-<footer>부산3지점 내부 업무 참고용 대시보드</footer>
-<script>
-let allResults = [];
-let selectedRegion = "전체";
+    <div class="card">
+      <h3>개원·채용 공고</h3>
+      <div class="stat" id="statJobs">-</div>
+      <p>results.json에서 불러온 공고</p>
+    </div>
+  </div>
 
-const list = document.getElementById("results");
-const keyword = document.getElementById("keyword");
-const statusBox = document.getElementById("status");
+  <div class="grid" style="margin-top:16px">
+    <div class="card">
+      <h3>📄 제안서 자동생성</h3>
+      <p>검사 확대, 수익 개선, 신규 개원 등 거래처 상황에 맞춘 영업 제안서를 작성합니다.</p>
+      <button class="launch" onclick="showPage('proposal')">제안서 작성하기 →</button>
+    </div>
+    <div class="card">
+      <h3>🎯 숙성영업 관리</h3>
+      <p>당장 계약이 어렵더라도 추후 방문과 연락이 필요한 거래처를 기록합니다.</p>
+      <button class="launch" onclick="showPage('crm')">거래처 관리하기 →</button>
+    </div>
+    <div class="card">
+      <h3>📊 시장조사</h3>
+      <p>지역 의료기관, 신규 개원, 검체 검사, 의료기관 채용 관련 정보를 조사합니다.</p>
+      <button class="launch" onclick="showPage('market')">시장조사 시작하기 →</button>
+    </div>
+    <div class="card">
+      <h3>🏥 개원·채용정보</h3>
+      <p>기존 자동수집 프로그램이 생성한 공고 데이터를 확인합니다.</p>
+      <button class="launch" onclick="showPage('jobs')">공고 확인하기 →</button>
+    </div>
+  </div>
+</section>
 
-function regionName(value) {
-  return (value || "").replace("시", "").trim();
-}
+<!-- 제안서 -->
+<section class="page" id="proposal">
+  <h2>제안서 자동생성</h2>
+  <p class="subtitle">거래처 상황에 맞춰 초안을 작성하고 Word 호환 파일로 저장합니다.</p>
 
-function render() {
-  const q = keyword.value.trim().toLocaleLowerCase("ko");
-  const filtered = allResults.filter(item => {
-    const region = regionName(item.region);
-    const regionOK = selectedRegion === "전체" ||
-      region.includes(regionName(selectedRegion));
-    const text = [
-      item.title, item.region, item.source, item.date
-    ].join(" ").toLocaleLowerCase("ko");
-    return regionOK && (!q || text.includes(q));
-  });
-
-  document.getElementById("total").textContent = filtered.length + "건";
-  list.innerHTML = "";
-
-  if (!filtered.length) {
-    list.innerHTML = '<div class="result"><h3>표시할 공고가 없습니다.</h3><p>다른 지역이나 검색어를 선택해 주세요.</p></div>';
-    return;
-  }
-
-  filtered.forEach(item => {
-    const card = document.createElement("article");
-    card.className = "result";
-
-    const tags = document.createElement("div");
-    const regionTag = document.createElement("span");
-    regionTag.className = "tag";
-    regionTag.textContent = item.region || "지역 확인 필요";
-    tags.appendChild(regionTag);
-
-    const categoryTag = document.createElement("span");
-    categoryTag.className = "tag";
-    categoryTag.textContent = item.opening ? "개원 관련 단서" : "채용 후보";
-    tags.appendChild(categoryTag);
-    card.appendChild(tags);
-
-    const title = document.createElement("h3");
-    title.textContent = item.title || "제목 확인 필요";
-    card.appendChild(title);
-
-    const meta = document.createElement("p");
-    meta.textContent = "게시일: " + (item.date || "확인 필요") +
-      " · 출처: " + (item.source || "미상");
-    card.appendChild(meta);
-
-    const link = document.createElement("a");
-    link.href = item.link;
-    link.target = "_blank";
-    link.rel = "noopener noreferrer";
-    link.textContent = "원문 공고 열기 ↗";
-    card.appendChild(link);
-
-    list.appendChild(card);
-  });
-}
-
-document.querySelectorAll("#regions button").forEach(button => {
-  button.addEventListener("click", () => {
-    document.querySelectorAll("#regions button").forEach(b => b.classList.remove("active"));
-    button.classList.add("active");
-    selectedRegion = button.dataset.region;
-    render();
-  });
-});
-
-document.getElementById("searchBtn").addEventListener("click", render);
-keyword.addEventListener("keydown", event => {
-  if (event.key === "Enter") render();
-});
-
-async function loadData() {
-  try {
-    const response = await fetch("./results.json?ts=" + Date.now(), {
-      cache: "no-store"
-    });
-    if (!response.ok) throw new Error("HTTP " + response.status);
-
-    const data = await response.json();
-    allResults = Array.isArray(data.results) ? data.results : [];
-
-    document.getElementById("updated").textContent =
-      data.updated_at
-        ? new Date(data.updated_at).toLocaleString("ko-KR")
-        : "날짜 확인 필요";
-
-    statusBox.textContent = "검색 결과 " + allResults.length + "건을 불러왔습니다.";
-    render();
-  } catch (error) {
-    document.getElementById("total").textContent = "오류";
-    statusBox.textContent =
-      "데이터를 불러오지 못했습니다. docs/results.json 위치와 GitHub Pages 배포 설정을 확인해 주세요. (" +
-      error.message + ")";
-    list.innerHTML = "";
-  }
-}
-
-loadData();
-</script>
-
-<!-- 부산3지점 제안서 자동 생성 기능 시작 -->
-<style>
-#b3p-proposal-launcher {
-  position:fixed; right:22px; bottom:22px; z-index:9998;
-  border:0; border-radius:12px; padding:15px 20px;
-  color:#fff; background:#17365d; font-size:15px;
-  font-weight:700; cursor:pointer;
-  box-shadow:0 4px 16px #0003;
-}
-#b3p-proposal-overlay {
-  display:none; position:fixed; inset:0; z-index:9999;
-  background:#1119; padding:18px; overflow-y:auto;
-}
-#b3p-proposal-overlay.b3p-open { display:block; }
-#b3p-proposal-panel {
-  max-width:850px; margin:25px auto; padding:24px;
-  border-radius:16px; background:#fff; color:#222;
-  font-family:Arial,"Malgun Gothic",sans-serif;
-}
-#b3p-proposal-panel * { box-sizing:border-box; }
-#b3p-proposal-panel h2 { margin:0 0 8px; color:#17365d; }
-#b3p-proposal-panel .b3p-muted { color:#666; font-size:13px; }
-#b3p-proposal-panel .b3p-grid {
-  display:grid; grid-template-columns:1fr 1fr; gap:14px;
-  margin-top:20px;
-}
-#b3p-proposal-panel label {
-  display:block; font-size:13px; font-weight:700; margin-bottom:6px;
-}
-#b3p-proposal-panel input,
-#b3p-proposal-panel select,
-#b3p-proposal-panel textarea {
-  width:100%; padding:10px; border:1px solid #ccd2db;
-  border-radius:7px; font:inherit; background:#fff;
-}
-#b3p-proposal-panel textarea { resize:vertical; }
-#b3p-proposal-panel .b3p-full { grid-column:1/-1; }
-#b3p-proposal-panel .b3p-actions {
-  display:flex; flex-wrap:wrap; gap:8px; margin:16px 0;
-}
-#b3p-proposal-panel button {
-  cursor:pointer; border:0; border-radius:7px;
-  padding:11px 15px; font-weight:700;
-}
-#b3p-proposal-panel .b3p-primary { background:#17365d; color:#fff; }
-#b3p-proposal-panel .b3p-secondary { background:#edf1f6; color:#17365d; }
-#b3p-proposal-panel .b3p-close { float:right; background:#edf1f6; }
-#b3p-proposal-panel #b3p-output { min-height:340px; line-height:1.7; }
-@media(max-width:600px) {
-  #b3p-proposal-panel .b3p-grid { grid-template-columns:1fr; }
-  #b3p-proposal-panel .b3p-full { grid-column:auto; }
-  #b3p-proposal-panel { padding:16px; }
-  #b3p-proposal-launcher { right:12px; bottom:12px; }
-}
-</style>
-
-<button id="b3p-proposal-launcher" type="button">
-  ✚ 제안서 자동 생성
-</button>
-
-<div id="b3p-proposal-overlay" aria-hidden="true">
-  <section id="b3p-proposal-panel" role="dialog"
-    aria-modal="true" aria-labelledby="b3p-proposal-title">
-    <button id="b3p-proposal-close" class="b3p-close"
-      type="button">닫기 ✕</button>
-
-    <h2 id="b3p-proposal-title">부산3지점 영업 제안서 제작</h2>
-    <p class="b3p-muted">
-      병원 정보를 입력하고 제안서 초안을 생성하세요.
-      생성 결과는 직접 수정할 수 있습니다.
-    </p>
-
-    <div class="b3p-grid">
+  <div class="card">
+    <div class="grid">
       <div>
-        <label for="b3p-clinic">병원명 *</label>
-        <input id="b3p-clinic" placeholder="예: ○○내과의원">
+        <label for="pClinic">병원·의원명</label>
+        <input id="pClinic" placeholder="예: ○○내과의원">
       </div>
       <div>
-        <label for="b3p-area">지역</label>
-        <select id="b3p-area">
-          <option>김해시</option>
+        <label for="pManager">담당자</label>
+        <input id="pManager" placeholder="예: 원장님">
+      </div>
+      <div>
+        <label for="pType">제안 유형</label>
+        <select id="pType">
+          <option value="highprofit">고수익 검사 확대</option>
+          <option value="opening">신규 개원 제안</option>
+          <option value="conversion">거래처 전환 제안</option>
+          <option value="support">거래처 지원 제안</option>
+          <option value="renewal">기존 거래처 관리</option>
+        </select>
+      </div>
+      <div>
+        <label for="pDate">작성일</label>
+        <input id="pDate" type="date">
+      </div>
+    </div>
+
+    <label for="pSituation">거래처 현황 및 고민</label>
+    <textarea id="pSituation" placeholder="예: 현재 외부 의뢰 검사가 적고, 검사 항목 확대에 관심이 있음"></textarea>
+
+    <label for="pNeeds">중점 제안 내용</label>
+    <textarea id="pNeeds" placeholder="예: 검사 항목 확대, 의뢰 편의성 개선, 수익 구조 검토"></textarea>
+
+    <label for="pAction">후속 조치 및 일정</label>
+    <textarea id="pAction" placeholder="예: 다음 주 방문하여 검사 목록과 예상 수익 검토"></textarea>
+
+    <div class="toolbar">
+      <button class="btn" onclick="generateProposal()">제안서 초안 만들기</button>
+      <button class="btn secondary" onclick="copyProposal()">내용 복사</button>
+      <button class="btn secondary" onclick="downloadProposal()">Word 파일 저장</button>
+    </div>
+    <div id="proposalPreview">위 항목을 입력한 뒤 ‘제안서 초안 만들기’를 누르세요.</div>
+    <p class="meta">생성되는 문서는 수정 가능한 초안입니다. 실제 검사 가능 여부, 가격 및 계약 조건은 내부 확인 후 사용해 주세요.</p>
+  </div>
+</section>
+
+<!-- 숙성영업 -->
+<section class="page" id="crm">
+  <h2>숙성영업 관리</h2>
+  <p class="subtitle">추후 재방문하거나 연락할 거래처와 영업 진행 상황을 기록합니다.</p>
+
+  <div class="notice">
+    기록은 현재 브라우저에 저장됩니다. 브라우저 데이터 삭제나 기기 변경 시 기록이 사라질 수 있으므로 주기적으로 백업해 주세요.
+  </div>
+
+  <div class="card">
+    <h3>거래처 등록 및 수정</h3>
+    <input type="hidden" id="crmId">
+    <div class="grid">
+      <div>
+        <label for="cClinic">병원·의원명 *</label>
+        <input id="cClinic" placeholder="병원명">
+      </div>
+      <div>
+        <label for="cArea">지역</label>
+        <select id="cArea">
+          <option>김해</option>
           <option>부산 강서구</option>
           <option>부산 사하구</option>
           <option>부산 사상구</option>
           <option>기타</option>
         </select>
       </div>
-
       <div>
-        <label for="b3p-department">진료과목</label>
-        <input id="b3p-department" placeholder="예: 내과, 정형외과">
+        <label for="cContact">담당자</label>
+        <input id="cContact" placeholder="원장님 또는 담당자">
       </div>
       <div>
-        <label for="b3p-type">제안 유형 *</label>
-        <select id="b3p-type">
-          <option value="opening">신규 개원 병원</option>
-          <option value="conversion">검사 수탁 전환</option>
-          <option value="highprofit">고수익·특수검사 확대</option>
-          <option value="support">검사실 운영 지원</option>
-          <option value="renewal">재계약 및 거래처 유지</option>
+        <label for="cStatus">진행 상태</label>
+        <select id="cStatus">
+          <option>관심 확인</option>
+          <option>자료 전달</option>
+          <option>재방문 예정</option>
+          <option>조건 협의</option>
+          <option>계약 완료</option>
+          <option>보류</option>
         </select>
       </div>
-
-      <div class="b3p-full">
-        <label for="b3p-needs">병원 상황 및 제안할 내용</label>
-        <textarea id="b3p-needs" rows="3"
-          placeholder="예: 신규 개원 예정, 검체 수거 일정 협의 필요, 특정 검사 확대 검토 등"></textarea>
-      </div>
-     
-        <div class="b3p-full">
-        <label for="b3p-files">회사 마케팅 자료 첨부 (PDF / PPT / PPTX)</label>
-        <input
-          id="b3p-files"
-          type="file"
-          accept=".pdf,.ppt,.pptx,application/pdf,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation"
-          multiple
-        >
-        <small id="b3p-files-status" style="display:block;margin-top:6px;color:#666;">
-          검사 소개서, 제품 안내서, 마케팅팀 공식 자료를 선택해 주세요.
-        </small>
-      </div>
-      
       <div>
-        <label for="b3p-manager">담당 영업사원</label>
-        <input id="b3p-manager" placeholder="담당자 이름">
+        <label for="cLast">최근 접촉일</label>
+        <input id="cLast" type="date">
       </div>
       <div>
-        <label for="b3p-date">제안일</label>
-        <input id="b3p-date" type="date">
+        <label for="cNext">다음 연락 예정일</label>
+        <input id="cNext" type="date">
       </div>
     </div>
 
-    <div class="b3p-actions">
-      <button id="b3p-generate" class="b3p-primary" type="button">
-        제안서 초안 생성
-      </button>
-      <button id="b3p-copy" class="b3p-secondary" type="button">
-        내용 복사
-      </button>
-      <button id="b3p-download" class="b3p-secondary" type="button">
-        Word 문서 저장
-      </button>
-    </div>
+    <label for="cMemo">영업 내용 및 다음 조치</label>
+    <textarea id="cMemo" placeholder="상담 내용, 관심 검사, 거절 사유, 다음 방문 계획 등"></textarea>
 
-    <label for="b3p-output">생성된 제안서 (자유롭게 수정 가능)</label>
-    <textarea id="b3p-output" rows="18"
-      placeholder="위 정보를 입력하고 '제안서 초안 생성'을 눌러주세요."></textarea>
-    <p class="b3p-muted">
-      안내: 실제 검사 가능 항목, 수거 일정, 비용 및 지원 조건은
-      재단의 최신 기준과 내부 승인 사항을 확인한 뒤 사용하세요.
-    </p>
-  </section>
-</div>
+    <div class="toolbar">
+      <button class="btn" onclick="saveCrm()">거래처 저장</button>
+      <button class="btn secondary" onclick="clearCrmForm()">입력 초기화</button>
+      <button class="btn secondary" onclick="exportCrm()">CSV 백업</button>
+      <button class="btn secondary" onclick="document.getElementById('crmImport').click()">CSV 복원</button>
+      <input type="file" id="crmImport" accept=".csv,text/csv" style="display:none" onchange="importCrm(event)">
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <input id="crmSearch" placeholder="병원명·지역·메모 검색" oninput="renderCrm()">
+    <select id="crmFilter" onchange="renderCrm()">
+      <option value="">전체 진행 상태</option>
+      <option>관심 확인</option>
+      <option>자료 전달</option>
+      <option>재방문 예정</option>
+      <option>조건 협의</option>
+      <option>계약 완료</option>
+      <option>보류</option>
+    </select>
+  </div>
+  <div id="crmList"></div>
+</section>
+
+<!-- 시장조사 -->
+<section class="page" id="market">
+  <h2>시장조사</h2>
+  <p class="subtitle">지역과 조사 주제를 선택해 공개 웹 정보를 검색합니다.</p>
+
+  <div class="card">
+    <label for="mArea">조사 지역</label>
+    <select id="mArea">
+      <option>김해시</option>
+      <option>부산 강서구</option>
+      <option>부산 사하구</option>
+      <option>부산 사상구</option>
+      <option>부산광역시</option>
+    </select>
+
+    <label for="mTopic">조사 주제</label>
+    <select id="mTopic">
+      <option value="신규 개원 예정 의원">신규 개원 예정 의원</option>
+      <option value="신규 개원 병원 채용">신규 개원 및 채용</option>
+      <option value="내과 의원 목록">내과 의원 현황</option>
+      <option value="검체 검사 수탁 검사실">검체 검사 및 수탁 관련 정보</option>
+      <option value="의원 개원 소식">의원 개원 소식</option>
+      <option value="의료기관 채용공고">의료기관 채용공고</option>
+      <option value="건강검진 내과 의원">건강검진 관련 의원</option>
+    </select>
+
+    <label for="mKeyword">추가 키워드 (선택)</label>
+    <input id="mKeyword" placeholder="예: 내과, 건강검진, 개원 예정">
+
+    <div class="toolbar">
+      <button class="btn" onclick="marketSearch('google')">Google 검색</button>
+      <button class="btn secondary" onclick="marketSearch('naver')">네이버 검색</button>
+      <button class="btn secondary" onclick="marketSearch('news')">뉴스 검색</button>
+    </div>
+    <div class="notice">
+      검색 결과는 외부 검색 사이트에서 확인합니다. 이 메뉴는 검색을 실행하는 기능이며, 조사 결과를 자동으로 수집하거나 검증된 시장조사 보고서로 만들어 주는 기능은 아닙니다.
+    </div>
+  </div>
+
+  <div class="grid" style="margin-top:15px">
+    <div class="card">
+      <h3>조사 시 확인할 항목</h3>
+      <p>① 의료기관명과 주소<br>② 개원 또는 채용 시점<br>③ 진료과목 및 검진 여부<br>④ 현재 거래 가능성<br>⑤ 방문 우선순위와 후속 조치</p>
+    </div>
+    <div class="card">
+      <h3>영업 우선순위 설정</h3>
+      <p>신규 개원 예정 기관, 검사 항목 확대 가능성이 있는 의원, 거래 전환 가능성이 있는 기관부터 확인하고 조사 결과를 숙성영업 관리에 등록하세요.</p>
+      <button class="launch" onclick="showPage('crm')">조사 결과 거래처 등록 →</button>
+    </div>
+  </div>
+</section>
+
+<!-- 개원·채용정보 -->
+<section class="page" id="jobs">
+  <h2>개원·채용정보</h2>
+  <p class="subtitle">기존 자동수집 프로그램의 results.json 데이터를 불러옵니다.</p>
+
+  <div class="notice">
+    이 화면은 공고 데이터를 새로 수집하지 않습니다. 기존 GitHub Actions 또는 수집 프로그램이 생성한 results.json 파일을 읽습니다.
+  </div>
+
+  <div class="toolbar">
+    <select id="jobArea" onchange="renderJobs()">
+      <option value="">전체 지역</option>
+      <option value="김해">김해</option>
+      <option value="강서">부산 강서구</option>
+      <option value="사하">부산 사하구</option>
+      <option value="사상">부산 사상구</option>
+      <option value="부산">부산 전체</option>
+    </select>
+    <input id="jobSearch" placeholder="병원명·공고·키워드 검색" oninput="renderJobs()">
+    <button class="btn secondary" onclick="loadJobs()">공고 새로고침</button>
+  </div>
+
+  <p id="jobStatus" class="meta">공고 데이터를 불러오는 중입니다.</p>
+  <div id="jobList"></div>
+</section>
+
+</main>
+
+<footer>부산3지점 통합 영업 대시보드 · 개원·채용정보는 기존 results.json 연동</footer>
 
 <script>
-(function () {
-  "use strict";
+const $ = id => document.getElementById(id);
+let jobs = [];
+let crmRecords = [];
 
-  const $ = id => document.getElementById(id);
-  const overlay = $("b3p-proposal-overlay");
-  const output = $("b3p-output");
+const CRM_KEY = "busan3_crm_records_v1";
 
-  $("b3p-date").value = new Date().toLocaleDateString("sv-SE");
+function showPage(name) {
+  document.querySelectorAll(".page").forEach(el => el.classList.remove("active"));
+  document.querySelectorAll(".navbtn").forEach(el => el.classList.toggle("active", el.dataset.page === name));
+  const page = $(""+name);
+  if (page) page.classList.add("active");
+  if (name === "jobs") loadJobs();
+  if (name === "crm") renderCrm();
+  window.scrollTo({top:0, behavior:"smooth"});
+}
 
-  function openPanel() {
-    overlay.classList.add("b3p-open");
-    overlay.setAttribute("aria-hidden", "false");
-  }
+document.querySelectorAll(".navbtn").forEach(btn => {
+  btn.addEventListener("click", () => showPage(btn.dataset.page));
+});
 
-  function closePanel() {
-    overlay.classList.remove("b3p-open");
-    overlay.setAttribute("aria-hidden", "true");
-  }
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, ch => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+  })[ch]);
+}
 
-  $("b3p-proposal-launcher").addEventListener("click", openPanel);
-  $("b3p-proposal-close").addEventListener("click", closePanel);
+function formatDate(value) {
+  if (!value) return "-";
+  return String(value).slice(0,10);
+}
 
-  overlay.addEventListener("click", function (event) {
-    if (event.target === overlay) closePanel();
-  });
+/* 제안서 */
+function generateProposal() {
+  const clinic = $("pClinic").value.trim() || "거래처명 미입력";
+  const manager = $("pManager").value.trim() || "원장님";
+  const date = $("pDate").value || new Date().toISOString().slice(0,10);
+  const situation = $("pSituation").value.trim() || "거래처 현황 추가 확인 필요";
+  const needs = $("pNeeds").value.trim() || "거래처별 필요 사항 확인 후 구체화";
+  const action = $("pAction").value.trim() || "담당자와 후속 일정 협의";
+  const type = $("pType").value;
 
-  document.addEventListener("keydown", function (event) {
-    if (event.key === "Escape") closePanel();
-  });
-
-  const proposalDetails = {
-    opening: [
-      "신규 개원에 따른 검사 운영체계 사전 준비",
-      "개원 일정과 진료과목에 맞춰 필요한 검사 항목을 검토하고, 검체 의뢰 및 결과 확인 절차를 협의합니다.",
-      "개원 일정 확인 → 검사 항목 협의 → 검체 수거 및 결과 확인 절차 점검 → 운영 개시 전 최종 확인"
-    ],
-    conversion: [
-      "검사 수탁 서비스 비교 및 전환 검토",
-      "현재 이용 중인 검사 항목, 검체 수거 일정, 결과 보고 방식, 비용 조건 및 전환 시 필요한 업무를 확인하여 비교 검토 자료를 마련합니다.",
-      "현행 운영 확인 → 검사 항목 및 조건 비교 → 전환 범위와 일정 협의 → 적용 후 불편 사항 점검"
-    ],
-    highprofit: [
-      "고수익·특수검사 항목 확대 검토",
-      "병원의 진료과목과 실제 진료 흐름에 적합한 검사 항목을 검토합니다. 적용 전 검사 적응증, 급여 기준, 환자 안내 및 비용 조건을 확인합니다.",
-      "진료 특성 확인 → 후보 검사 항목 선정 → 검사 목적 및 적용 기준 검토 → 의료진 협의 후 시행 여부 결정"
-    ],
-    support: [
-      "검사실 운영 효율화 지원 검토",
-      "검체 처리 과정, 검사 의뢰 절차, 수거 일정 및 결과 확인 과정에서 개선이 필요한 부분을 파악합니다. 장비·교육 등 지원 사항은 내부 기준과 승인 가능 범위를 확인해 협의합니다.",
-      "운영 현황 확인 → 개선 과제 도출 → 지원 가능 범위 확인 → 실행 일정 및 사후 점검 협의"
-    ],
-    renewal: [
-      "기존 거래처 서비스 점검 및 재계약 협의",
-      "기존 이용 현황과 검사 항목, 업무상 불편 사항 및 서비스 개선 요청을 확인하여 향후 협력 방향을 협의합니다.",
-      "이용 현황 확인 → 개선 요청 수렴 → 적용 가능한 개선안 협의 → 계약 조건 및 향후 일정 확인"
-    ]
+  const titles = {
+    highprofit:"검사 항목 확대 및 수익 개선 제안",
+    opening:"신규 개원 검사 의뢰 지원 제안",
+    conversion:"검사 의뢰 거래 전환 제안",
+    support:"거래처 운영 지원 제안",
+    renewal:"기존 거래처 협력 강화 제안"
   };
 
-  $("b3p-generate").addEventListener("click", function () {
-    const clinic = $("b3p-clinic").value.trim();
-    const area = $("b3p-area").value;
-    const dept = $("b3p-department").value.trim() || "미기재";
-    const type = $("b3p-type").value;
-    const needs = $("b3p-needs").value.trim();
-    const manager = $("b3p-manager").value.trim() || "부산3지점 담당자";
-    const date = $("b3p-date").value || new Date().toLocaleDateString("sv-SE");
-    const detail = proposalDetails[type];
+  const content =
+`부산3지점 영업 제안서
 
-    if (!clinic) {
-      alert("병원명을 입력해 주세요.");
-      $("b3p-clinic").focus();
-      return;
-    }
+1. 제안 개요
+- 거래처: ${clinic}
+- 담당자: ${manager}
+- 작성일: ${date}
+- 제안 주제: ${titles[type]}
 
-    output.value =
-`씨젠의료재단 부산3지점
-영업 제안서
+2. 거래처 현황 및 검토 사항
+${situation}
 
-수신: ${clinic} 귀중
-소재지: ${area}
-진료과목: ${dept}
-제안일: ${date}
-담당자: ${manager}
+3. 제안 내용
+${needs}
 
-제목: ${detail[0]}
+4. 기대 효과
+- 의료기관의 검사 운영 방식과 필요에 맞는 의뢰 항목 검토
+- 검사 의뢰 절차 및 업무 편의성 개선 가능성 확인
+- 적정 검사 항목 확대를 통한 환자 서비스 선택지 검토
+- 거래처별 실제 이용량과 비용을 바탕으로 운영 효율성 검토
 
-1. 제안 목적
-귀원의 진료 환경과 검사 운영 상황을 확인하고, 병원 운영에 적합한 검사 수탁 서비스 및 업무 개선 방향을 협의하고자 합니다.
+5. 추진 계획 및 후속 조치
+${action}
 
-2. 주요 제안 내용
-${detail[1]}
+6. 확인 사항
+실제 검사 가능 항목, 검사 일정, 비용, 급여 기준 및 계약 조건은 관련 부서 확인 후 확정합니다. 기대 효과와 수익성은 거래처의 실제 상황과 적용 조건에 따라 달라질 수 있습니다.
 
-3. 귀원 맞춤 검토 사항
-${needs || "초기 상담을 통해 귀원의 운영 현황과 우선 검토 사항을 확인한 후 구체적인 제안 내용을 협의합니다."}
+부산3지점 드림`;
 
-4. 추진 절차
-${detail[2]}
+  $("proposalPreview").textContent = content;
+}
 
-5. 후속 협의 사항
-- 세부 검사 항목 및 검사 가능 여부 확인
-- 검체 수거 일정과 결과 확인 절차 협의
-- 적용 기준, 비용 및 계약 조건 확인
-- 필요한 지원 사항과 시행 일정 협의
-
-6. 맺음말
-귀원의 진료 및 검사 운영 환경을 충분히 고려하여 실질적인 도움이 될 수 있는 협력 방안을 함께 검토하겠습니다. 구체적인 적용 사항은 상호 협의 및 관련 기준 확인 후 확정하겠습니다.
-
-씨젠의료재단 부산3지점
-담당: ${manager}
-
-※ 본 문서는 영업 제안 초안입니다. 검사 항목, 수거 일정, 급여 기준, 가격 및 장비 지원 등은 최신 내부 기준과 승인 여부를 확인한 후 확정해 주세요.`;
-
-    output.focus();
-  });
-
-  $("b3p-copy").addEventListener("click", async function () {
-    if (!output.value.trim()) {
-      alert("먼저 제안서 초안을 생성해 주세요.");
-      return;
-    }
-
-    try {
-      await navigator.clipboard.writeText(output.value);
-      alert("제안서 내용을 복사했습니다.");
-    } catch (error) {
-      output.focus();
-      output.select();
-      const copied = document.execCommand("copy");
-      alert(copied
-        ? "제안서 내용을 복사했습니다."
-        : "내용을 선택했습니다. Ctrl+C를 눌러 복사해 주세요.");
-    }
-  });
-
-  $("b3p-download").addEventListener("click", function () {
-    if (!output.value.trim()) {
-      alert("먼저 제안서 초안을 생성해 주세요.");
-      return;
-    }
-
-    function escapeHTML(value) {
-      return value.replace(/[&<>"]/g, function (char) {
-        return {
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          '"': "&quot;"
-        }[char];
-      });
-    }
-
-    const html =
-      '<!doctype html><html><head><meta charset="utf-8">' +
-      '<title>부산3지점 영업 제안서</title></head>' +
-      '<body><pre style="font-family:Malgun Gothic,Arial,sans-serif;' +
-      'white-space:pre-wrap;font-size:11pt;line-height:1.8;">' +
-      escapeHTML(output.value) +
-      '</pre></body></html>';
-
-    const blob = new Blob(["\ufeff", html], {
-      type: "application/msword"
-    });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    const clinic = $("b3p-clinic").value.trim()
-      .replace(/[\\/:*?"<>|]/g, "_");
-
-    link.href = url;
-    link.download = (clinic || "병원") + "_영업제안서.doc";
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    setTimeout(function () {
-      URL.revokeObjectURL(url);
-    }, 1500);
-  });
-})();
-</script>
-<!-- 부산3지점 제안서 자동 생성 기능 끝 -->
-
-<script>
-(function () {
-  const fileInput = document.getElementById('b3p-files');
-  const status = document.getElementById('b3p-files-status');
-
-  if (!fileInput || !status) return;
-
-  fileInput.addEventListener('change', function () {
-    const files = Array.from(fileInput.files || []);
-
-    if (files.length === 0) {
-      status.textContent = '선택된 파일이 없습니다.';
-      return;
-    }
-
-    const allowedExtensions = /\.(pdf|ppt|pptx)$/i;
-    const invalidFiles = files.filter(file => !allowedExtensions.test(file.name));
-
-    if (invalidFiles.length > 0) {
-      status.textContent = 'PDF, PPT, PPTX 파일만 선택해 주세요.';
-      fileInput.value = '';
-      return;
-    }
-
-    status.textContent = '';
-
-const message = document.createElement('div');
-message.textContent = '선택된 파일 ' + files.length + '개';
-status.appendChild(message);
-
-files.forEach(function (file) {
-  const fileName = document.createElement('div');
-  fileName.textContent = '📎 ' + file.name;
-  fileName.style.cssText =
-    'margin-top:6px;overflow-wrap:anywhere;color:#333;';
-  status.appendChild(fileName);
-});
-  });
-})();
-</script>
-</escape>
-
-<script type="module">
-(async function () {
-  const input = document.getElementById("b3p-files");
-  const status = document.getElementById("b3p-files-status");
-
-  if (!input || !status) return;
-
-  try {
-    const pdfjs = await import("./docs/vendor/pdf.mjs");
-    pdfjs.GlobalWorkerOptions.workerSrc =
-      "./docs/vendor/pdf.worker.mjs";
-
-    input.addEventListener("change", async function () {
-      const files = Array.from(input.files || []);
-      const pdfFiles = files.filter(
-        file => file.name.toLowerCase().endsWith(".pdf")
-      );
-
-      if (files.length === 0) {
-        status.textContent = "선택된 파일이 없습니다.";
-        return;
-      }
-
-      if (pdfFiles.length === 0) {
-        status.textContent =
-          "선택한 파일에서 PDF를 찾지 못했습니다. PPT/PPTX 추출은 다음 단계에서 연결합니다.";
-        return;
-      }
-
-      status.textContent = "PDF 자료의 글자를 추출하고 있습니다...";
-
-      try {
-        const results = [];
-
-        for (const file of pdfFiles) {
-          const buffer = await file.arrayBuffer();
-          const pdf = await pdfjs.getDocument({
-            data: new Uint8Array(buffer)
-          }).promise;
-
-          const pages = [];
-
-          for (let pageNo = 1; pageNo <= pdf.numPages; pageNo++) {
-            const page = await pdf.getPage(pageNo);
-            const content = await page.getTextContent();
-            const text = content.items
-              .map(item => item.str || "")
-              .join(" ");
-
-            pages.push("[페이지 " + pageNo + "]\n" + text);
-          }
-
-          results.push(
-            "===== " + file.name + " =====\n" + pages.join("\n\n")
-          );
-        }
-
-        let output = document.getElementById("b3p-extracted-text");
-
-        if (!output) {
-          output = document.createElement("textarea");
-          output.id = "b3p-extracted-text";
-          output.rows = 10;
-          output.style.cssText =
-            "display:block;width:100%;box-sizing:border-box;margin-top:12px;padding:10px;";
-          output.placeholder = "추출된 공식 마케팅 자료가 여기에 표시됩니다.";
-          output.setAttribute("aria-label", "추출된 마케팅 자료");
-          status.insertAdjacentElement("afterend", output);
-        }
-
-        output.value = results.join("\n\n");
-        status.textContent =
-          "PDF 글자 추출 완료 (" + pdfFiles.length + "개). 아래 내용이 추출되었습니다.";
-      } catch (error) {
-        console.error(error);
-        status.textContent =
-          "PDF 추출에 실패했습니다. vendor 파일 경로와 브라우저 오류를 확인해 주세요.";
-      }
-    });
-  } catch (error) {
-    console.error(error);
-    status.textContent =
-      "PDF 기능을 불러오지 못했습니다. 라이브러리 경로를 확인해 주세요.";
+function copyProposal() {
+  const text = $("proposalPreview").textContent;
+  if (!text || text.includes("위 항목을 입력한 뒤")) {
+    alert("먼저 제안서 초안을 만들어 주세요.");
+    return;
   }
-})();
-</script>
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text)
+      .then(() => alert("제안서 내용을 복사했습니다."))
+      .catch(() => fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
 
+function fallbackCopy(text) {
+  const area = document.createElement("textarea");
+  area.value = text;
+  document.body.appendChild(area);
+  area.select();
+  try {
+    document.execCommand("copy");
+    alert("제안서 내용을 복사했습니다.");
+  } catch (e) {
+    alert("복사에 실패했습니다. 내용을 선택해 직접 복사해 주세요.");
+  }
+  area.remove();
+}
+
+function downloadProposal() {
+  const content = $("proposalPreview").textContent;
+  if (!content || content.includes("위 항목을 입력한 뒤")) {
+    alert("먼저 제안서 초안을 만들어 주세요.");
+    return;
+  }
+
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <style>body{font-family:Arial,'Malgun Gothic',sans-serif;line-height:1.8;margin:35px;white-space:pre-wrap}</style>
+  </head><body>${escapeHtml(content)}</body></html>`;
+
+  const blob = new Blob(["\ufeff", html], {type:"application/msword"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "부산3지점_영업제안서.doc";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+/* 숙성영업 관리 */
+function loadCrm() {
+  try {
+    const saved = localStorage.getItem(CRM_KEY);
+    crmRecords = saved ? JSON.parse(saved) : [];
+    if (!Array.isArray(crmRecords)) crmRecords = [];
+  } catch (e) {
+    crmRecords = [];
+  }
+}
+
+function persistCrm() {
+  try {
+    localStorage.setItem(CRM_KEY, JSON.stringify(crmRecords));
+    return true;
+  } catch (e) {
+    alert("브라우저 저장 공간에 저장하지 못했습니다. CSV 백업을 이용해 주세요.");
+    return false;
+  }
+}
+
+function clearCrmForm() {
+  ["crmId","cClinic","cContact","cLast","cNext","cMemo"].forEach(id => $(id).value = "");
+  $("cArea").value = "김해";
+  $("cStatus").value = "관심 확인";
+}
+
+function saveCrm() {
+  const clinic = $("cClinic").value.trim();
+  if (!clinic) {
+    alert("병원·의원명을 입력해 주세요.");
+    $("cClinic").focus();
+    return;
+  }
+
+  const id = $("crmId").value || (Date.now().toString() + Math.random().toString(36).slice(2,7));
+  const record = {
+    id,
+    clinic,
+    area:$("cArea").value,
+    contact:$("cContact").value.trim(),
+    status:$("cStatus").value,
+    last:$("cLast").value,
+    next:$("cNext").value,
+    memo:$("cMemo").value.trim(),
+    updated:new Date().toISOString()
+  };
+
+  const idx = crmRecords.findIndex(item => item.id === id);
+  if (idx >= 0) crmRecords[idx] = record;
+  else crmRecords.unshift(record);
+
+  if (persistCrm()) {
+    renderCrm();
+    updateStats();
+    clearCrmForm();
+    alert("거래처를 저장했습니다.");
+  }
+}
+
+function editCrm(id) {
+  const r = crmRecords.find(item => item.id === id);
+  if (!r) return;
+  $("crmId").value = r.id;
+  $("cClinic").value = r.clinic || "";
+  $("cArea").value = r.area || "김해";
+  $("cContact").value = r.contact || "";
+  $("cStatus").value = r.status || "관심 확인";
+  $("cLast").value = r.last || "";
+  $("cNext").value = r.next || "";
+  $("cMemo").value = r.memo || "";
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+function deleteCrm(id) {
+  const r = crmRecords.find(item => item.id === id);
+  if (!r || !confirm(r.clinic + " 거래처 기록을 삭제할까요?")) return;
+  crmRecords = crmRecords.filter(item => item.id !== id);
+  persistCrm();
+  renderCrm();
+  updateStats();
+}
+
+function renderCrm() {
+  const query = ($("crmSearch").value || "").trim().toLowerCase();
+  const filter = $("crmFilter").value;
+  const today = new Date().toISOString().slice(0,10);
+
+  const filtered = crmRecords.filter(r => {
+    const haystack = [r.clinic,r.area,r.contact,r.status,r.memo].join(" ").toLowerCase();
+    return (!query || haystack.includes(query)) && (!filter || r.status === filter);
+  }).sort((a,b) => {
+    const ad = a.next || "9999-99-99";
+    const bd = b.next || "9999-99-99";
+    return ad.localeCompare(bd);
+  });
+
+  if (!filtered.length) {
+    $("crmList").innerHTML = '<div class="empty">등록된 거래처가 없거나 검색 결과가 없습니다.<br>위 입력란에서 첫 거래처를 등록해 주세요.</div>';
+    updateStats();
+    return;
+  }
+
+  $("crmList").innerHTML = filtered.map(r => {
+    const overdue = r.next && r.next <= today && r.status !== "계약 완료";
+    return `<article class="item">
+      <h3>${escapeHtml(r.clinic)}</h3>
+      <span class="pill">${escapeHtml(r.area || "지역 미입력")}</span>
+      <span class="pill">${escapeHtml(r.status || "상태 미입력")}</span>
+      ${overdue ? '<span class="pill" style="background:#fee2e2;color:#991b1b">연락 확인 필요</span>' : ""}
+      <p><b>담당자:</b> ${escapeHtml(r.contact || "-")}</p>
+      <p><b>최근 접촉:</b> ${escapeHtml(formatDate(r.last))} &nbsp; <b>다음 연락:</b> ${escapeHtml(formatDate(r.next))}</p>
+      <p>${escapeHtml(r.memo || "영업 메모 없음").replace(/\n/g,"<br>")}</p>
+      <p class="meta">최종 수정: ${escapeHtml(formatDate(r.updated))}</p>
+      <div class="toolbar">
+        <button class="btn small" onclick="editCrm('${escapeHtml(r.id)}')">수정</button>
+        <button class="btn danger small" onclick="deleteCrm('${escapeHtml(r.id)}')">삭제</button>
+      </div>
+    </article>`;
+  }).join("");
+
+  updateStats();
+}
+
+function csvEscape(value) {
+  return '"' + String(value ?? "").replace(/"/g,'""') + '"';
+}
+
+function exportCrm() {
+  const headers = ["id","clinic","area","contact","status","last","next","memo","updated"];
+  const lines = [headers.map(csvEscape).join(",")];
+  crmRecords.forEach(r => lines.push(headers.map(h => csvEscape(r[h])).join(",")));
+  const blob = new Blob(["\ufeff" + lines.join("\r\n")], {type:"text/csv;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "부산3지점_숙성영업_백업.csv";
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function parseCsv(text) {
+  const rows = [];
+  let row = [], field = "", quoted = false;
+  for (let i=0; i<text.length; i++) {
+    const c = text[i];
+    if (quoted) {
+      if (c === '"' && text[i+1] === '"') { field += '"'; i++; }
+      else if (c === '"') quoted = false;
+      else field += c;
+    } else {
+      if (c === '"' && field === "") quoted = true;
+      else if (c === ",") { row.push(field); field = ""; }
+      else if (c === "\n") { row.push(field); rows.push(row); row=[]; field=""; }
+      else if (c !== "\r") field += c;
+    }
+  }
+  row.push(field);
+  if (row.some(v => v !== "")) rows.push(row);
+  return rows;
+}
+
+function importCrm(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const rows = parseCsv(String(reader.result || "").replace(/^\uFEFF/,""));
+      if (rows.length < 2) throw new Error("복원할 데이터가 없습니다.");
+      const headers = rows[0];
+      const imported = rows.slice(1).map(row => {
+        const r = {};
+        headers.forEach((h,i) => r[h] = row[i] || "");
+        return r;
+      }).filter(r => r.clinic);
+
+      if (!confirm(imported.length + "개 거래처를 가져옵니다. 기존 기록과 합쳐집니다. 진행할까요?")) return;
+
+      imported.forEach(r => {
+        if (!r.id) r.id = Date.now().toString() + Math.random().toString(36).slice(2,7);
+        const idx = crmRecords.findIndex(old => old.id === r.id);
+        if (idx >= 0) crmRecords[idx] = {...crmRecords[idx],...r};
+        else crmRecords.push(r);
+      });
+      persistCrm();
+      renderCrm();
+      updateStats();
+      alert("CSV 복원이 완료되었습니다.");
+    } catch (e) {
+      alert("CSV를 읽지 못했습니다. 이 대시보드에서 저장한 백업 파일인지 확인해 주세요.");
+    } finally {
+      event.target.value = "";
+    }
+  };
+  reader.readAsText(file, "UTF-8");
+}
+
+/* 시장조사 */
+function marketSearch(engine) {
+  const area = $("mArea").value;
+  const topic = $("mTopic").value;
+  const keyword = $("mKeyword").value.trim();
+  const query = [area,topic,keyword].filter(Boolean).join(" ");
+  let url = "";
+  if (engine === "naver") {
+    url = "https://search.naver.com/search.naver?query=" + encodeURIComponent(query);
+  } else if (engine === "news") {
+    url = "https://www.google.com/search?tbm=nws&q=" + encodeURIComponent(query);
+  } else {
+    url = "https://www.google.com/search?q=" + encodeURIComponent(query);
+  }
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
+/* 개원·채용정보 */
+function normalizeJob(job) {
+  if (typeof job === "string") {
+    return {title:job, clinic:"", area:"", date:"", url:"", description:""};
+  }
+  job = job || {};
+  return {
+    title:job.title || job.subject || job.post_title || job.name || job.position || "제목 없음",
+    clinic:job.clinic || job.hospital || job.company || job.organization || job.institution || "",
+    area:job.area || job.region || job.location || job.address || "",
+    date:job.date || job.created_at || job.posted_at || job.reg_date || job.datetime || "",
+    url:job.url || job.link || job.href || job.source_url || "",
+    description:job.description || job.content || job.summary || job.detail || "",
+    source:job.source || job.site || ""
+  };
+}
+
+function findJobArray(data) {
+  if (Array.isArray(data)) return data;
+  if (!data || typeof data !== "object") return [];
+  for (const key of ["results","jobs","items","data","posts","announcements"]) {
+    if (Array.isArray(data[key])) return data[key];
+  }
+  return [];
+}
+
+async function loadJobs() {
+  $("jobStatus").textContent = "공고 데이터를 불러오는 중입니다.";
+  try {
+    const response = await fetch("./results.json?ts=" + Date.now(), {cache:"no-store"});
+    if (!response.ok) throw new Error("HTTP " + response.status);
+    const data = await response.json();
+    jobs = findJobArray(data).map(normalizeJob);
+    $("jobStatus").textContent = "불러온 공고: " + jobs.length + "건";
+    renderJobs();
+    updateStats();
+  } catch (e) {
+    jobs = [];
+    $("jobStatus").textContent = "공고 데이터를 불러오지 못했습니다. results.json 경로와 파일 내용을 확인해 주세요.";
+    $("jobList").innerHTML = `<div class="empty">공고 데이터 연결에 실패했습니다.<br>
+      기존 자동수집 프로그램이 results.json을 생성하는지 확인해 주세요.<br>
+      파일 위치는 index.html과 같은 docs 폴더여야 합니다.</div>`;
+    updateStats();
+  }
+}
+
+function renderJobs() {
+  const query = ($("jobSearch").value || "").trim().toLowerCase();
+  const area = $("jobArea").value;
+  const filtered = jobs.filter(j => {
+    const all = [j.title,j.clinic,j.area,j.description,j.source].join(" ").toLowerCase();
+    const matchesQuery = !query || all.includes(query);
+    const matchesArea = !area || (area === "부산"
+      ? /부산|강서|사하|사상/.test(j.area + " " + j.title + " " + j.clinic)
+      : (j.area + " " + j.title + " " + j.clinic).includes(area));
+    return matchesQuery && matchesArea;
+  });
+
+  if (!filtered.length) {
+    $("jobList").innerHTML = '<div class="empty">표시할 공고가 없습니다.<br>지역 필터를 변경하거나 공고 데이터를 새로고침해 주세요.</div>';
+    return;
+  }
+
+  $("jobList").innerHTML = filtered.map(j => {
+    const safeUrl = /^https?:\/\//i.test(j.url) ? j.url : "";
+    return `<article class="item">
+      <h3>${escapeHtml(j.title)}</h3>
+      ${j.clinic ? `<p><b>기관:</b> ${escapeHtml(j.clinic)}</p>` : ""}
+      ${j.area ? `<p><b>지역:</b> ${escapeHtml(j.area)}</p>` : ""}
+      ${j.date ? `<p class="meta">등록일: ${escapeHtml(formatDate(j.date))}</p>` : ""}
+      ${j.description ? `<p>${escapeHtml(j.description)}</p>` : ""}
+      ${j.source ? `<p class="meta">출처: ${escapeHtml(j.source)}</p>` : ""}
+      ${safeUrl ? `<p><a href="${escapeHtml(safeUrl)}" target="_blank" rel="noopener noreferrer">공고 원문 열기 ↗</a></p>` : ""}
+    </article>`;
+  }).join("");
+}
+
+function updateStats() {
+  $("statCrm").textContent = crmRecords.length;
+  const today = new Date().toISOString().slice(0,10);
+  $("statFollow").textContent = crmRecords.filter(r =>
+    r.next && r.next <= today && r.status !== "계약 완료"
+  ).length;
+  $("statJobs").textContent = jobs.length;
+}
+
+loadCrm();
+clearCrmForm();
+renderCrm();
+updateStats();
+$("pDate").value = new Date().toISOString().slice(0,10);
+loadJobs();
+</script>
 </body>
 </html>
