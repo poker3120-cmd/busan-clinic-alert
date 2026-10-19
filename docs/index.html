@@ -282,6 +282,45 @@ footer {
 
     <label for="pAction">후속 조치 및 일정</label>
     <textarea id="pAction" placeholder="예: 다음 주 방문하여 검사 목록과 예상 수익 검토"></textarea>
+    
+    <!-- 검사별 청구액 및 차액 계산 -->
+    <div class="card" style="margin-top:16px;">
+      <h3>고수익 검사 확대 및 차액 분석</h3>
+      <p class="meta">
+        금액은 원 단위로 입력하세요. 차액은 재단 청구액에서 병원 청구액을 뺀 값입니다.
+      </p>
+
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;min-width:700px;">
+          <thead>
+            <tr>
+              <th style="padding:8px;border-bottom:1px solid #ddd;">검사명</th>
+              <th style="padding:8px;border-bottom:1px solid #ddd;">재단 청구액(원)</th>
+              <th style="padding:8px;border-bottom:1px solid #ddd;">병원 청구액(원)</th>
+              <th style="padding:8px;border-bottom:1px solid #ddd;">월 검사 건수</th>
+              <th style="padding:8px;border-bottom:1px solid #ddd;">건당 차액(원)</th>
+              <th style="padding:8px;border-bottom:1px solid #ddd;">월 차액(원)</th>
+              <th style="padding:8px;border-bottom:1px solid #ddd;">삭제</th>
+            </tr>
+          </thead>
+          <tbody id="pTestRows"></tbody>
+        </table>
+      </div>
+
+      <div class="toolbar" style="margin-top:12px;">
+        <button type="button" class="btn secondary"
+          onclick="addProposalTestRow()">검사 항목 추가</button>
+      </div>
+
+      <div style="margin-top:12px;padding:12px;background:#f5f7fa;border-radius:8px;">
+        <strong>월간 차액 합계: </strong>
+        <span id="pTotalDifference">0원</span>
+        <p class="meta" style="margin-bottom:0;">
+          입력한 검사별 건당 차액 × 월 검사 건수의 합계입니다.
+          실제 순이익 또는 확정 수익을 의미하지 않습니다.
+        </p>
+      </div>
+    </div>
 
     <div class="toolbar">
       <button class="btn" onclick="generateProposal()">제안서 초안 만들기</button>
@@ -487,7 +526,107 @@ function formatDate(value) {
 }
 
 /* 제안서 */
-function generateProposal() {
+  
+/* 제안서 검사 항목 계산 */
+function addProposalTestRow(name = "", foundation = "", hospital = "", count = "") {
+  const tbody = document.getElementById("pTestRows");
+  if (!tbody) return;
+
+  const row = document.createElement("tr");
+
+  row.innerHTML = `
+    <td style="padding:5px;border-bottom:1px solid #eee;">
+      <input class="p-test-name" placeholder="예: 셀레늄"
+        value="${escapeHtml(name)}" style="width:130px;">
+    </td>
+    <td style="padding:5px;border-bottom:1px solid #eee;">
+      <input class="p-test-foundation" type="number" min="0" step="1"
+        value="${escapeHtml(String(foundation))}" placeholder="0"
+        style="width:110px;">
+    </td>
+    <td style="padding:5px;border-bottom:1px solid #eee;">
+      <input class="p-test-hospital" type="number" min="0" step="1"
+        value="${escapeHtml(String(hospital))}" placeholder="0"
+        style="width:110px;">
+    </td>
+    <td style="padding:5px;border-bottom:1px solid #eee;">
+      <input class="p-test-count" type="number" min="0" step="1"
+        value="${escapeHtml(String(count))}" placeholder="0"
+        style="width:90px;">
+    </td>
+    <td class="p-test-difference"
+      style="padding:8px;text-align:right;border-bottom:1px solid #eee;">0원</td>
+    <td class="p-test-monthly"
+      style="padding:8px;text-align:right;border-bottom:1px solid #eee;">0원</td>
+    <td style="padding:5px;border-bottom:1px solid #eee;">
+      <button type="button" class="btn secondary p-test-delete">삭제</button>
+    </td>
+  `;
+
+  tbody.appendChild(row);
+
+  row.querySelectorAll("input").forEach(input => {
+    input.addEventListener("input", calculateProposalTests);
+  });
+
+  row.querySelector(".p-test-delete").addEventListener("click", () => {
+    row.remove();
+    calculateProposalTests();
+  });
+
+  calculateProposalTests();
+}
+
+function getProposalTests() {
+  const rows = document.querySelectorAll("#pTestRows tr");
+
+  return Array.from(rows).map(row => {
+    const name = row.querySelector(".p-test-name").value.trim();
+    const foundation = Number(row.querySelector(".p-test-foundation").value) || 0;
+    const hospital = Number(row.querySelector(".p-test-hospital").value) || 0;
+    const count = Number(row.querySelector(".p-test-count").value) || 0;
+
+    return {
+      name,
+      foundation,
+      hospital,
+      count,
+      difference: foundation - hospital,
+      monthly: (foundation - hospital) * count
+    };
+  }).filter(test =>
+    test.name || test.foundation || test.hospital || test.count
+  );
+}
+
+function calculateProposalTests() {
+  const tests = getProposalTests();
+  let total = 0;
+
+  document.querySelectorAll("#pTestRows tr").forEach(row => {
+    const foundation = Number(row.querySelector(".p-test-foundation").value) || 0;
+    const hospital = Number(row.querySelector(".p-test-hospital").value) || 0;
+    const count = Number(row.querySelector(".p-test-count").value) || 0;
+
+    const difference = foundation - hospital;
+    const monthly = difference * count;
+    total += monthly;
+
+    row.querySelector(".p-test-difference").textContent =
+      difference.toLocaleString("ko-KR") + "원";
+    row.querySelector(".p-test-monthly").textContent =
+      monthly.toLocaleString("ko-KR") + "원";
+  });
+
+  const totalElement = document.getElementById("pTotalDifference");
+  if (totalElement) {
+    totalElement.textContent = total.toLocaleString("ko-KR") + "원";
+  }
+
+  return { tests, total };
+}
+
+  function generateProposal() {
   const clinic = $("pClinic").value.trim() || "거래처명 미입력";
   const manager = $("pManager").value.trim() || "원장님";
   const date = $("pDate").value || new Date().toISOString().slice(0,10);
@@ -503,7 +642,24 @@ function generateProposal() {
     support:"거래처 운영 지원 제안",
     renewal:"기존 거래처 협력 강화 제안"
   };
+    const testAnalysis = calculateProposalTests();
+  const testDetails = testAnalysis.tests.length
+    ? testAnalysis.tests.map((test, index) =>
+        `${index + 1}. ${test.name || "검사명 미입력"}
+   - 재단 청구액: ${test.foundation.toLocaleString("ko-KR")}원
+   - 병원 청구액: ${test.hospital.toLocaleString("ko-KR")}원
+   - 건당 차액: ${test.difference.toLocaleString("ko-KR")}원
+   - 월 검사 건수: ${test.count.toLocaleString("ko-KR")}건
+   - 월간 차액: ${test.monthly.toLocaleString("ko-KR")}원`
+      ).join("\n")
+    : "검사별 분석 자료가 입력되지 않았습니다.";
 
+  const testSection =
+`검사별 청구액 분석
+${testDetails}
+
+월간 차액 합계: ${testAnalysis.total.toLocaleString("ko-KR")}원
+※ 차액은 재단 청구액에서 병원 청구액을 뺀 값이며, 실제 순이익을 의미하지 않습니다.`;
   const content =
 `부산3지점 영업 제안서
 
@@ -519,16 +675,19 @@ ${situation}
 3. 제안 내용
 ${needs}
 
-4. 기대 효과
+4. 검사별 청구액 분석
+${testSection}
+
+5. 기대 효과
 - 의료기관의 검사 운영 방식과 필요에 맞는 의뢰 항목 검토
 - 검사 의뢰 절차 및 업무 편의성 개선 가능성 확인
 - 적정 검사 항목 확대를 통한 환자 서비스 선택지 검토
 - 거래처별 실제 이용량과 비용을 바탕으로 운영 효율성 검토
 
-5. 추진 계획 및 후속 조치
+6. 추진 계획 및 후속 조치
 ${action}
 
-6. 확인 사항
+7. 확인 사항
 실제 검사 가능 항목, 검사 일정, 비용, 급여 기준 및 계약 조건은 관련 부서 확인 후 확정합니다. 기대 효과와 수익성은 거래처의 실제 상황과 적용 조건에 따라 달라질 수 있습니다.
 
 부산3지점 드림`;
