@@ -387,6 +387,45 @@ footer {
 
     <label for="cMemo">영업 내용 및 다음 조치</label>
     <textarea id="cMemo" placeholder="상담 내용, 관심 검사, 거절 사유, 다음 방문 계획 등"></textarea>
+    
+    <!-- 거래처별 고수익 검사 분석 -->
+    <div class="card" style="margin-top:16px;">
+      <h3>거래처별 고수익 검사 확대 및 차액 분석</h3>
+      <p class="meta">
+        아래 검사 분석은 현재 등록하거나 수정 중인 거래처에 연결됩니다.
+        차액은 재단 청구액에서 병원 청구액을 뺀 금액입니다.
+      </p>
+
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;min-width:720px;">
+          <thead>
+            <tr>
+              <th style="padding:8px;border-bottom:1px solid #ddd;">검사명</th>
+              <th style="padding:8px;border-bottom:1px solid #ddd;">재단 청구액(원)</th>
+              <th style="padding:8px;border-bottom:1px solid #ddd;">병원 청구액(원)</th>
+              <th style="padding:8px;border-bottom:1px solid #ddd;">월 검사 건수</th>
+              <th style="padding:8px;border-bottom:1px solid #ddd;">건당 차액</th>
+              <th style="padding:8px;border-bottom:1px solid #ddd;">월간 차액</th>
+              <th style="padding:8px;border-bottom:1px solid #ddd;">삭제</th>
+            </tr>
+          </thead>
+          <tbody id="crmTestRows"></tbody>
+        </table>
+      </div>
+
+      <div class="toolbar" style="margin-top:12px;">
+        <button type="button" class="btn secondary"
+          onclick="addCrmTestRow()">검사 항목 추가</button>
+      </div>
+
+      <div style="margin-top:12px;padding:12px;background:#f5f7fa;border-radius:8px;">
+        <strong>월간 차액 합계: </strong>
+        <span id="crmTotalDifference">0원</span>
+        <p class="meta" style="margin-bottom:0;">
+          참고용 계산값이며 실제 순이익이나 확정 수익을 의미하지 않습니다.
+        </p>
+      </div>
+    </div>
 
     <div class="toolbar">
       <button class="btn" onclick="saveCrm()">거래처 저장</button>
@@ -1318,6 +1357,136 @@ function downloadProposal() {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
+/* 숙성영업 거래처별 검사 분석 */
+function addCrmTestRow(name = "", foundation = "", hospital = "", count = "") {
+  const tbody = $("crmTestRows");
+  if (!tbody) return;
+
+  const row = document.createElement("tr");
+
+  row.innerHTML = `
+    <td style="padding:5px;border-bottom:1px solid #eee;">
+      <input class="crm-test-name" placeholder="검사명"
+        style="width:120px;">
+    </td>
+    <td style="padding:5px;border-bottom:1px solid #eee;">
+      <input class="crm-test-foundation" type="number" min="0" step="1"
+        placeholder="0" style="width:105px;">
+    </td>
+    <td style="padding:5px;border-bottom:1px solid #eee;">
+      <input class="crm-test-hospital" type="number" min="0" step="1"
+        placeholder="0" style="width:105px;">
+    </td>
+    <td style="padding:5px;border-bottom:1px solid #eee;">
+      <input class="crm-test-count" type="number" min="0" step="1"
+        placeholder="0" style="width:85px;">
+    </td>
+    <td class="crm-test-difference"
+      style="padding:8px;text-align:right;border-bottom:1px solid #eee;">0원</td>
+    <td class="crm-test-monthly"
+      style="padding:8px;text-align:right;border-bottom:1px solid #eee;">0원</td>
+    <td style="padding:5px;border-bottom:1px solid #eee;">
+      <button type="button" class="btn secondary crm-test-delete">삭제</button>
+    </td>
+  `;
+
+  row.querySelector(".crm-test-name").value = name;
+  row.querySelector(".crm-test-foundation").value = foundation;
+  row.querySelector(".crm-test-hospital").value = hospital;
+  row.querySelector(".crm-test-count").value = count;
+
+  tbody.appendChild(row);
+
+  row.querySelectorAll("input").forEach(input => {
+    input.addEventListener("input", calculateCrmTests);
+  });
+
+  row.querySelector(".crm-test-delete").addEventListener("click", () => {
+    row.remove();
+    calculateCrmTests();
+  });
+
+  calculateCrmTests();
+}
+
+function getCrmTests() {
+  return Array.from(document.querySelectorAll("#crmTestRows tr"))
+    .map(row => {
+      const name = row.querySelector(".crm-test-name").value.trim();
+      const foundation =
+        Number(row.querySelector(".crm-test-foundation").value) || 0;
+      const hospital =
+        Number(row.querySelector(".crm-test-hospital").value) || 0;
+      const count =
+        Number(row.querySelector(".crm-test-count").value) || 0;
+
+      return {
+        name,
+        foundation,
+        hospital,
+        count,
+        difference: foundation - hospital,
+        monthly: (foundation - hospital) * count
+      };
+    })
+    .filter(test =>
+      test.name || test.foundation || test.hospital || test.count
+    );
+}
+
+function calculateCrmTests() {
+  const tbody = $("crmTestRows");
+  if (!tbody) return { tests: [], total: 0 };
+
+  let total = 0;
+
+  tbody.querySelectorAll("tr").forEach(row => {
+    const foundation =
+      Number(row.querySelector(".crm-test-foundation").value) || 0;
+    const hospital =
+      Number(row.querySelector(".crm-test-hospital").value) || 0;
+    const count =
+      Number(row.querySelector(".crm-test-count").value) || 0;
+
+    const difference = foundation - hospital;
+    const monthly = difference * count;
+
+    total += monthly;
+
+    row.querySelector(".crm-test-difference").textContent =
+      difference.toLocaleString("ko-KR") + "원";
+    row.querySelector(".crm-test-monthly").textContent =
+      monthly.toLocaleString("ko-KR") + "원";
+  });
+
+  const totalElement = $("crmTotalDifference");
+  if (totalElement) {
+    totalElement.textContent = total.toLocaleString("ko-KR") + "원";
+  }
+
+  return { tests: getCrmTests(), total };
+}
+
+function renderCrmTests(tests = []) {
+  const tbody = $("crmTestRows");
+  if (!tbody) return;
+
+  tbody.innerHTML = "";
+
+  if (Array.isArray(tests)) {
+    tests.forEach(test => {
+      addCrmTestRow(
+        test.name || "",
+        test.foundation ?? "",
+        test.hospital ?? "",
+        test.count ?? ""
+      );
+    });
+  }
+
+  calculateCrmTests();
+}
+
 /* 숙성영업 관리 */
 function loadCrm() {
   try {
@@ -1340,9 +1509,12 @@ function persistCrm() {
 }
 
 function clearCrmForm() {
-  ["crmId","cClinic","cContact","cLast","cNext","cMemo"].forEach(id => $(id).value = "");
+  ["crmId","cClinic","cContact","cLast","cNext","cMemo"].forEach(
+    id => $(id).value = ""
+  );
   $("cArea").value = "김해";
   $("cStatus").value = "관심 확인";
+  renderCrmTests([]);
 }
 
 function saveCrm() {
@@ -1362,7 +1534,8 @@ function saveCrm() {
     status:$("cStatus").value,
     last:$("cLast").value,
     next:$("cNext").value,
-    memo:$("cMemo").value.trim(),
+        memo:$("cMemo").value.trim(),
+    tests:getCrmTests(),
     updated:new Date().toISOString()
   };
 
@@ -1388,7 +1561,8 @@ function editCrm(id) {
   $("cStatus").value = r.status || "관심 확인";
   $("cLast").value = r.last || "";
   $("cNext").value = r.next || "";
-  $("cMemo").value = r.memo || "";
+    $("cMemo").value = r.memo || "";
+  renderCrmTests(Array.isArray(r.tests) ? r.tests : []);
   window.scrollTo({top:0, behavior:"smooth"});
 }
 
@@ -1446,18 +1620,41 @@ function csvEscape(value) {
   return '"' + String(value ?? "").replace(/"/g,'""') + '"';
 }
 
+
 function exportCrm() {
-  const headers = ["id","clinic","area","contact","status","last","next","memo","updated"];
+  const headers = [
+    "id", "clinic", "area", "contact", "status",
+    "last", "next", "memo", "updated", "tests"
+  ];
+
   const lines = [headers.map(csvEscape).join(",")];
-  crmRecords.forEach(r => lines.push(headers.map(h => csvEscape(r[h])).join(",")));
-  const blob = new Blob(["\ufeff" + lines.join("\r\n")], {type:"text/csv;charset=utf-8"});
+
+  crmRecords.forEach(r => {
+    const row = headers.map(h => {
+      const value = h === "tests"
+        ? JSON.stringify(Array.isArray(r.tests) ? r.tests : [])
+        : r[h];
+      return csvEscape(value);
+    });
+    lines.push(row.join(","));
+  });
+
+  const blob = new Blob(
+    ["\ufeff" + lines.join("\r\n")],
+    { type: "text/csv;charset=utf-8" }
+  );
+
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
   a.download = "부산3지점_숙성영업_백업.csv";
+  document.body.appendChild(a);
   a.click();
+  a.remove();
+
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
+
 
 function parseCsv(text) {
   const rows = [];
@@ -1489,11 +1686,25 @@ function importCrm(event) {
       const rows = parseCsv(String(reader.result || "").replace(/^\uFEFF/,""));
       if (rows.length < 2) throw new Error("복원할 데이터가 없습니다.");
       const headers = rows[0];
-      const imported = rows.slice(1).map(row => {
-        const r = {};
-        headers.forEach((h,i) => r[h] = row[i] || "");
-        return r;
-      }).filter(r => r.clinic);
+      
+const imported = rows.slice(1).map(row => {
+  const r = {};
+  headers.forEach((h, i) => r[h] = row[i] || "");
+
+  if (r.tests) {
+    try {
+      r.tests = JSON.parse(r.tests);
+      if (!Array.isArray(r.tests)) r.tests = [];
+    } catch (e) {
+      r.tests = [];
+    }
+  } else {
+    r.tests = [];
+  }
+
+  return r;
+}).filter(r => r.clinic);
+
 
       if (!confirm(imported.length + "개 거래처를 가져옵니다. 기존 기록과 합쳐집니다. 진행할까요?")) return;
 
