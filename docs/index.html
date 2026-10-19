@@ -283,6 +283,60 @@ footer {
     <label for="pAction">후속 조치 및 일정</label>
     <textarea id="pAction" placeholder="예: 다음 주 방문하여 검사 목록과 예상 수익 검토"></textarea>
     
+    <!-- 재단 마케팅 자료 참고 영역 -->
+    <div class="card" style="margin-top:16px;">
+      <h3>재단 마케팅 자료 참고</h3>
+      <p class="meta">
+        재단에서 배포한 검사 안내서와 서비스 소개 자료를 첨부하세요.
+        자료는 이 브라우저에서 처리하며 파일 자체를 외부 서버에 업로드하지 않습니다.
+      </p>
+
+      <label for="b3pMarketingFiles">
+        마케팅 자료 선택 (PDF 또는 PPTX, 여러 개 선택 가능)
+      </label>
+
+      <input
+        id="b3pMarketingFiles"
+        type="file"
+        accept=".pdf,.pptx,application/pdf,application/vnd.openxmlformats-officedocument.presentationml.presentation"
+        multiple
+      >
+
+      <div class="toolbar" style="margin-top:12px;">
+        <button
+          type="button"
+          class="btn secondary"
+          onclick="extractMarketingFiles()">
+          자료 내용 추출
+        </button>
+
+        <button
+          type="button"
+          class="btn secondary"
+          onclick="clearMarketingMaterials()">
+          자료 초기화
+        </button>
+      </div>
+
+      <p id="b3pMarketingStatus" class="meta">
+        아직 첨부된 자료가 없습니다.
+      </p>
+
+      <label for="b3pMarketingText">
+        추출된 마케팅 자료 내용
+      </label>
+
+      <textarea
+        id="b3pMarketingText"
+        placeholder="PDF 또는 PPTX를 선택하고 자료 내용 추출 버튼을 누르면 이곳에 내용이 표시됩니다. 추출 결과를 검토하고 필요한 부분을 직접 수정할 수 있습니다."
+        style="min-height:180px;"
+      ></textarea>
+
+      <p class="meta">
+        추출한 내용을 확인한 뒤 신규 개원 또는 타사 거래처 전환 제안서에 참고 자료로 활용합니다.
+      </p>
+    </div>
+
     <!-- 검사별 청구액 및 차액 계산 -->
     <div class="card" style="margin-top:16px;">
       <h3>고수익 검사 확대 및 차액 분석</h3>
@@ -664,6 +718,325 @@ function calculateProposalTests() {
   }
 
   return { tests, total };
+}
+
+// ===== 재단 마케팅 자료 읽기: 브라우저 내부 처리 =====
+
+let b3pPdfJsPromise = null;
+
+async function getB3PPdfJs() {
+  if (!b3pPdfJsPromise) {
+    b3pPdfJsPromise = import("./vendor/pdf.mjs")
+      .then(pdfjs => {
+        pdfjs.GlobalWorkerOptions.workerSrc =
+          new URL("./vendor/pdf.worker.mjs", document.baseURI).href;
+        return pdfjs;
+      })
+      .catch(error => {
+        b3pPdfJsPromise = null;
+        throw new Error(
+          "PDF.js 파일을 불러오지 못했습니다. docs/vendor 폴더의 pdf.mjs와 pdf.worker.mjs 파일을 확인해 주세요. " +
+          error.message
+        );
+      });
+  }
+
+  return b3pPdfJsPromise;
+}
+
+async function extractPdfMarketingText(file) {
+  const pdfjs = await getB3PPdfJs();
+  const data = new Uint8Array(await file.arrayBuffer());
+  const pdf = await pdfjs.getDocument({ data }).promise;
+  const pages = [];
+
+  try {
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+      const page = await pdf.getPage(pageNum);
+      const content = await page.getTextContent();
+
+      const pageText = content.items
+        .map(item => {
+          if (typeof item.str !== "string") return "";
+          return item.str + (item.hasEOL ? "\n" : " ");
+        })
+        .join("")
+        .replace(/[ \t]+\n/g, "\n")
+        .replace(/\n{3,}/g, "\n\n")
+        .trim();
+
+      if (pageText) {
+        pages.push(
+          `--- ${file.name} / ${pageNum}페이지 ---\n${pageText}`
+        );
+      }
+    }
+  } finally {
+    await pdf.destroy();
+  }
+
+  if (!pages.length) {
+    return (
+      `--- ${file.name} ---\n` +
+      "추출된 텍스트가 없습니다. 스캔 이미지 PDF이거나 텍스트 추출을 지원하지 않는 형식일 수 있습니다."
+    );
+  }
+
+  return pages.join("\n\n");
+}
+
+// PPTX는 ZIP 내부의 슬라이드 XML에서 텍스트를 읽습니다.
+function getPptxZipEntries(buffer) {
+  const view = new DataView(buffer);
+  const decoder = new TextDecoder("utf-8");
+  const minOffset = Math.max(0, buffer.byteLength - 65557);
+  let eocd = -1;
+
+  // ZIP 파일 끝의 중앙 디렉터리 정보를 찾습니다.
+  for (let pos = buffer.byteLength - 22; pos >= minOffset; pos--) {
+    if (
+      pos + 4 <= buffer.byteLength &&
+      view.getUint32(pos, true) === 0x06054b50
+    ) {
+      eocd = pos;
+      break;
+    }
+  }
+
+  if (eocd < 0) {
+    throw new Error("PPTX ZIP 구조를 읽을 수 없습니다.");
+  }
+
+  const entryCount = view.getUint16(eocd + 10, true);
+  const centralOffset = view.getUint32(eocd + 16, true);
+  const entries = [];
+  let ptr = centralOffset;
+
+  for (let i = 0; i < entryCount; i++) {
+    if (
+      ptr + 46 > buffer.byteLength ||
+      view.getUint32(ptr, true) !== 0x02014b50
+    ) {
+      throw new Error("PPTX 내부 파일 목록을 읽을 수 없습니다.");
+    }
+
+    const flags = view.getUint16(ptr + 8, true);
+    const method = view.getUint16(ptr + 10, true);
+    const compressedSize = view.getUint32(ptr + 20, true);
+    const nameLength = view.getUint16(ptr + 28, true);
+    const extraLength = view.getUint16(ptr + 30, true);
+    const commentLength = view.getUint16(ptr + 32, true);
+    const localOffset = view.getUint32(ptr + 42, true);
+
+    const nameStart = ptr + 46;
+    const name = decoder.decode(
+      new Uint8Array(buffer, nameStart, nameLength)
+    );
+
+    entries.push({
+      name,
+      flags,
+      method,
+      compressedSize,
+      localOffset
+    });
+
+    ptr += 46 + nameLength + extraLength + commentLength;
+  }
+
+  return { entries, view };
+}
+
+async function inflatePptxEntry(buffer, entry, view) {
+  if (entry.flags & 1) {
+    throw new Error("암호가 설정된 PPTX 파일은 처리할 수 없습니다.");
+  }
+
+  const local = entry.localOffset;
+
+  if (
+    local + 30 > buffer.byteLength ||
+    view.getUint32(local, true) !== 0x04034b50
+  ) {
+    throw new Error("PPTX 슬라이드 데이터를 읽을 수 없습니다.");
+  }
+
+  const nameLength = view.getUint16(local + 26, true);
+  const extraLength = view.getUint16(local + 28, true);
+  const start = local + 30 + nameLength + extraLength;
+  const end = start + entry.compressedSize;
+
+  if (end > buffer.byteLength) {
+    throw new Error("PPTX 파일 데이터가 잘려 있습니다.");
+  }
+
+  const compressed = new Uint8Array(buffer, start, entry.compressedSize);
+
+  // 압축 방식 0은 그대로 저장된 데이터, 8은 DEFLATE입니다.
+  if (entry.method === 0) {
+    return new Uint8Array(compressed);
+  }
+
+  if (entry.method !== 8) {
+    throw new Error("지원하지 않는 PPTX 압축 방식입니다.");
+  }
+
+  if (typeof DecompressionStream === "undefined") {
+    throw new Error(
+      "이 브라우저는 PPTX 압축 해제를 지원하지 않습니다. 최신 Edge 또는 Chrome에서 다시 시도해 주세요."
+    );
+  }
+
+  const stream = new Blob([compressed])
+    .stream()
+    .pipeThrough(new DecompressionStream("deflate-raw"));
+
+  return new Uint8Array(await new Response(stream).arrayBuffer());
+}
+
+async function extractPptxMarketingText(file) {
+  const buffer = await file.arrayBuffer();
+  const { entries, view } = getPptxZipEntries(buffer);
+
+  const slides = entries
+    .filter(entry =>
+      /^ppt\/slides\/slide\d+\.xml$/i.test(entry.name)
+    )
+    .sort((a, b) => {
+      const numA = Number(a.name.match(/slide(\d+)\.xml/i)[1]);
+      const numB = Number(b.name.match(/slide(\d+)\.xml/i)[1]);
+      return numA - numB;
+    });
+
+  if (!slides.length) {
+    throw new Error("PPTX 파일에서 슬라이드를 찾지 못했습니다.");
+  }
+
+  const drawingNamespace =
+    "http://schemas.openxmlformats.org/drawingml/2006/main";
+  const decoder = new TextDecoder("utf-8");
+  const results = [];
+
+  for (let i = 0; i < slides.length; i++) {
+    const bytes = await inflatePptxEntry(buffer, slides[i], view);
+    const xmlText = decoder.decode(bytes);
+    const xml = new DOMParser().parseFromString(
+      xmlText,
+      "application/xml"
+    );
+
+    if (xml.getElementsByTagName("parsererror").length) {
+      continue;
+    }
+
+    const paragraphs = Array.from(
+      xml.getElementsByTagNameNS(drawingNamespace, "p")
+    );
+
+    const textLines = paragraphs
+      .map(paragraph =>
+        Array.from(
+          paragraph.getElementsByTagNameNS(drawingNamespace, "t")
+        )
+          .map(node => node.textContent || "")
+          .join("")
+          .trim()
+      )
+      .filter(Boolean);
+
+    if (textLines.length) {
+      results.push(
+        `--- ${file.name} / 슬라이드 ${i + 1} ---\n` +
+        textLines.join("\n")
+      );
+    }
+  }
+
+  if (!results.length) {
+    return (
+      `--- ${file.name} ---\n` +
+      "추출된 텍스트가 없습니다. 이미지로만 구성된 슬라이드일 수 있습니다."
+    );
+  }
+
+  return results.join("\n\n");
+}
+
+async function extractMarketingFiles() {
+  const input = $("b3pMarketingFiles");
+  const output = $("b3pMarketingText");
+  const status = $("b3pMarketingStatus");
+  const files = Array.from(input.files || []);
+
+  if (!files.length) {
+    alert("먼저 PDF 또는 PPTX 자료를 선택해 주세요.");
+    return;
+  }
+
+  const allResults = [];
+  const failures = [];
+  status.textContent = "자료를 읽는 중입니다. 파일 크기에 따라 시간이 걸릴 수 있습니다.";
+
+  for (const file of files) {
+    try {
+      if (file.size > 50 * 1024 * 1024) {
+        throw new Error("파일이 50MB를 초과합니다.");
+      }
+
+      const lowerName = file.name.toLowerCase();
+      let extracted = "";
+
+      if (lowerName.endsWith(".pdf")) {
+        extracted = await extractPdfMarketingText(file);
+      } else if (lowerName.endsWith(".pptx")) {
+        extracted = await extractPptxMarketingText(file);
+      } else {
+        throw new Error("PDF 또는 PPTX 파일만 지원합니다.");
+      }
+
+      allResults.push(extracted);
+    } catch (error) {
+      failures.push(`${file.name}: ${error.message}`);
+    }
+
+    status.textContent =
+      `처리 중: ${allResults.length + failures.length}/${files.length}개 파일`;
+  }
+
+  // 대량 문서로 화면이 지나치게 커지는 것을 방지합니다.
+  const combined = allResults.join("\n\n====================\n\n");
+  const maxChars = 150000;
+  output.value = combined.length > maxChars
+    ? combined.slice(0, maxChars) +
+      "\n\n[화면 표시 제한으로 이후 내용은 생략했습니다.]"
+    : combined;
+
+  if (failures.length) {
+    status.textContent =
+      `완료: 성공 ${allResults.length}개, 실패 ${failures.length}개.\n` +
+      failures.join("\n");
+  } else {
+    status.textContent =
+      `완료: ${allResults.length}개 파일의 텍스트를 추출했습니다.`;
+  }
+
+  if (!allResults.length) {
+    alert(
+      "자료 내용을 추출하지 못했습니다.\n\n" +
+      failures.join("\n") +
+      "\n\n파일 경로, 형식, 암호 설정 여부를 확인해 주세요."
+    );
+  } else if (failures.length) {
+    alert(
+      "일부 파일을 추출하지 못했습니다. 아래 상태 메시지를 확인해 주세요."
+    );
+  }
+}
+
+function clearMarketingMaterials() {
+  $("b3pMarketingFiles").value = "";
+  $("b3pMarketingText").value = "";
+  $("b3pMarketingStatus").textContent = "자료가 초기화되었습니다.";
 }
 
   function generateProposal() {
