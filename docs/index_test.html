@@ -1,0 +1,1962 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>부산3지점 통합 영업 대시보드</title>
+<style>
+:root {
+  --navy:#17365d;
+  --blue:#2563eb;
+  --bg:#f3f6fb;
+  --line:#e1e7ef;
+  --text:#1f2937;
+  --muted:#64748b;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  font-family:Arial,"Malgun Gothic",sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+header {
+  background:var(--navy);
+  color:white;
+  padding:24px max(18px,calc((100% - 1200px)/2));
+}
+header h1 { margin:0 0 8px; font-size:25px; }
+header p { margin:0; color:#dbeafe; font-size:14px; }
+nav {
+  display:flex;
+  gap:7px;
+  flex-wrap:wrap;
+  background:white;
+  padding:12px max(12px,calc((100% - 1200px)/2));
+  border-bottom:1px solid var(--line);
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+button,.navbtn {
+  font:inherit;
+  cursor:pointer;
+}
+.navbtn {
+  border:0;
+  border-radius:8px;
+  background:#eef2f7;
+  color:#334155;
+  padding:11px 15px;
+  font-weight:700;
+}
+.navbtn.active { background:var(--navy); color:white; }
+main { max-width:1200px; margin:auto; padding:22px 16px 50px; }
+.page { display:none; }
+.page.active { display:block; }
+h2 { margin:0 0 8px; font-size:23px; }
+.subtitle { margin:0 0 20px; color:var(--muted); font-size:14px; }
+.grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:15px;
+}
+.grid3 { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.card {
+  background:white;
+  border:1px solid var(--line);
+  border-radius:13px;
+  padding:19px;
+  min-width:0;
+}
+.card h3 { margin:0 0 9px; font-size:17px; }
+.card p { color:var(--muted); font-size:14px; line-height:1.6; }
+.launch {
+  display:block;
+  width:100%;
+  margin-top:13px;
+  border:0;
+  border-radius:8px;
+  background:var(--navy);
+  color:white;
+  padding:12px;
+  font-weight:700;
+}
+.stat { font-size:30px; font-weight:800; color:var(--navy); }
+label { display:block; font-size:13px; font-weight:700; margin:13px 0 6px; }
+input,select,textarea {
+  width:100%;
+  border:1px solid #cbd5e1;
+  border-radius:8px;
+  padding:11px;
+  background:white;
+  color:var(--text);
+  font:inherit;
+  font-size:14px;
+}
+textarea { min-height:95px; resize:vertical; }
+.row {
+  display:flex;
+  gap:10px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+.row > * { flex:1; min-width:130px; }
+.btn {
+  border:0;
+  border-radius:8px;
+  background:var(--blue);
+  color:white;
+  padding:11px 15px;
+  font-weight:700;
+}
+.btn.secondary { background:#e8edf5; color:#334155; }
+.btn.danger { background:#b91c1c; }
+.btn.small { padding:7px 10px; font-size:12px; }
+.toolbar { display:flex; gap:8px; flex-wrap:wrap; margin:14px 0; }
+.toolbar > * { flex:1; min-width:140px; }
+.item {
+  background:white;
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:15px;
+  margin:10px 0;
+  overflow-wrap:anywhere;
+}
+.item h3 { margin:0 0 8px; font-size:16px; }
+.item p { margin:6px 0; font-size:14px; line-height:1.55; }
+.meta { font-size:12px; color:var(--muted); }
+.pill {
+  display:inline-block;
+  background:#eaf1ff;
+  color:#1d4ed8;
+  border-radius:20px;
+  padding:4px 9px;
+  font-size:12px;
+  margin:2px 4px 2px 0;
+}
+.empty {
+  padding:25px;
+  background:white;
+  border:1px dashed #cbd5e1;
+  border-radius:10px;
+  text-align:center;
+  color:var(--muted);
+  line-height:1.7;
+}
+.notice {
+  background:#eff6ff;
+  border:1px solid #bfdbfe;
+  padding:12px;
+  border-radius:8px;
+  color:#1e40af;
+  font-size:13px;
+  line-height:1.6;
+  margin:12px 0;
+}
+footer {
+  text-align:center;
+  padding:22px;
+  color:var(--muted);
+  font-size:12px;
+}
+#proposalPreview {
+  background:white;
+  padding:24px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  line-height:1.8;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  min-height:120px;
+}
+@media(max-width:700px) {
+  header h1 { font-size:21px; }
+  .grid,.grid3 { grid-template-columns:1fr; }
+  nav { position:static; }
+  .navbtn { flex:1 1 40%; }
+  main { padding:16px 12px 35px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>부산3지점 통합 영업 대시보드</h1>
+  <p>영업관리.계획 | 김해 · 부산 서부권</p>
+</header>
+
+<nav>
+  <button class="navbtn active" data-page="home">홈</button>
+  <button class="navbtn" data-page="proposal">제안서 자동생성</button>
+  <button class="navbtn" data-page="crm">숙성영업 관리</button>
+  <button class="navbtn" data-page="market">시장조사</button>
+  <button class="navbtn" data-page="jobs">개원·채용정보</button>
+</nav>
+
+<main>
+
+<!-- 홈 -->
+<section class="page active" id="home">
+  <h2>영업 현황</h2>
+  <p class="subtitle">부산3지점 영업 업무를 한 화면에서 관리합니다.</p>
+
+  <div class="grid grid3">
+    <div class="card">
+      <h3>숙성영업 거래처</h3>
+      <div class="stat" id="statCrm">0</div>
+      <p>등록된 영업 대상 거래처</p>
+    </div>
+    <div class="card">
+      <h3>후속 연락 예정</h3>
+      <div class="stat" id="statFollow">0</div>
+      <p>오늘 이전 또는 오늘이 연락 예정일인 거래처</p>
+    </div>
+    <div class="card">
+      <h3>개원·채용 공고</h3>
+      <div class="stat" id="statJobs">-</div>
+      <p>results.json에서 불러온 공고</p>
+    </div>
+  </div>
+
+  <div class="grid" style="margin-top:16px">
+    <div class="card">
+      <h3>📄 제안서 자동생성</h3>
+      <p>재단 마케팅 자료를 바탕으로 신규 개원·타사 거래처 전환용 제안서를 구성합니다.</p>
+      <button class="launch" onclick="showPage('proposal')">제안서 작성하기 →</button>
+    </div>
+    <div class="card">
+      <h3>🎯 숙성영업 관리</h3>
+      <p>추후 재방문하거나 연락할 거래처와 영업 진행 상황을 기록합니다.</p>
+      <button class="launch" onclick="showPage('crm')">거래처 관리하기 →</button>
+    </div>
+    <div class="card">
+      <h3>📊 시장조사</h3>
+      <p>지역 의료기관, 신규 개원, 검체 검사, 의료기관 채용 관련 정보를 조사합니다.</p>
+      <button class="launch" onclick="showPage('market')">시장조사 시작하기 →</button>
+    </div>
+    <div class="card">
+      <h3>🏥 개원·채용정보</h3>
+      <p>기존 자동수집 프로그램이 생성한 공고 데이터를 확인합니다.</p>
+      <button class="launch" onclick="showPage('jobs')">공고 확인하기 →</button>
+    </div>
+  </div>
+</section>
+
+<!-- 제안서 -->
+<section class="page" id="proposal">
+  <h2>제안서 자동생성</h2>
+  <p class="subtitle">재단 마케팅 자료를 참고해 신규 개원·타사 거래 전환 제안서를 구성하고 PDF로 저장합니다.</p>
+
+  <div class="card">
+    <div class="grid">
+      <div>
+        <label for="pClinic">병원·의원명</label>
+        <input id="pClinic" placeholder="예: ○○내과의원">
+      </div>
+      <div>
+        <label for="pManager">담당자</label>
+        <input id="pManager" placeholder="예: 원장님">
+      </div>
+      <div>
+        <label for="pType">제안 유형</label>
+        <select id="pType">
+          <option value="opening">신규 개원 제안</option>
+          <option value="conversion">타사 거래처 전환 제안</option>
+        </select>
+      </div>
+      <div>
+        <label for="pDate">작성일</label>
+        <input id="pDate" type="date">
+      </div>
+    </div>
+
+    <label for="pSituation">거래처 현황 및 고민</label>
+    <textarea id="pSituation" placeholder="예: 현재 외부 의뢰 검사가 적고, 검사 항목 확대에 관심이 있음"></textarea>
+
+    <label for="pNeeds">중점 제안 내용</label>
+    <textarea id="pNeeds" placeholder="예: 검사 항목 확대, 의뢰 편의성 개선, 수익 구조 검토"></textarea>
+
+    <label for="pAction">후속 조치 및 일정</label>
+    <textarea id="pAction" placeholder="예: 다음 주 방문하여 검사 목록과 의뢰 조건 협의"></textarea>
+
+    <!-- 신규 개원·타사 전환 제안 가격 및 조건 -->
+    <div class="card" style="margin-top:16px;">
+      <h3>제안 단가 및 적용 조건</h3>
+      <p class="meta">기준 단가와 승인된 할인율을 입력하면 제안 단가를 계산합니다. 승인 전 할인율은 확정 조건으로 제시하지 마세요.</p>
+      <div class="grid">
+        <div>
+          <label for="pPriceItem">제안 대상 품목·서비스</label>
+          <input id="pPriceItem" placeholder="예: 검사 패키지 또는 검사 의뢰 서비스">
+        </div>
+        <div>
+          <label for="pBasePrice">기준 단가(원)</label>
+          <input id="pBasePrice" type="number" min="0" step="1" placeholder="기준 금액 입력">
+        </div>
+        <div>
+          <label for="pDiscountRate">승인 할인율(%)</label>
+          <input id="pDiscountRate" type="number" min="0" max="100" step="0.1" placeholder="승인된 할인율 입력">
+        </div>
+        <div>
+          <label>예상 할인 금액</label>
+          <div id="pDiscountAmountDisplay" class="notice" style="margin:0;min-height:42px;">기준 단가와 할인율 입력 후 계산</div>
+        </div>
+        <div>
+          <label>계산된 제안 단가</label>
+          <div id="pProposedPriceDisplay" class="notice" style="margin:0;min-height:42px;">기준 단가와 할인율 입력 후 계산</div>
+        </div>
+        <div>
+          <label for="pValidPeriod">적용 기간</label>
+          <input id="pValidPeriod" placeholder="예: 계약 후 12개월 / 협의 후 확정">
+        </div>
+      </div>
+      <label for="pOfferConditions">할인·계약 적용 조건</label>
+      <textarea id="pOfferConditions" placeholder="예: 대상 검사, 월 의뢰량, 계약 기간, 할인 적용 범위 등"></textarea>
+      <label for="pSupport">지원 및 운영 조건</label>
+      <textarea id="pSupport" placeholder="예: 검체 수거 횟수, 결과 연계, 초기 의뢰 안내, 담당자 교육 등"></textarea>
+    </div>
+    
+    <!-- 재단 마케팅 자료 참고 영역 -->
+    <div class="card" style="margin-top:16px;">
+      <h3>재단 마케팅 자료 참고</h3>
+      <p class="meta">
+        재단에서 배포한 검사 안내서와 서비스 소개 자료를 첨부하세요.
+        자료는 이 브라우저에서 처리하며 파일 자체를 외부 서버에 업로드하지 않습니다.
+      </p>
+
+      <label for="b3pMarketingFiles">
+        마케팅 자료 선택 (PDF 또는 PPTX, 여러 개 선택 가능)
+      </label>
+
+      <input
+        id="b3pMarketingFiles"
+        type="file"
+        accept=".pdf,.pptx,application/pdf,application/vnd.openxmlformats-officedocument.presentationml.presentation"
+        multiple
+      >
+
+      <div class="toolbar" style="margin-top:12px;">
+        <button
+          type="button"
+          class="btn secondary"
+          onclick="extractMarketingFiles()">
+          자료 내용 추출
+        </button>
+
+        <button
+          type="button"
+          class="btn secondary"
+          onclick="clearMarketingMaterials()">
+          자료 초기화
+        </button>
+      </div>
+
+      <p id="b3pMarketingStatus" class="meta">
+        아직 첨부된 자료가 없습니다.
+      </p>
+
+      <label for="b3pMarketingText">
+        추출된 마케팅 자료 내용
+      </label>
+
+      <textarea
+        id="b3pMarketingText"
+        placeholder="PDF 또는 PPTX를 선택하고 자료 내용 추출 버튼을 누르면 이곳에 내용이 표시됩니다. 추출 결과를 검토하고 필요한 부분을 직접 수정할 수 있습니다."
+        style="min-height:180px;"
+      ></textarea>
+
+      <p class="meta">
+        추출한 내용은 PDF 제안서의 핵심 검사·서비스 카드와 제안 포인트 구성에 사용됩니다. 원문을 별도 부록으로 붙이지 않습니다.
+      </p>
+    </div>
+
+    <div class="toolbar">
+      <button class="btn" onclick="generateProposal()">제안서 초안 만들기</button>
+      <button class="btn secondary" onclick="copyProposal()">내용 복사</button>
+      <button class="btn secondary" onclick="downloadProposal()">Word 파일 저장</button>
+      <button class="btn secondary" onclick="downloadProposalPDF()">PDF 저장</button>
+    </div>
+    <div id="proposalPreview">위 항목을 입력한 뒤 ‘제안서 초안 만들기’를 누르세요.</div>
+    <p class="meta">생성되는 문서는 수정 가능한 초안입니다. 실제 검사 가능 여부, 가격 및 계약 조건은 내부 확인 후 사용해 주세요.</p>
+  </div>
+</section>
+
+<!-- 숙성영업 -->
+<section class="page" id="crm">
+  <h2>숙성영업 관리</h2>
+  <p class="subtitle">추후 재방문하거나 연락할 거래처와 영업 진행 상황을 기록합니다.</p>
+
+  <div class="notice">
+    기록은 현재 브라우저에 저장됩니다. 브라우저 데이터 삭제나 기기 변경 시 기록이 사라질 수 있으므로 주기적으로 백업해 주세요.
+  </div>
+
+  <div class="card">
+    <h3>거래처 등록 및 수정</h3>
+    <input type="hidden" id="crmId">
+    <div class="grid">
+      <div>
+        <label for="cClinic">병원·의원명 *</label>
+        <input id="cClinic" placeholder="병원명">
+      </div>
+      <div>
+        <label for="cArea">지역</label>
+        <select id="cArea">
+          <option>김해</option>
+          <option>부산 강서구</option>
+          <option>부산 사하구</option>
+          <option>부산 사상구</option>
+          <option>기타</option>
+        </select>
+      </div>
+      <div>
+        <label for="cContact">담당자</label>
+        <input id="cContact" placeholder="원장님 또는 담당자">
+      </div>
+      <div>
+        <label for="cStatus">진행 상태</label>
+        <select id="cStatus">
+          <option>관심 확인</option>
+          <option>자료 전달</option>
+          <option>재방문 예정</option>
+          <option>조건 협의</option>
+          <option>계약 완료</option>
+          <option>보류</option>
+        </select>
+      </div>
+      <div>
+        <label for="cLast">최근 접촉일</label>
+        <input id="cLast" type="date">
+      </div>
+      <div>
+        <label for="cNext">다음 연락 예정일</label>
+        <input id="cNext" type="date">
+      </div>
+    </div>
+
+    <label for="cMemo">영업 내용 및 다음 조치</label>
+    <textarea id="cMemo" placeholder="상담 내용, 관심 검사, 거절 사유, 다음 방문 계획 등"></textarea>
+    
+    <!-- 거래처별 고수익 검사 분석 -->
+    <div class="card" style="margin-top:16px;">
+      <h3>거래처별 고수익 검사 확대 및 차액 분석</h3>
+      <p class="meta">
+        아래 검사 분석은 현재 등록하거나 수정 중인 거래처에 연결됩니다.
+        차액은 재단 청구액에서 병원 청구액을 뺀 금액입니다.
+      </p>
+
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;min-width:720px;">
+          <thead>
+            <tr>
+              <th style="padding:8px;border-bottom:1px solid #ddd;">검사명</th>
+              <th style="padding:8px;border-bottom:1px solid #ddd;">재단 청구액(원)</th>
+              <th style="padding:8px;border-bottom:1px solid #ddd;">병원 청구액(원)</th>
+              <th style="padding:8px;border-bottom:1px solid #ddd;">월 검사 건수</th>
+              <th style="padding:8px;border-bottom:1px solid #ddd;">건당 차액</th>
+              <th style="padding:8px;border-bottom:1px solid #ddd;">월간 차액</th>
+              <th style="padding:8px;border-bottom:1px solid #ddd;">삭제</th>
+            </tr>
+          </thead>
+          <tbody id="crmTestRows"></tbody>
+        </table>
+      </div>
+
+      <div class="toolbar" style="margin-top:12px;">
+        <button type="button" class="btn secondary"
+          onclick="addCrmTestRow()">검사 항목 추가</button>
+      </div>
+
+      <div style="margin-top:12px;padding:12px;background:#f5f7fa;border-radius:8px;">
+        <strong>월간 차액 합계: </strong>
+        <span id="crmTotalDifference">0원</span>
+        <p class="meta" style="margin-bottom:0;">
+          참고용 계산값이며 실제 순이익이나 확정 수익을 의미하지 않습니다.
+        </p>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <button class="btn" onclick="saveCrm()">거래처 저장</button>
+      <button class="btn secondary" onclick="clearCrmForm()">입력 초기화</button>
+      <button class="btn secondary" onclick="exportCrm()">CSV 백업</button>
+      <button class="btn secondary" onclick="document.getElementById('crmImport').click()">CSV 복원</button>
+      <input type="file" id="crmImport" accept=".csv,text/csv" style="display:none" onchange="importCrm(event)">
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <input id="crmSearch" placeholder="병원명·지역·메모 검색" oninput="renderCrm()">
+    <select id="crmFilter" onchange="renderCrm()">
+      <option value="">전체 진행 상태</option>
+      <option>관심 확인</option>
+      <option>자료 전달</option>
+      <option>재방문 예정</option>
+      <option>조건 협의</option>
+      <option>계약 완료</option>
+      <option>보류</option>
+    </select>
+  </div>
+  <div id="crmList"></div>
+</section>
+
+<!-- 시장조사 -->
+<section class="page" id="market">
+  <h2>시장조사</h2>
+  <p class="subtitle">지역과 조사 주제를 선택해 공개 웹 정보를 검색합니다.</p>
+
+  <div class="card">
+    <label for="mArea">조사 지역</label>
+    <select id="mArea">
+      <option>김해시</option>
+      <option>부산 강서구</option>
+      <option>부산 사하구</option>
+      <option>부산 사상구</option>
+      <option>부산광역시</option>
+    </select>
+
+    <label for="mTopic">조사 주제</label>
+    <select id="mTopic">
+      <option value="신규 개원 예정 의원">신규 개원 예정 의원</option>
+      <option value="신규 개원 병원 채용">신규 개원 및 채용</option>
+      <option value="내과 의원 목록">내과 의원 현황</option>
+      <option value="검체 검사 수탁 검사실">검체 검사 및 수탁 관련 정보</option>
+      <option value="의원 개원 소식">의원 개원 소식</option>
+      <option value="의료기관 채용공고">의료기관 채용공고</option>
+      <option value="건강검진 내과 의원">건강검진 관련 의원</option>
+    </select>
+
+    <label for="mKeyword">추가 키워드 (선택)</label>
+    <input id="mKeyword" placeholder="예: 내과, 건강검진, 개원 예정">
+
+    <div class="toolbar">
+      <button class="btn" onclick="marketSearch('google')">Google 검색</button>
+      <button class="btn secondary" onclick="marketSearch('naver')">네이버 검색</button>
+      <button class="btn secondary" onclick="marketSearch('news')">뉴스 검색</button>
+    </div>
+    <div class="notice">
+      검색 결과는 외부 검색 사이트에서 확인합니다. 이 메뉴는 검색을 실행하는 기능이며, 조사 결과를 자동으로 수집하거나 검증된 시장조사 보고서로 만들어 주는 기능은 아닙니다.
+    </div>
+  </div>
+
+  <div class="grid" style="margin-top:15px">
+    <div class="card">
+      <h3>조사 시 확인할 항목</h3>
+      <p>① 의료기관명과 주소<br>② 개원 또는 채용 시점<br>③ 진료과목 및 검진 여부<br>④ 현재 거래 가능성<br>⑤ 방문 우선순위와 후속 조치</p>
+    </div>
+    <div class="card">
+      <h3>영업 우선순위 설정</h3>
+      <p>신규 개원 예정 기관, 검사 항목 확대 가능성이 있는 의원, 거래 전환 가능성이 있는 기관부터 확인하고 조사 결과를 숙성영업 관리에 등록하세요.</p>
+      <button class="launch" onclick="showPage('crm')">조사 결과 거래처 등록 →</button>
+    </div>
+  </div>
+</section>
+
+<!-- 개원·채용정보 -->
+<section class="page" id="jobs">
+  <h2>개원·채용정보</h2>
+  <p class="subtitle">기존 자동수집 프로그램의 results.json 데이터를 불러옵니다.</p>
+
+  <div class="notice">
+    이 화면은 공고 데이터를 새로 수집하지 않습니다. 기존 GitHub Actions 또는 수집 프로그램이 생성한 results.json 파일을 읽습니다.
+  </div>
+
+  <div class="toolbar">
+    <select id="jobArea" onchange="renderJobs()">
+      <option value="">전체 지역</option>
+      <option value="김해">김해</option>
+      <option value="강서">부산 강서구</option>
+      <option value="사하">부산 사하구</option>
+      <option value="사상">부산 사상구</option>
+      <option value="부산">부산 전체</option>
+    </select>
+    <input id="jobSearch" placeholder="병원명·공고·키워드 검색" oninput="renderJobs()">
+    <button class="btn secondary" onclick="loadJobs()">공고 새로고침</button>
+  </div>
+
+  <p id="jobStatus" class="meta">공고 데이터를 불러오는 중입니다.</p>
+  <div id="jobList"></div>
+</section>
+
+</main>
+
+<footer>부산3지점 통합 영업 대시보드 · 개원·채용정보는 기존 results.json 연동</footer>
+
+<script>
+const $ = id => document.getElementById(id);
+let jobs = [];
+let crmRecords = [];
+
+const CRM_KEY = "busan3_crm_records_v1";
+
+function showPage(name) {
+  document.querySelectorAll(".page").forEach(el => el.classList.remove("active"));
+  document.querySelectorAll(".navbtn").forEach(el => el.classList.toggle("active", el.dataset.page === name));
+  const page = $(""+name);
+  if (page) page.classList.add("active");
+  if (name === "jobs") loadJobs();
+  if (name === "crm") renderCrm();
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+document.querySelectorAll(".navbtn").forEach(btn => {
+  btn.addEventListener("click", () => showPage(btn.dataset.page));
+});
+
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, ch => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+  })[ch]);
+}
+
+function formatDate(value) {
+  if (!value) return "-";
+  return String(value).slice(0,10);
+}
+
+/* 제안서 */
+  
+// ===== 재단 마케팅 자료 읽기: 브라우저 내부 처리 =====
+
+let b3pPdfJsPromise = null;
+
+async function getB3PPdfJs() {
+  if (!b3pPdfJsPromise) {
+    b3pPdfJsPromise = import("./vendor/pdf.mjs")
+      .then(pdfjs => {
+        pdfjs.GlobalWorkerOptions.workerSrc =
+          new URL("./vendor/pdf.worker.mjs", document.baseURI).href;
+        return pdfjs;
+      })
+      .catch(error => {
+        b3pPdfJsPromise = null;
+        throw new Error(
+          "PDF.js 파일을 불러오지 못했습니다. docs/vendor 폴더의 pdf.mjs와 pdf.worker.mjs 파일을 확인해 주세요. " +
+          error.message
+        );
+      });
+  }
+
+  return b3pPdfJsPromise;
+}
+
+
+async function extractPdfMarketingText(file) {
+  const pdfjs = await getB3PPdfJs();
+  const data = new Uint8Array(await file.arrayBuffer());
+
+  // PDF 문서와 로딩 작업을 별도로 보관합니다.
+  const loadingTask = pdfjs.getDocument({ data });
+  const pdf = await loadingTask.promise;
+  const pages = [];
+
+  try {
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+      const page = await pdf.getPage(pageNum);
+      const content = await page.getTextContent();
+
+      const pageText = content.items
+        .map(item => {
+          if (typeof item.str !== "string") return "";
+          return item.str + (item.hasEOL ? "\n" : " ");
+        })
+        .join("")
+        .replace(/[ \t]+\n/g, "\n")
+        .replace(/\n{3,}/g, "\n\n")
+        .trim();
+
+      if (pageText) {
+        pages.push(
+          `--- ${file.name} / ${pageNum}페이지 ---\n${pageText}`
+        );
+      }
+    }
+  } finally {
+    // destroy()는 PDF 문서 객체가 아닌 로딩 작업에 호출합니다.
+    if (typeof loadingTask.destroy === "function") {
+      await loadingTask.destroy();
+    }
+  }
+
+  if (!pages.length) {
+    return (
+      `--- ${file.name} ---\n` +
+      "추출된 텍스트가 없습니다. 스캔 이미지 PDF이거나 이미지로만 구성된 자료일 수 있습니다."
+    );
+  }
+
+  return pages.join("\n\n");
+}
+
+
+// PPTX는 ZIP 내부의 슬라이드 XML에서 텍스트를 읽습니다.
+function getPptxZipEntries(buffer) {
+  const view = new DataView(buffer);
+  const decoder = new TextDecoder("utf-8");
+  const minOffset = Math.max(0, buffer.byteLength - 65557);
+  let eocd = -1;
+
+  // ZIP 파일 끝의 중앙 디렉터리 정보를 찾습니다.
+  for (let pos = buffer.byteLength - 22; pos >= minOffset; pos--) {
+    if (
+      pos + 4 <= buffer.byteLength &&
+      view.getUint32(pos, true) === 0x06054b50
+    ) {
+      eocd = pos;
+      break;
+    }
+  }
+
+  if (eocd < 0) {
+    throw new Error("PPTX ZIP 구조를 읽을 수 없습니다.");
+  }
+
+  const entryCount = view.getUint16(eocd + 10, true);
+  const centralOffset = view.getUint32(eocd + 16, true);
+  const entries = [];
+  let ptr = centralOffset;
+
+  for (let i = 0; i < entryCount; i++) {
+    if (
+      ptr + 46 > buffer.byteLength ||
+      view.getUint32(ptr, true) !== 0x02014b50
+    ) {
+      throw new Error("PPTX 내부 파일 목록을 읽을 수 없습니다.");
+    }
+
+    const flags = view.getUint16(ptr + 8, true);
+    const method = view.getUint16(ptr + 10, true);
+    const compressedSize = view.getUint32(ptr + 20, true);
+    const nameLength = view.getUint16(ptr + 28, true);
+    const extraLength = view.getUint16(ptr + 30, true);
+    const commentLength = view.getUint16(ptr + 32, true);
+    const localOffset = view.getUint32(ptr + 42, true);
+
+    const nameStart = ptr + 46;
+    const name = decoder.decode(
+      new Uint8Array(buffer, nameStart, nameLength)
+    );
+
+    entries.push({
+      name,
+      flags,
+      method,
+      compressedSize,
+      localOffset
+    });
+
+    ptr += 46 + nameLength + extraLength + commentLength;
+  }
+
+  return { entries, view };
+}
+
+async function inflatePptxEntry(buffer, entry, view) {
+  if (entry.flags & 1) {
+    throw new Error("암호가 설정된 PPTX 파일은 처리할 수 없습니다.");
+  }
+
+  const local = entry.localOffset;
+
+  if (
+    local + 30 > buffer.byteLength ||
+    view.getUint32(local, true) !== 0x04034b50
+  ) {
+    throw new Error("PPTX 슬라이드 데이터를 읽을 수 없습니다.");
+  }
+
+  const nameLength = view.getUint16(local + 26, true);
+  const extraLength = view.getUint16(local + 28, true);
+  const start = local + 30 + nameLength + extraLength;
+  const end = start + entry.compressedSize;
+
+  if (end > buffer.byteLength) {
+    throw new Error("PPTX 파일 데이터가 잘려 있습니다.");
+  }
+
+  const compressed = new Uint8Array(buffer, start, entry.compressedSize);
+
+  // 압축 방식 0은 그대로 저장된 데이터, 8은 DEFLATE입니다.
+  if (entry.method === 0) {
+    return new Uint8Array(compressed);
+  }
+
+  if (entry.method !== 8) {
+    throw new Error("지원하지 않는 PPTX 압축 방식입니다.");
+  }
+
+  if (typeof DecompressionStream === "undefined") {
+    throw new Error(
+      "이 브라우저는 PPTX 압축 해제를 지원하지 않습니다. 최신 Edge 또는 Chrome에서 다시 시도해 주세요."
+    );
+  }
+
+  const stream = new Blob([compressed])
+    .stream()
+    .pipeThrough(new DecompressionStream("deflate-raw"));
+
+  return new Uint8Array(await new Response(stream).arrayBuffer());
+}
+
+async function extractPptxMarketingText(file) {
+  const buffer = await file.arrayBuffer();
+  const { entries, view } = getPptxZipEntries(buffer);
+
+  const slides = entries
+    .filter(entry =>
+      /^ppt\/slides\/slide\d+\.xml$/i.test(entry.name)
+    )
+    .sort((a, b) => {
+      const numA = Number(a.name.match(/slide(\d+)\.xml/i)[1]);
+      const numB = Number(b.name.match(/slide(\d+)\.xml/i)[1]);
+      return numA - numB;
+    });
+
+  if (!slides.length) {
+    throw new Error("PPTX 파일에서 슬라이드를 찾지 못했습니다.");
+  }
+
+  const drawingNamespace =
+    "http://schemas.openxmlformats.org/drawingml/2006/main";
+  const decoder = new TextDecoder("utf-8");
+  const results = [];
+
+  for (let i = 0; i < slides.length; i++) {
+    const bytes = await inflatePptxEntry(buffer, slides[i], view);
+    const xmlText = decoder.decode(bytes);
+    const xml = new DOMParser().parseFromString(
+      xmlText,
+      "application/xml"
+    );
+
+    if (xml.getElementsByTagName("parsererror").length) {
+      continue;
+    }
+
+    const paragraphs = Array.from(
+      xml.getElementsByTagNameNS(drawingNamespace, "p")
+    );
+
+    const textLines = paragraphs
+      .map(paragraph =>
+        Array.from(
+          paragraph.getElementsByTagNameNS(drawingNamespace, "t")
+        )
+          .map(node => node.textContent || "")
+          .join("")
+          .trim()
+      )
+      .filter(Boolean);
+
+    if (textLines.length) {
+      results.push(
+        `--- ${file.name} / 슬라이드 ${i + 1} ---\n` +
+        textLines.join("\n")
+      );
+    }
+  }
+
+  if (!results.length) {
+    return (
+      `--- ${file.name} ---\n` +
+      "추출된 텍스트가 없습니다. 이미지로만 구성된 슬라이드일 수 있습니다."
+    );
+  }
+
+  return results.join("\n\n");
+}
+
+async function extractMarketingFiles() {
+  const input = $("b3pMarketingFiles");
+  const output = $("b3pMarketingText");
+  const status = $("b3pMarketingStatus");
+  const files = Array.from(input.files || []);
+
+  if (!files.length) {
+    alert("먼저 PDF 또는 PPTX 자료를 선택해 주세요.");
+    return;
+  }
+
+  const allResults = [];
+  const failures = [];
+  status.textContent = "자료를 읽는 중입니다. 파일 크기에 따라 시간이 걸릴 수 있습니다.";
+
+  for (const file of files) {
+    try {
+      if (file.size > 50 * 1024 * 1024) {
+        throw new Error("파일이 50MB를 초과합니다.");
+      }
+
+      const lowerName = file.name.toLowerCase();
+      let extracted = "";
+
+      if (lowerName.endsWith(".pdf")) {
+        extracted = await extractPdfMarketingText(file);
+      } else if (lowerName.endsWith(".pptx")) {
+        extracted = await extractPptxMarketingText(file);
+      } else {
+        throw new Error("PDF 또는 PPTX 파일만 지원합니다.");
+      }
+
+      allResults.push(extracted);
+    } catch (error) {
+      failures.push(`${file.name}: ${error.message}`);
+    }
+
+    status.textContent =
+      `처리 중: ${allResults.length + failures.length}/${files.length}개 파일`;
+  }
+
+  // 대량 문서로 화면이 지나치게 커지는 것을 방지합니다.
+  const combined = allResults.join("\n\n====================\n\n");
+  const maxChars = 150000;
+  output.value = combined.length > maxChars
+    ? combined.slice(0, maxChars) +
+      "\n\n[화면 표시 제한으로 이후 내용은 생략했습니다.]"
+    : combined;
+
+  if (failures.length) {
+    status.textContent =
+      `완료: 성공 ${allResults.length}개, 실패 ${failures.length}개.\n` +
+      failures.join("\n");
+  } else {
+    status.textContent =
+      `완료: ${allResults.length}개 파일의 텍스트를 추출했습니다.`;
+  }
+
+  if (!allResults.length) {
+    alert(
+      "자료 내용을 추출하지 못했습니다.\n\n" +
+      failures.join("\n") +
+      "\n\n파일 경로, 형식, 암호 설정 여부를 확인해 주세요."
+    );
+  } else if (failures.length) {
+    alert(
+      "일부 파일을 추출하지 못했습니다. 아래 상태 메시지를 확인해 주세요."
+    );
+  }
+}
+
+function clearMarketingMaterials() {
+  $("b3pMarketingFiles").value = "";
+  $("b3pMarketingText").value = "";
+  $("b3pMarketingStatus").textContent = "자료가 초기화되었습니다.";
+}
+  
+// 모든 PDF/PPTX에 공통으로 사용하는 마케팅 자료 분류 기능
+function buildMarketingProposalSection() {
+  const input = document.getElementById("b3pMarketingText");
+  const raw = input ? input.value.trim() : "";
+
+  if (!raw) {
+    return "";
+  }
+
+  // 추출된 페이지·슬라이드 제목을 기준으로 자료 출처를 구분합니다.
+  const sourceBlocks = [];
+  let current = {
+    source: "첨부 자료",
+    lines: []
+  };
+
+  raw.split(/\r?\n/).forEach(line => {
+    const match = line.trim().match(/^---\s*(.*?)\s*---$/);
+
+    if (match) {
+      if (current.lines.length) sourceBlocks.push(current);
+      current = {
+        source: match[1],
+        lines: []
+      };
+    } else {
+      current.lines.push(line);
+    }
+  });
+
+  if (current.lines.length) sourceBlocks.push(current);
+
+  // PDF 추출 과정에서 발생한 불필요한 공백을 정리합니다.
+  function cleanLine(value) {
+    return String(value || "")
+      .replace(/[ \t]+/g, " ")
+      .replace(/\s+([,.;:!?%)\]])/g, "$1")
+      .replace(/([(\\[])\s+/g, "$1")
+      .trim();
+  }
+
+  // 검사명에 의존하지 않고 내용의 일반적인 주제로 분류합니다.
+  const categories = [
+    {
+      title: "검사 및 운영 정보",
+      pattern: /검사|항목|검체|검사방법|검사 일정|소요일|결과보고|의뢰|수거|운송|보관|채취|서비스|지원|장비|전산|연계|운영/i
+    },
+    {
+      title: "검사 대상 및 임상적 활용",
+      pattern: /적응증|대상|환자|질환|위험도|진단|평가|관리|선별|권고|유용|임상|예방|증상|고위험|추적/i
+    },
+    {
+      title: "보험·수가·가격 정보",
+      pattern: /보험|수가|급여|비급여|EDI|청구|가격|단가|할인|계약|본인부담|질가산|정산|수익/i
+    },
+    {
+      title: "근거 및 참고 자료",
+      pattern: /출처|가이드라인|가이드|권고사항|참고문헌|통계|논문|학회|기준|발표|연구|지침/i
+    }
+  ];
+
+  const collected = categories.map(category => ({
+    title: category.title,
+    items: []
+  }));
+
+  const seen = new Set();
+
+  sourceBlocks.forEach(block => {
+    block.lines.forEach(originalLine => {
+      const cleaned = cleanLine(originalLine);
+
+      if (cleaned.length < 8) return;
+
+      // 한 줄이 긴 경우 문장 단위로 나누어 분류합니다.
+      const segments = cleaned
+        .split(/(?<=[.!?])\s+|;\s+/)
+        .map(part => part.trim())
+        .filter(part => part.length >= 8);
+
+      segments.forEach(segment => {
+        categories.forEach((category, index) => {
+          if (!category.pattern.test(segment)) return;
+
+          const key = category.title + "|" + segment;
+          if (seen.has(key)) return;
+
+          seen.add(key);
+          collected[index].items.push({
+            text: segment.length > 350
+              ? segment.slice(0, 350) + "…"
+              : segment,
+            source: block.source
+          });
+        });
+      });
+    });
+  });
+
+  const sections = collected
+    .filter(category => category.items.length > 0)
+    .map(category => {
+      const items = category.items.slice(0, 8);
+
+      return category.title + "\n" +
+        items.map((item, index) =>
+          `${index + 1}. ${item.text}\n   [출처: ${item.source}]`
+        ).join("\n");
+    });
+
+  if (!sections.length) {
+    return (
+      "첨부 자료의 텍스트는 추출되었으나 주제별 자동 분류가 되지 않았습니다.\n" +
+      "추출된 원문을 검토한 후 필요한 내용을 직접 제안서에 반영해 주세요."
+    );
+  }
+
+  return (
+    "첨부 마케팅 자료 참고 내용\n\n" +
+    sections.join("\n\n") +
+    "\n\n확인 사항\n" +
+    "위 내용은 첨부 자료의 텍스트를 일반적인 주제별로 분류한 초안입니다. " +
+    "분류가 정확하지 않을 수 있으므로 원문과 출처를 확인한 후 사용하세요. " +
+    "자료에 명시되지 않은 할인율, 계약 조건, 검사 효과는 임의로 추정하지 않습니다."
+  );
+}
+
+function getProposalPricing() {
+  const item = $("pPriceItem") ? $("pPriceItem").value.trim() : "";
+  const baseRaw = $("pBasePrice") ? $("pBasePrice").value.trim() : "";
+  const rateRaw = $("pDiscountRate") ? $("pDiscountRate").value.trim() : "";
+  const hasBase = baseRaw !== "" && Number.isFinite(Number(baseRaw)) && Number(baseRaw) >= 0;
+  const hasRate = rateRaw !== "" && Number.isFinite(Number(rateRaw)) && Number(rateRaw) >= 0 && Number(rateRaw) <= 100;
+  const basePrice = hasBase ? Number(baseRaw) : null;
+  const discountRate = hasRate ? Number(rateRaw) : null;
+  const calculated = hasBase && hasRate;
+  const discountAmount = calculated ? Math.round(basePrice * discountRate / 100) : null;
+  const proposedPrice = calculated ? basePrice - discountAmount : null;
+  return {
+    item,
+    hasBase,
+    hasRate,
+    basePrice,
+    discountRate,
+    calculated,
+    discountAmount,
+    proposedPrice,
+    validPeriod: $("pValidPeriod") ? $("pValidPeriod").value.trim() : "",
+    conditions: $("pOfferConditions") ? $("pOfferConditions").value.trim() : "",
+    support: $("pSupport") ? $("pSupport").value.trim() : ""
+  };
+}
+
+function calculateProposalPricing() {
+  const pricing = getProposalPricing();
+  const amount = $("pDiscountAmountDisplay");
+  const proposed = $("pProposedPriceDisplay");
+  const formatWon = value => Number(value).toLocaleString("ko-KR") + "원";
+
+  if (amount) {
+    if (pricing.calculated) {
+      amount.textContent = formatWon(pricing.discountAmount);
+    } else if (pricing.hasBase && !pricing.hasRate) {
+      amount.textContent = "승인 할인율 입력 필요";
+    } else if (!pricing.hasBase && pricing.hasRate) {
+      amount.textContent = "기준 단가 입력 필요";
+    } else {
+      amount.textContent = "기준 단가와 할인율 입력 후 계산";
+    }
+  }
+
+  if (proposed) {
+    if (pricing.calculated) {
+      proposed.textContent = formatWon(pricing.proposedPrice);
+    } else {
+      proposed.textContent = "기준 단가와 승인 할인율 입력 후 계산";
+    }
+  }
+
+  return pricing;
+}
+
+function generateProposal() {
+  const clinic = $("pClinic").value.trim() || "거래처명 미입력";
+  const manager = $("pManager").value.trim() || "원장님";
+  const date = $("pDate").value || new Date().toISOString().slice(0, 10);
+  const situation = $("pSituation").value.trim() || "거래처 현황 추가 확인 필요";
+  const needs = $("pNeeds").value.trim() || "거래처별 필요 사항 확인 후 구체화";
+  const action = $("pAction").value.trim() || "담당자와 후속 일정 협의";
+  const type = $("pType").value;
+  const pricing = calculateProposalPricing();
+  const fmtWon = value => Number(value).toLocaleString("ko-KR") + "원";
+
+  const titles = {
+    opening: "신규 개원 검사 의뢰 지원 제안",
+    conversion: "타사 거래처 전환 제안"
+  };
+
+  const priceText = pricing.calculated
+    ? `- 기준 단가: ${fmtWon(pricing.basePrice)}
+- 승인 할인율: ${pricing.discountRate}%
+- 할인 금액: ${fmtWon(pricing.discountAmount)}
+- 계산된 제안 단가: ${fmtWon(pricing.proposedPrice)}`
+    : `- 기준 단가: ${pricing.hasBase ? fmtWon(pricing.basePrice) : "미입력"}
+- 승인 할인율: ${pricing.hasRate ? pricing.discountRate + "%" : "내부 승인 기준 확인 후 입력"}
+- 할인 금액 및 제안 단가: 기준 단가와 승인 할인율 확인 후 계산`;
+
+  const content =
+`부산3지점 영업 제안서
+
+1. 제안 개요
+- 거래처: ${clinic}
+- 담당자: ${manager}
+- 작성일: ${date}
+- 제안 유형: ${titles[type] || "맞춤형 영업 제안"}
+
+2. 거래처 현황 및 제안 배경
+${situation}
+
+3. 맞춤형 제안 내용
+${needs}
+
+4. 제안 단가 및 적용 조건
+- 제안 대상: ${pricing.item || "미입력"}
+${priceText}
+- 적용 기간: ${pricing.validPeriod || "거래처 협의 후 확정"}
+- 할인·계약 적용 조건: ${pricing.conditions || "내부 승인 및 거래처 협의 후 확정"}
+- 지원 및 운영 조건: ${pricing.support || "거래처별 필요와 제공 가능 범위를 확인 후 협의"}
+
+5. 추진 일정 및 후속 조치
+${action}
+
+6. 확인 사항
+할인율과 제안 단가는 재단 내부 승인 기준에 따라 확정합니다. 첨부 마케팅 자료의 검사 정보와 임상적 설명은 원문 및 최신 기준을 확인한 후 사용하며, 자료에 없는 검사 효과나 계약 조건은 임의로 확정하지 않습니다.
+
+씨젠의료재단 부산3지점 드림`;
+
+  $("proposalPreview").textContent = content;
+}
+
+function copyProposal() {
+  const text = $("proposalPreview").textContent;
+  if (!text || text.includes("위 항목을 입력한 뒤")) {
+    alert("먼저 제안서 초안을 만들어 주세요.");
+    return;
+  }
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text)
+      .then(() => alert("제안서 내용을 복사했습니다."))
+      .catch(() => fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
+
+function fallbackCopy(text) {
+  const area = document.createElement("textarea");
+  area.value = text;
+  document.body.appendChild(area);
+  area.select();
+  try {
+    document.execCommand("copy");
+    alert("제안서 내용을 복사했습니다.");
+  } catch (e) {
+    alert("복사에 실패했습니다. 내용을 선택해 직접 복사해 주세요.");
+  }
+  area.remove();
+}
+
+/* 첨부 마케팅 자료를 반영한 디자인형 PDF 생성 */
+function downloadProposalPDF() {
+  const clinic = $("pClinic").value.trim() || "거래처명 미입력";
+  const manager = $("pManager").value.trim() || "원장님";
+  const date = $("pDate").value || new Date().toISOString().slice(0, 10);
+  const situation = $("pSituation").value.trim() || "거래처 현황 추가 확인 필요";
+  const needs = $("pNeeds").value.trim() || "거래처별 필요 사항 확인 후 구체화";
+  const action = $("pAction").value.trim() || "담당자와 후속 일정 협의";
+  const type = $("pType").value;
+  const marketingText = $("b3pMarketingText") ? $("b3pMarketingText").value.trim() : "";
+  const pricing = getProposalPricing();
+  const validPeriod = pricing.validPeriod || "거래처 협의 후 확정";
+  const offerConditions = pricing.conditions || "내부 승인 및 거래처 협의 후 확정";
+  const supportConditions = pricing.support || "거래처별 필요와 실제 제공 가능 범위를 확인 후 협의";
+  const moneyText = value => Number(value).toLocaleString("ko-KR") + "원";
+  const basePriceText = pricing.hasBase ? moneyText(pricing.basePrice) : "미입력";
+  const discountRateText = pricing.hasRate ? `${pricing.discountRate}%` : "승인 기준 확인 후 확정";
+  const discountAmountText = pricing.calculated ? moneyText(pricing.discountAmount) : "기준 단가·할인율 입력 후 계산";
+  const proposedPriceText = pricing.calculated ? moneyText(pricing.proposedPrice) : "승인 조건 확인 후 확정";
+
+  const titles = {
+    opening: "신규 개원 검사 의뢰 지원 제안",
+    conversion: "타사 거래처 전환 제안"
+  };
+
+  const esc = value => escapeHtml(String(value ?? ""));
+
+  // 첨부 파일의 텍스트 분류 결과를 디자인 카드로 재구성합니다.
+  // 첨부 원문을 별도 부록처럼 붙이지 않고, 제안의 핵심 포인트로 보여줍니다.
+  const categoryNames = [
+    "검사 및 운영 정보",
+    "검사 대상 및 임상적 활용",
+    "보험·수가·가격 정보",
+    "근거 및 참고 자료"
+  ];
+
+  const marketingCards = [];
+  const sourceLabels = [];
+
+  if (marketingText) {
+    const sourceMatches = marketingText.match(/^---\s*(.*?)\s*---\s*$/gm) || [];
+    sourceMatches.forEach(line => {
+      const source = line.replace(/^---\s*/, "").replace(/\s*---\s*$/, "").trim();
+      if (source && !sourceLabels.includes(source)) sourceLabels.push(source);
+    });
+
+    const classified = buildMarketingProposalSection();
+    const lines = classified.split(/\r?\n/);
+    let current = null;
+
+    lines.forEach(line => {
+      const trimmed = line.trim();
+      if (categoryNames.includes(trimmed)) {
+        current = { title: trimmed, items: [] };
+        marketingCards.push(current);
+        return;
+      }
+
+      if (!current) return;
+
+      const itemMatch = trimmed.match(/^\d+\.\s*(.+)$/);
+      if (itemMatch) {
+        current.items.push({ text: itemMatch[1], source: "" });
+        return;
+      }
+
+      const sourceMatch = trimmed.match(/^\[출처:\s*(.+?)\]$/);
+      if (sourceMatch && current.items.length) {
+        current.items[current.items.length - 1].source = sourceMatch[1];
+      }
+    });
+  }
+
+  const usableCards = marketingCards
+    .filter(card => card.items.length)
+    .slice(0, 4);
+
+  const marketingCardsHtml = usableCards.length
+    ? usableCards.map((card, index) => `
+        <article class="feature-card">
+          <div class="feature-head">
+            <span class="feature-number">0${index + 1}</span>
+            <h3>${esc(card.title)}</h3>
+          </div>
+          <ul>
+            ${card.items.slice(0, 3).map(item => `
+              <li>
+                <span>${esc(item.text.replace(/\s*\[출처:[^\]]+\]\s*/g, ""))}</span>
+                ${item.source ? `<small class="source">근거 자료: ${esc(item.source)}</small>` : ""}
+              </li>
+            `).join("")}
+          </ul>
+        </article>
+      `).join("")
+    : `
+      <article class="feature-card feature-card-empty">
+        <div class="feature-head"><span class="feature-number">01</span><h3>검사·서비스 제안</h3></div>
+        <p>마케팅 자료를 첨부하고 ‘자료 내용 추출’을 실행하면, 자료 내용에 맞는 제안 포인트가 이 영역에 구성됩니다.</p>
+      </article>
+    `;
+
+  const sourceSummary = sourceLabels.length
+    ? sourceLabels.slice(0, 3).map(esc).join(" · ") + (sourceLabels.length > 3 ? ` 외 ${sourceLabels.length - 3}개 자료` : "")
+    : "제안 대상 및 필요에 따라 재단 자료를 검토합니다.";
+
+  const popup = window.open("", "_blank");
+  if (!popup) {
+    alert("PDF 출력 창이 차단되었습니다. 브라우저의 팝업 차단을 해제한 뒤 다시 눌러 주세요.");
+    return;
+  }
+
+  const report = `<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${esc(clinic)}_영업제안서</title>
+<style>
+  @page { size: A4; margin: 11mm; }
+  * { box-sizing: border-box; }
+  body { margin:0; color:#22354b; background:#fff; font-family:Arial,"Malgun Gothic","맑은 고딕",sans-serif; font-size:9.5pt; line-height:1.55; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .report { max-width:190mm; margin:0 auto; }
+  .masthead { display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #16877f; padding-bottom:8px; margin-bottom:12px; color:#60748a; font-size:8pt; }
+  .brand { color:#17365d; font-weight:800; letter-spacing:.3px; }
+  .hero { position:relative; overflow:hidden; background:linear-gradient(115deg,#eaf5fc 0%,#f7fbff 54%,#e2f5f2 100%); border:1px solid #d4e5f3; border-radius:12px; padding:22px 23px 20px; margin-bottom:13px; }
+  .hero:after { content:""; position:absolute; right:-35px; top:-70px; width:220px; height:220px; border-radius:50%; background:rgba(34,131,170,.08); }
+  .eyebrow { color:#16877f; font-size:8pt; font-weight:800; letter-spacing:1.2px; }
+  h1 { position:relative; z-index:1; margin:6px 0 5px; color:#17365d; font-size:23pt; line-height:1.25; letter-spacing:-.5px; }
+  .hero-subtitle { position:relative; z-index:1; margin:0; color:#32516e; font-size:11pt; font-weight:700; }
+  .hero-note { position:relative; z-index:1; margin:7px 0 0; color:#627a90; font-size:8.5pt; }
+  .meta-grid { display:grid; grid-template-columns:1.3fr 1fr 1fr; gap:7px; margin-bottom:15px; }
+  .meta-card { border:1px solid #dce7ef; border-radius:8px; padding:9px 11px; background:#fff; min-width:0; }
+  .label { color:#71869a; font-size:7.8pt; margin-bottom:2px; }
+  .value { color:#1b3551; font-weight:800; overflow-wrap:anywhere; }
+  .section { margin:14px 0; }
+  .section-title { display:flex; align-items:center; gap:8px; border-bottom:1px solid #d9e6ef; padding-bottom:7px; margin-bottom:9px; color:#17365d; font-size:11.5pt; font-weight:800; }
+  .section-num { display:inline-flex; align-items:center; justify-content:center; min-width:25px; height:25px; background:#17365d; color:#fff; border-radius:50%; font-size:8pt; }
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:9px; }
+  .info-card { border:1px solid #dfe8ef; border-radius:8px; background:#fff; padding:11px 12px; min-width:0; break-inside:avoid; }
+  .info-card h3 { margin:0 0 5px; color:#166b85; font-size:9.4pt; }
+  .info-card p { margin:0; white-space:pre-wrap; overflow-wrap:anywhere; }
+  .feature-grid { display:grid; grid-template-columns:1fr 1fr; gap:9px; }
+  .feature-card { border:1px solid #dce8ef; border-radius:9px; padding:11px 12px; background:linear-gradient(145deg,#fff 0%,#f5faff 100%); min-width:0; break-inside:avoid; }
+  .feature-head { display:flex; align-items:center; gap:7px; border-bottom:1px solid #e0ebf2; padding-bottom:7px; margin-bottom:7px; }
+  .feature-number { display:inline-flex; flex:0 0 25px; width:25px; height:25px; align-items:center; justify-content:center; border-radius:50%; background:#167b91; color:#fff; font-size:8pt; font-weight:800; }
+  .feature-head h3 { margin:0; color:#17365d; font-size:9.2pt; }
+  .feature-card ul { padding-left:15px; margin:0; }
+  .feature-card li { margin:4px 0 7px; overflow-wrap:anywhere; }
+  .feature-card li::marker { color:#16877f; }
+  .source { display:block; color:#74879a; font-size:7pt; margin-top:3px; }
+  .feature-card-empty p { margin:0; color:#65788b; }
+  .steps { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+  .step { border-radius:8px; padding:10px; background:#f0f7fa; border:1px solid #dbe9ef; break-inside:avoid; }
+  .step b { display:block; color:#177d86; font-size:8pt; margin-bottom:4px; }
+  .step span { display:block; color:#2d4660; font-size:8.2pt; }
+  .terms { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; margin-top:8px; }
+  .term { background:#f4f7fb; border:1px solid #e0e8ef; border-radius:7px; padding:9px; }
+  .term .label { margin-bottom:4px; }
+  .term .value { font-size:8.5pt; }
+  .notice { background:#f6f9fb; color:#5e7184; border:1px solid #e1e8ee; border-radius:7px; padding:9px 11px; font-size:7.6pt; }
+  .footer { border-top:1px solid #dce7ef; margin-top:18px; padding-top:8px; display:flex; justify-content:space-between; gap:8px; color:#8090a0; font-size:7.5pt; }
+  .no-print { text-align:center; margin:15px 0 0; }
+  .print-btn { border:0; border-radius:7px; padding:10px 19px; color:white; background:#17365d; font-weight:800; cursor:pointer; }
+  @media screen { body { background:#edf2f6; padding:18px; } .report { max-width:210mm; min-height:297mm; background:#fff; padding:12mm; box-shadow:0 3px 18px rgba(23,54,93,.12); } }
+  @media print { body { padding:0; background:#fff; } .report { max-width:none; padding:0; box-shadow:none; } .no-print { display:none !important; } .section, .meta-grid, .hero { break-inside:avoid; } }
+</style>
+</head>
+<body>
+<div class="report">
+  <div class="masthead"><div class="brand">씨젠의료재단 · 부산3지점</div><div>맞춤형 영업 제안</div></div>
+  <header class="hero">
+    <div class="eyebrow">BUSAN BRANCH 03 · PROPOSAL</div>
+    <h1>맞춤형 검사 제안서</h1>
+    <p class="hero-subtitle">${esc(titles[type] || "거래처 협력 제안")}</p>
+    <p class="hero-note">거래처 상황과 재단 마케팅 자료를 바탕으로 구성한 협의용 초안</p>
+  </header>
+
+  <div class="meta-grid">
+    <div class="meta-card"><div class="label">제안 대상 거래처</div><div class="value">${esc(clinic)}</div></div>
+    <div class="meta-card"><div class="label">담당자</div><div class="value">${esc(manager)}</div></div>
+    <div class="meta-card"><div class="label">작성일</div><div class="value">${esc(date)}</div></div>
+  </div>
+
+  <section class="section">
+    <div class="section-title"><span class="section-num">01</span> 거래처 상황 및 제안 방향</div>
+    <div class="two-col">
+      <div class="info-card"><h3>거래처 현황</h3><p>${esc(situation)}</p></div>
+      <div class="info-card"><h3>핵심 제안</h3><p>${esc(needs)}</p></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-title"><span class="section-num">02</span> 핵심 검사·서비스 제안 포인트</div>
+    <div class="feature-grid">${marketingCardsHtml}</div>
+    <p class="source" style="margin-top:7px">자료 기반: ${esc(sourceSummary)}</p>
+  </section>
+
+  <section class="section">
+    <div class="section-title"><span class="section-num">03</span> 제안 조건 및 운영 계획</div>
+    <div class="info-card"><h3>거래처 적용 방향</h3><p>${esc(needs)}</p></div>
+    <div class="terms">
+      <div class="term"><div class="label">제안 대상</div><div class="value">${esc(pricing.item || "미입력")}</div></div>
+      <div class="term"><div class="label">기준 단가</div><div class="value">${esc(basePriceText)}</div></div>
+      <div class="term"><div class="label">승인 할인율</div><div class="value">${esc(discountRateText)}</div></div>
+      <div class="term"><div class="label">할인 금액</div><div class="value">${esc(discountAmountText)}</div></div>
+      <div class="term"><div class="label">계산된 제안 단가</div><div class="value">${esc(proposedPriceText)}</div></div>
+      <div class="term"><div class="label">적용 기간</div><div class="value">${esc(validPeriod)}</div></div>
+    </div>
+    <div class="two-col" style="margin-top:8px;">
+      <div class="info-card"><h3>할인·계약 적용 조건</h3><p>${esc(offerConditions)}</p></div>
+      <div class="info-card"><h3>지원 및 운영 조건</h3><p>${esc(supportConditions)}</p></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-title"><span class="section-num">04</span> 추진 일정 및 후속 조치</div>
+    <div class="steps">
+      <div class="step"><b>STEP 01 · 현황 확인</b><span>검사 적합성, 의뢰량 및 운영 환경 확인</span></div>
+      <div class="step"><b>STEP 02 · 조건 협의</b><span>승인된 가격·지원 조건과 의뢰 절차 협의</span></div>
+      <div class="step"><b>STEP 03 · 후속 관리</b><span>${esc(action)}</span></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="notice">본 문서는 영업 협의를 위한 초안입니다. 검사 정보와 임상적 설명은 첨부 자료의 원문 및 최신 기준을 확인한 뒤 사용해 주세요. 할인율과 제안 단가는 입력한 기준 단가·승인 할인율의 계산 참고값이며, 재단 내부 승인 후 확정해야 합니다. 자료에 없는 효과나 조건을 임의로 확정하지 않습니다.</div>
+  </section>
+
+  <div class="footer"><span>씨젠의료재단 부산3지점</span><span>거래처 협의 및 내부 검토용 초안</span></div>
+  <div class="no-print"><button class="print-btn" onclick="window.print()">PDF 저장 / 인쇄</button><p style="font-size:8pt;color:#6b7c8d">인쇄 창에서 대상 또는 프린터를 ‘PDF로 저장’으로 선택하세요.</p></div>
+</div>
+<script>
+  window.addEventListener("load", () => { setTimeout(() => window.print(), 500); });
+<\/script>
+</body>
+</html>`;
+
+  popup.document.open();
+  popup.document.write(report);
+  popup.document.close();
+}
+function downloadProposal() {
+  const content = $("proposalPreview").textContent;
+  if (!content || content.includes("위 항목을 입력한 뒤")) {
+    alert("먼저 제안서 초안을 만들어 주세요.");
+    return;
+  }
+
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <style>body{font-family:Arial,'Malgun Gothic',sans-serif;line-height:1.8;margin:35px;white-space:pre-wrap}</style>
+  </head><body>${escapeHtml(content)}</body></html>`;
+
+  const blob = new Blob(["\ufeff", html], {type:"application/msword"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "부산3지점_영업제안서.doc";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+/* 숙성영업 거래처별 검사 분석 */
+function addCrmTestRow(name = "", foundation = "", hospital = "", count = "") {
+  const tbody = $("crmTestRows");
+  if (!tbody) return;
+
+  const row = document.createElement("tr");
+
+  row.innerHTML = `
+    <td style="padding:5px;border-bottom:1px solid #eee;">
+      <input class="crm-test-name" placeholder="검사명"
+        style="width:120px;">
+    </td>
+    <td style="padding:5px;border-bottom:1px solid #eee;">
+      <input class="crm-test-foundation" type="number" min="0" step="1"
+        placeholder="0" style="width:105px;">
+    </td>
+    <td style="padding:5px;border-bottom:1px solid #eee;">
+      <input class="crm-test-hospital" type="number" min="0" step="1"
+        placeholder="0" style="width:105px;">
+    </td>
+    <td style="padding:5px;border-bottom:1px solid #eee;">
+      <input class="crm-test-count" type="number" min="0" step="1"
+        placeholder="0" style="width:85px;">
+    </td>
+    <td class="crm-test-difference"
+      style="padding:8px;text-align:right;border-bottom:1px solid #eee;">0원</td>
+    <td class="crm-test-monthly"
+      style="padding:8px;text-align:right;border-bottom:1px solid #eee;">0원</td>
+    <td style="padding:5px;border-bottom:1px solid #eee;">
+      <button type="button" class="btn secondary crm-test-delete">삭제</button>
+    </td>
+  `;
+
+  row.querySelector(".crm-test-name").value = name;
+  row.querySelector(".crm-test-foundation").value = foundation;
+  row.querySelector(".crm-test-hospital").value = hospital;
+  row.querySelector(".crm-test-count").value = count;
+
+  tbody.appendChild(row);
+
+  row.querySelectorAll("input").forEach(input => {
+    input.addEventListener("input", calculateCrmTests);
+  });
+
+  row.querySelector(".crm-test-delete").addEventListener("click", () => {
+    row.remove();
+    calculateCrmTests();
+  });
+
+  calculateCrmTests();
+}
+
+function getCrmTests() {
+  return Array.from(document.querySelectorAll("#crmTestRows tr"))
+    .map(row => {
+      const name = row.querySelector(".crm-test-name").value.trim();
+      const foundation =
+        Number(row.querySelector(".crm-test-foundation").value) || 0;
+      const hospital =
+        Number(row.querySelector(".crm-test-hospital").value) || 0;
+      const count =
+        Number(row.querySelector(".crm-test-count").value) || 0;
+
+      return {
+        name,
+        foundation,
+        hospital,
+        count,
+        difference: foundation - hospital,
+        monthly: (foundation - hospital) * count
+      };
+    })
+    .filter(test =>
+      test.name || test.foundation || test.hospital || test.count
+    );
+}
+
+function calculateCrmTests() {
+  const tbody = $("crmTestRows");
+  if (!tbody) return { tests: [], total: 0 };
+
+  let total = 0;
+
+  tbody.querySelectorAll("tr").forEach(row => {
+    const foundation =
+      Number(row.querySelector(".crm-test-foundation").value) || 0;
+    const hospital =
+      Number(row.querySelector(".crm-test-hospital").value) || 0;
+    const count =
+      Number(row.querySelector(".crm-test-count").value) || 0;
+
+    const difference = foundation - hospital;
+    const monthly = difference * count;
+
+    total += monthly;
+
+    row.querySelector(".crm-test-difference").textContent =
+      difference.toLocaleString("ko-KR") + "원";
+    row.querySelector(".crm-test-monthly").textContent =
+      monthly.toLocaleString("ko-KR") + "원";
+  });
+
+  const totalElement = $("crmTotalDifference");
+  if (totalElement) {
+    totalElement.textContent = total.toLocaleString("ko-KR") + "원";
+  }
+
+  return { tests: getCrmTests(), total };
+}
+
+function renderCrmTests(tests = []) {
+  const tbody = $("crmTestRows");
+  if (!tbody) return;
+
+  tbody.innerHTML = "";
+
+  if (Array.isArray(tests)) {
+    tests.forEach(test => {
+      addCrmTestRow(
+        test.name || "",
+        test.foundation ?? "",
+        test.hospital ?? "",
+        test.count ?? ""
+      );
+    });
+  }
+
+  calculateCrmTests();
+}
+
+/* 숙성영업 관리 */
+function loadCrm() {
+  try {
+    const saved = localStorage.getItem(CRM_KEY);
+    crmRecords = saved ? JSON.parse(saved) : [];
+    if (!Array.isArray(crmRecords)) crmRecords = [];
+  } catch (e) {
+    crmRecords = [];
+  }
+}
+
+function persistCrm() {
+  try {
+    localStorage.setItem(CRM_KEY, JSON.stringify(crmRecords));
+    return true;
+  } catch (e) {
+    alert("브라우저 저장 공간에 저장하지 못했습니다. CSV 백업을 이용해 주세요.");
+    return false;
+  }
+}
+
+function clearCrmForm() {
+  ["crmId","cClinic","cContact","cLast","cNext","cMemo"].forEach(
+    id => $(id).value = ""
+  );
+  $("cArea").value = "김해";
+  $("cStatus").value = "관심 확인";
+  renderCrmTests([]);
+}
+
+function saveCrm() {
+  const clinic = $("cClinic").value.trim();
+  if (!clinic) {
+    alert("병원·의원명을 입력해 주세요.");
+    $("cClinic").focus();
+    return;
+  }
+
+  const id = $("crmId").value || (Date.now().toString() + Math.random().toString(36).slice(2,7));
+  const record = {
+    id,
+    clinic,
+    area:$("cArea").value,
+    contact:$("cContact").value.trim(),
+    status:$("cStatus").value,
+    last:$("cLast").value,
+    next:$("cNext").value,
+        memo:$("cMemo").value.trim(),
+    tests:getCrmTests(),
+    updated:new Date().toISOString()
+  };
+
+  const idx = crmRecords.findIndex(item => item.id === id);
+  if (idx >= 0) crmRecords[idx] = record;
+  else crmRecords.unshift(record);
+
+  if (persistCrm()) {
+    renderCrm();
+    updateStats();
+    clearCrmForm();
+    alert("거래처를 저장했습니다.");
+  }
+}
+
+function editCrm(id) {
+  const r = crmRecords.find(item => item.id === id);
+  if (!r) return;
+  $("crmId").value = r.id;
+  $("cClinic").value = r.clinic || "";
+  $("cArea").value = r.area || "김해";
+  $("cContact").value = r.contact || "";
+  $("cStatus").value = r.status || "관심 확인";
+  $("cLast").value = r.last || "";
+  $("cNext").value = r.next || "";
+    $("cMemo").value = r.memo || "";
+  renderCrmTests(Array.isArray(r.tests) ? r.tests : []);
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+function deleteCrm(id) {
+  const r = crmRecords.find(item => item.id === id);
+  if (!r || !confirm(r.clinic + " 거래처 기록을 삭제할까요?")) return;
+  crmRecords = crmRecords.filter(item => item.id !== id);
+  persistCrm();
+  renderCrm();
+  updateStats();
+}
+
+function renderCrm() {
+  const query = ($("crmSearch").value || "").trim().toLowerCase();
+  const filter = $("crmFilter").value;
+  const today = new Date().toISOString().slice(0,10);
+
+  const filtered = crmRecords.filter(r => {
+    const haystack = [r.clinic,r.area,r.contact,r.status,r.memo].join(" ").toLowerCase();
+    return (!query || haystack.includes(query)) && (!filter || r.status === filter);
+  }).sort((a,b) => {
+    const ad = a.next || "9999-99-99";
+    const bd = b.next || "9999-99-99";
+    return ad.localeCompare(bd);
+  });
+
+  if (!filtered.length) {
+    $("crmList").innerHTML = '<div class="empty">등록된 거래처가 없거나 검색 결과가 없습니다.<br>위 입력란에서 첫 거래처를 등록해 주세요.</div>';
+    updateStats();
+    return;
+  }
+
+  $("crmList").innerHTML = filtered.map(r => {
+    const overdue = r.next && r.next <= today && r.status !== "계약 완료";
+    return `<article class="item">
+      <h3>${escapeHtml(r.clinic)}</h3>
+      <span class="pill">${escapeHtml(r.area || "지역 미입력")}</span>
+      <span class="pill">${escapeHtml(r.status || "상태 미입력")}</span>
+      ${overdue ? '<span class="pill" style="background:#fee2e2;color:#991b1b">연락 확인 필요</span>' : ""}
+      <p><b>담당자:</b> ${escapeHtml(r.contact || "-")}</p>
+      <p><b>최근 접촉:</b> ${escapeHtml(formatDate(r.last))} &nbsp; <b>다음 연락:</b> ${escapeHtml(formatDate(r.next))}</p>
+      <p>${escapeHtml(r.memo || "영업 메모 없음").replace(/\n/g,"<br>")}</p>
+      <p class="meta">최종 수정: ${escapeHtml(formatDate(r.updated))}</p>
+      <div class="toolbar">
+        <button class="btn small" onclick="editCrm('${escapeHtml(r.id)}')">수정</button>
+        <button class="btn danger small" onclick="deleteCrm('${escapeHtml(r.id)}')">삭제</button>
+      </div>
+    </article>`;
+  }).join("");
+
+  updateStats();
+}
+
+function csvEscape(value) {
+  return '"' + String(value ?? "").replace(/"/g,'""') + '"';
+}
+
+
+function exportCrm() {
+  const headers = [
+    "id", "clinic", "area", "contact", "status",
+    "last", "next", "memo", "updated", "tests"
+  ];
+
+  const lines = [headers.map(csvEscape).join(",")];
+
+  crmRecords.forEach(r => {
+    const row = headers.map(h => {
+      const value = h === "tests"
+        ? JSON.stringify(Array.isArray(r.tests) ? r.tests : [])
+        : r[h];
+      return csvEscape(value);
+    });
+    lines.push(row.join(","));
+  });
+
+  const blob = new Blob(
+    ["\ufeff" + lines.join("\r\n")],
+    { type: "text/csv;charset=utf-8" }
+  );
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "부산3지점_숙성영업_백업.csv";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+
+function parseCsv(text) {
+  const rows = [];
+  let row = [], field = "", quoted = false;
+  for (let i=0; i<text.length; i++) {
+    const c = text[i];
+    if (quoted) {
+      if (c === '"' && text[i+1] === '"') { field += '"'; i++; }
+      else if (c === '"') quoted = false;
+      else field += c;
+    } else {
+      if (c === '"' && field === "") quoted = true;
+      else if (c === ",") { row.push(field); field = ""; }
+      else if (c === "\n") { row.push(field); rows.push(row); row=[]; field=""; }
+      else if (c !== "\r") field += c;
+    }
+  }
+  row.push(field);
+  if (row.some(v => v !== "")) rows.push(row);
+  return rows;
+}
+
+function importCrm(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const rows = parseCsv(String(reader.result || "").replace(/^\uFEFF/,""));
+      if (rows.length < 2) throw new Error("복원할 데이터가 없습니다.");
+      const headers = rows[0];
+      
+const imported = rows.slice(1).map(row => {
+  const r = {};
+  headers.forEach((h, i) => r[h] = row[i] || "");
+
+  if (r.tests) {
+    try {
+      r.tests = JSON.parse(r.tests);
+      if (!Array.isArray(r.tests)) r.tests = [];
+    } catch (e) {
+      r.tests = [];
+    }
+  } else {
+    r.tests = [];
+  }
+
+  return r;
+}).filter(r => r.clinic);
+
+
+      if (!confirm(imported.length + "개 거래처를 가져옵니다. 기존 기록과 합쳐집니다. 진행할까요?")) return;
+
+      imported.forEach(r => {
+        if (!r.id) r.id = Date.now().toString() + Math.random().toString(36).slice(2,7);
+        const idx = crmRecords.findIndex(old => old.id === r.id);
+        if (idx >= 0) crmRecords[idx] = {...crmRecords[idx],...r};
+        else crmRecords.push(r);
+      });
+      persistCrm();
+      renderCrm();
+      updateStats();
+      alert("CSV 복원이 완료되었습니다.");
+    } catch (e) {
+      alert("CSV를 읽지 못했습니다. 이 대시보드에서 저장한 백업 파일인지 확인해 주세요.");
+    } finally {
+      event.target.value = "";
+    }
+  };
+  reader.readAsText(file, "UTF-8");
+}
+
+/* 시장조사 */
+function marketSearch(engine) {
+  const area = $("mArea").value;
+  const topic = $("mTopic").value;
+  const keyword = $("mKeyword").value.trim();
+  const query = [area,topic,keyword].filter(Boolean).join(" ");
+  let url = "";
+  if (engine === "naver") {
+    url = "https://search.naver.com/search.naver?query=" + encodeURIComponent(query);
+  } else if (engine === "news") {
+    url = "https://www.google.com/search?tbm=nws&q=" + encodeURIComponent(query);
+  } else {
+    url = "https://www.google.com/search?q=" + encodeURIComponent(query);
+  }
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
+/* 개원·채용정보 */
+function normalizeJob(job) {
+  if (typeof job === "string") {
+    return {title:job, clinic:"", area:"", date:"", url:"", description:""};
+  }
+  job = job || {};
+  return {
+    title:job.title || job.subject || job.post_title || job.name || job.position || "제목 없음",
+    clinic:job.clinic || job.hospital || job.company || job.organization || job.institution || "",
+    area:job.area || job.region || job.location || job.address || "",
+    date:job.date || job.created_at || job.posted_at || job.reg_date || job.datetime || "",
+    url:job.url || job.link || job.href || job.source_url || "",
+    description:job.description || job.content || job.summary || job.detail || "",
+    source:job.source || job.site || ""
+  };
+}
+
+function findJobArray(data) {
+  if (Array.isArray(data)) return data;
+  if (!data || typeof data !== "object") return [];
+  for (const key of ["results","jobs","items","data","posts","announcements"]) {
+    if (Array.isArray(data[key])) return data[key];
+  }
+  return [];
+}
+
+async function loadJobs() {
+  $("jobStatus").textContent = "공고 데이터를 불러오는 중입니다.";
+  try {
+    const response = await fetch("./results.json?ts=" + Date.now(), {cache:"no-store"});
+    if (!response.ok) throw new Error("HTTP " + response.status);
+    const data = await response.json();
+    jobs = findJobArray(data).map(normalizeJob);
+    $("jobStatus").textContent = "불러온 공고: " + jobs.length + "건";
+    renderJobs();
+    updateStats();
+  } catch (e) {
+    jobs = [];
+    $("jobStatus").textContent = "공고 데이터를 불러오지 못했습니다. results.json 경로와 파일 내용을 확인해 주세요.";
+    $("jobList").innerHTML = `<div class="empty">공고 데이터 연결에 실패했습니다.<br>
+      기존 자동수집 프로그램이 results.json을 생성하는지 확인해 주세요.<br>
+      파일 위치는 index.html과 같은 docs 폴더여야 합니다.</div>`;
+    updateStats();
+  }
+}
+
+function renderJobs() {
+  const query = ($("jobSearch").value || "").trim().toLowerCase();
+  const area = $("jobArea").value;
+  const filtered = jobs.filter(j => {
+    const all = [j.title,j.clinic,j.area,j.description,j.source].join(" ").toLowerCase();
+    const matchesQuery = !query || all.includes(query);
+    const matchesArea = !area || (area === "부산"
+      ? /부산|강서|사하|사상/.test(j.area + " " + j.title + " " + j.clinic)
+      : (j.area + " " + j.title + " " + j.clinic).includes(area));
+    return matchesQuery && matchesArea;
+  });
+
+  if (!filtered.length) {
+    $("jobList").innerHTML = '<div class="empty">표시할 공고가 없습니다.<br>지역 필터를 변경하거나 공고 데이터를 새로고침해 주세요.</div>';
+    return;
+  }
+
+  $("jobList").innerHTML = filtered.map(j => {
+    const safeUrl = /^https?:\/\//i.test(j.url) ? j.url : "";
+    return `<article class="item">
+      <h3>${escapeHtml(j.title)}</h3>
+      ${j.clinic ? `<p><b>기관:</b> ${escapeHtml(j.clinic)}</p>` : ""}
+      ${j.area ? `<p><b>지역:</b> ${escapeHtml(j.area)}</p>` : ""}
+      ${j.date ? `<p class="meta">등록일: ${escapeHtml(formatDate(j.date))}</p>` : ""}
+      ${j.description ? `<p>${escapeHtml(j.description)}</p>` : ""}
+      ${j.source ? `<p class="meta">출처: ${escapeHtml(j.source)}</p>` : ""}
+      ${safeUrl ? `<p><a href="${escapeHtml(safeUrl)}" target="_blank" rel="noopener noreferrer">공고 원문 열기 ↗</a></p>` : ""}
+    </article>`;
+  }).join("");
+}
+
+function updateStats() {
+  $("statCrm").textContent = crmRecords.length;
+  const today = new Date().toISOString().slice(0,10);
+  $("statFollow").textContent = crmRecords.filter(r =>
+    r.next && r.next <= today && r.status !== "계약 완료"
+  ).length;
+  $("statJobs").textContent = jobs.length;
+}
+
+loadCrm();
+clearCrmForm();
+renderCrm();
+updateStats();
+$("pDate").value = new Date().toISOString().slice(0,10);
+["pBasePrice", "pDiscountRate"].forEach(id => {
+  const input = $(id);
+  if (input) input.addEventListener("input", calculateProposalPricing);
+});
+calculateProposalPricing();
+loadJobs();
+</script>
+</body>
+</html>
