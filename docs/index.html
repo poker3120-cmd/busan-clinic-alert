@@ -1046,6 +1046,133 @@ function clearMarketingMaterials() {
   $("b3pMarketingText").value = "";
   $("b3pMarketingStatus").textContent = "자료가 초기화되었습니다.";
 }
+  
+// 모든 PDF/PPTX에 공통으로 사용하는 마케팅 자료 분류 기능
+function buildMarketingProposalSection() {
+  const input = document.getElementById("b3pMarketingText");
+  const raw = input ? input.value.trim() : "";
+
+  if (!raw) {
+    return "";
+  }
+
+  // 추출된 페이지·슬라이드 제목을 기준으로 자료 출처를 구분합니다.
+  const sourceBlocks = [];
+  let current = {
+    source: "첨부 자료",
+    lines: []
+  };
+
+  raw.split(/\r?\n/).forEach(line => {
+    const match = line.trim().match(/^---\s*(.*?)\s*---$/);
+
+    if (match) {
+      if (current.lines.length) sourceBlocks.push(current);
+      current = {
+        source: match[1],
+        lines: []
+      };
+    } else {
+      current.lines.push(line);
+    }
+  });
+
+  if (current.lines.length) sourceBlocks.push(current);
+
+  // PDF 추출 과정에서 발생한 불필요한 공백을 정리합니다.
+  function cleanLine(value) {
+    return String(value || "")
+      .replace(/[ \t]+/g, " ")
+      .replace(/\s+([,.;:!?%)\]])/g, "$1")
+      .replace(/([(\\[])\s+/g, "$1")
+      .trim();
+  }
+
+  // 검사명에 의존하지 않고 내용의 일반적인 주제로 분류합니다.
+  const categories = [
+    {
+      title: "검사 및 운영 정보",
+      pattern: /검사|항목|검체|검사방법|검사 일정|소요일|결과보고|의뢰|수거|운송|보관|채취|서비스|지원|장비|전산|연계|운영/i
+    },
+    {
+      title: "검사 대상 및 임상적 활용",
+      pattern: /적응증|대상|환자|질환|위험도|진단|평가|관리|선별|권고|유용|임상|예방|증상|고위험|추적/i
+    },
+    {
+      title: "보험·수가·가격 정보",
+      pattern: /보험|수가|급여|비급여|EDI|청구|가격|단가|할인|계약|본인부담|질가산|정산|수익/i
+    },
+    {
+      title: "근거 및 참고 자료",
+      pattern: /출처|가이드라인|가이드|권고사항|참고문헌|통계|논문|학회|기준|발표|연구|지침/i
+    }
+  ];
+
+  const collected = categories.map(category => ({
+    title: category.title,
+    items: []
+  }));
+
+  const seen = new Set();
+
+  sourceBlocks.forEach(block => {
+    block.lines.forEach(originalLine => {
+      const cleaned = cleanLine(originalLine);
+
+      if (cleaned.length < 8) return;
+
+      // 한 줄이 긴 경우 문장 단위로 나누어 분류합니다.
+      const segments = cleaned
+        .split(/(?<=[.!?])\s+|;\s+/)
+        .map(part => part.trim())
+        .filter(part => part.length >= 8);
+
+      segments.forEach(segment => {
+        categories.forEach((category, index) => {
+          if (!category.pattern.test(segment)) return;
+
+          const key = category.title + "|" + segment;
+          if (seen.has(key)) return;
+
+          seen.add(key);
+          collected[index].items.push({
+            text: segment.length > 350
+              ? segment.slice(0, 350) + "…"
+              : segment,
+            source: block.source
+          });
+        });
+      });
+    });
+  });
+
+  const sections = collected
+    .filter(category => category.items.length > 0)
+    .map(category => {
+      const items = category.items.slice(0, 8);
+
+      return category.title + "\n" +
+        items.map((item, index) =>
+          `${index + 1}. ${item.text}\n   [출처: ${item.source}]`
+        ).join("\n");
+    });
+
+  if (!sections.length) {
+    return (
+      "첨부 자료의 텍스트는 추출되었으나 주제별 자동 분류가 되지 않았습니다.\n" +
+      "추출된 원문을 검토한 후 필요한 내용을 직접 제안서에 반영해 주세요."
+    );
+  }
+
+  return (
+    "첨부 마케팅 자료 참고 내용\n\n" +
+    sections.join("\n\n") +
+    "\n\n확인 사항\n" +
+    "위 내용은 첨부 자료의 텍스트를 일반적인 주제별로 분류한 초안입니다. " +
+    "분류가 정확하지 않을 수 있으므로 원문과 출처를 확인한 후 사용하세요. " +
+    "자료에 명시되지 않은 할인율, 계약 조건, 검사 효과는 임의로 추정하지 않습니다."
+  );
+}
 
   function generateProposal() {
   const clinic = $("pClinic").value.trim() || "거래처명 미입력";
@@ -1064,7 +1191,9 @@ function clearMarketingMaterials() {
     renewal:"기존 거래처 협력 강화 제안"
   };
     const testAnalysis = calculateProposalTests();
-  const testDetails = testAnalysis.tests.length
+    const marketingSection = buildMarketingProposalSection();
+  
+    const testDetails = testAnalysis.tests.length
     ? testAnalysis.tests.map((test, index) =>
         `${index + 1}. ${test.name || "검사명 미입력"}
    - 재단 청구액: ${test.foundation.toLocaleString("ko-KR")}원
@@ -1163,6 +1292,9 @@ ${situation}
 3. 제안 내용
 ${needs}
 
+첨부 마케팅 자료 참고
+${marketingSection || "첨부된 마케팅 자료가 없습니다. 자료를 업로드한 후 내용을 추출해 주세요."}
+
 거래처별 개선 실행안
 ${improvementProposal}
 
@@ -1222,6 +1354,7 @@ function downloadProposalPDF() {
   const date = $("pDate").value || new Date().toISOString().slice(0, 10);
   const situation = $("pSituation").value.trim() || "거래처 현황 추가 확인 필요";
   const needs = $("pNeeds").value.trim() || "거래처별 필요 사항 확인 후 구체화";
+  const marketingSection = buildMarketingProposalSection();
   const action = $("pAction").value.trim() || "담당자와 후속 일정 협의";
   const type = $("pType").value;
 
@@ -1638,6 +1771,12 @@ function downloadProposalPDF() {
     </div>
   </section>
 
+    <section class="section">
+    <div class="section-title">
+      <span class="section-num">자료</span> 첨부 마케팅 자료 참고
+    </div>
+    <div class="content-card" style="white-space:pre-wrap;">${esc(marketingSection || "첨부된 마케팅 자료가 없습니다.")}</div>
+  </section>
   <section class="section">
     <div class="section-title"><span class="section-num">02</span> 검사별 청구액 분석</div>
 
