@@ -744,10 +744,14 @@ async function getB3PPdfJs() {
   return b3pPdfJsPromise;
 }
 
+
 async function extractPdfMarketingText(file) {
   const pdfjs = await getB3PPdfJs();
   const data = new Uint8Array(await file.arrayBuffer());
-  const pdf = await pdfjs.getDocument({ data }).promise;
+
+  // PDF 문서와 로딩 작업을 별도로 보관합니다.
+  const loadingTask = pdfjs.getDocument({ data });
+  const pdf = await loadingTask.promise;
   const pages = [];
 
   try {
@@ -772,18 +776,22 @@ async function extractPdfMarketingText(file) {
       }
     }
   } finally {
-    await pdf.destroy();
+    // destroy()는 PDF 문서 객체가 아닌 로딩 작업에 호출합니다.
+    if (typeof loadingTask.destroy === "function") {
+      await loadingTask.destroy();
+    }
   }
 
   if (!pages.length) {
     return (
       `--- ${file.name} ---\n` +
-      "추출된 텍스트가 없습니다. 스캔 이미지 PDF이거나 텍스트 추출을 지원하지 않는 형식일 수 있습니다."
+      "추출된 텍스트가 없습니다. 스캔 이미지 PDF이거나 이미지로만 구성된 자료일 수 있습니다."
     );
   }
 
   return pages.join("\n\n");
 }
+
 
 // PPTX는 ZIP 내부의 슬라이드 XML에서 텍스트를 읽습니다.
 function getPptxZipEntries(buffer) {
