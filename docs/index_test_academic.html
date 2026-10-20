@@ -1,0 +1,2264 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>부산3지점 통합 영업 대시보드</title>
+<style>
+:root {
+  --navy:#17365d;
+  --blue:#2563eb;
+  --bg:#f3f6fb;
+  --line:#e1e7ef;
+  --text:#1f2937;
+  --muted:#64748b;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  font-family:Arial,"Malgun Gothic",sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+header {
+  background:var(--navy);
+  color:white;
+  padding:24px max(18px,calc((100% - 1200px)/2));
+}
+header h1 { margin:0 0 8px; font-size:25px; }
+header p { margin:0; color:#dbeafe; font-size:14px; }
+nav {
+  display:flex;
+  gap:7px;
+  flex-wrap:wrap;
+  background:white;
+  padding:12px max(12px,calc((100% - 1200px)/2));
+  border-bottom:1px solid var(--line);
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+button,.navbtn {
+  font:inherit;
+  cursor:pointer;
+}
+.navbtn {
+  border:0;
+  border-radius:8px;
+  background:#eef2f7;
+  color:#334155;
+  padding:11px 15px;
+  font-weight:700;
+}
+.navbtn.active { background:var(--navy); color:white; }
+main { max-width:1200px; margin:auto; padding:22px 16px 50px; }
+.page { display:none; }
+.page.active { display:block; }
+h2 { margin:0 0 8px; font-size:23px; }
+.subtitle { margin:0 0 20px; color:var(--muted); font-size:14px; }
+.grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:15px;
+}
+.grid3 { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.card {
+  background:white;
+  border:1px solid var(--line);
+  border-radius:13px;
+  padding:19px;
+  min-width:0;
+}
+.card h3 { margin:0 0 9px; font-size:17px; }
+.card p { color:var(--muted); font-size:14px; line-height:1.6; }
+.launch {
+  display:block;
+  width:100%;
+  margin-top:13px;
+  border:0;
+  border-radius:8px;
+  background:var(--navy);
+  color:white;
+  padding:12px;
+  font-weight:700;
+}
+.stat { font-size:30px; font-weight:800; color:var(--navy); }
+label { display:block; font-size:13px; font-weight:700; margin:13px 0 6px; }
+input,select,textarea {
+  width:100%;
+  border:1px solid #cbd5e1;
+  border-radius:8px;
+  padding:11px;
+  background:white;
+  color:var(--text);
+  font:inherit;
+  font-size:14px;
+}
+textarea { min-height:95px; resize:vertical; }
+.row {
+  display:flex;
+  gap:10px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+.row > * { flex:1; min-width:130px; }
+.btn {
+  border:0;
+  border-radius:8px;
+  background:var(--blue);
+  color:white;
+  padding:11px 15px;
+  font-weight:700;
+}
+.btn.secondary { background:#e8edf5; color:#334155; }
+.btn.danger { background:#b91c1c; }
+.btn.small { padding:7px 10px; font-size:12px; }
+.toolbar { display:flex; gap:8px; flex-wrap:wrap; margin:14px 0; }
+.toolbar > * { flex:1; min-width:140px; }
+.item {
+  background:white;
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:15px;
+  margin:10px 0;
+  overflow-wrap:anywhere;
+}
+.item h3 { margin:0 0 8px; font-size:16px; }
+.item p { margin:6px 0; font-size:14px; line-height:1.55; }
+.meta { font-size:12px; color:var(--muted); }
+.pill {
+  display:inline-block;
+  background:#eaf1ff;
+  color:#1d4ed8;
+  border-radius:20px;
+  padding:4px 9px;
+  font-size:12px;
+  margin:2px 4px 2px 0;
+}
+.empty {
+  padding:25px;
+  background:white;
+  border:1px dashed #cbd5e1;
+  border-radius:10px;
+  text-align:center;
+  color:var(--muted);
+  line-height:1.7;
+}
+.notice {
+  background:#eff6ff;
+  border:1px solid #bfdbfe;
+  padding:12px;
+  border-radius:8px;
+  color:#1e40af;
+  font-size:13px;
+  line-height:1.6;
+  margin:12px 0;
+}
+footer {
+  text-align:center;
+  padding:22px;
+  color:var(--muted);
+  font-size:12px;
+}
+#proposalPreview {
+  background:white;
+  padding:24px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  line-height:1.8;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  min-height:120px;
+}
+@media(max-width:700px) {
+  header h1 { font-size:21px; }
+  .grid,.grid3 { grid-template-columns:1fr; }
+  nav { position:static; }
+  .navbtn { flex:1 1 40%; }
+  main { padding:16px 12px 35px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>부산3지점 통합 영업 대시보드</h1>
+  <p>영업관리 · 학술교육자료 | 김해 · 부산 서부권</p>
+</header>
+
+<nav>
+  <button class="navbtn active" data-page="home">홈</button>
+  <button class="navbtn" data-page="proposal">제안서 자동생성</button>
+  <button class="navbtn" data-page="crm">숙성영업 관리</button>
+  <button class="navbtn" data-page="academy">학술교육자료</button>
+  <button class="navbtn" data-page="jobs">개원·채용정보</button>
+</nav>
+
+<main>
+
+<!-- 홈 -->
+<section class="page active" id="home">
+  <h2>영업 현황</h2>
+  <p class="subtitle">부산3지점 영업 업무를 한 화면에서 관리합니다.</p>
+
+  <div class="grid grid3">
+    <div class="card">
+      <h3>숙성영업 거래처</h3>
+      <div class="stat" id="statCrm">0</div>
+      <p>등록된 영업 대상 거래처</p>
+    </div>
+    <div class="card">
+      <h3>후속 연락 예정</h3>
+      <div class="stat" id="statFollow">0</div>
+      <p>오늘 이전 또는 오늘이 연락 예정일인 거래처</p>
+    </div>
+    <div class="card">
+      <h3>개원·채용 공고</h3>
+      <div class="stat" id="statJobs">-</div>
+      <p>results.json에서 불러온 공고</p>
+    </div>
+  </div>
+
+  <div class="grid" style="margin-top:16px">
+    <div class="card">
+      <h3>📄 제안서 자동생성</h3>
+      <p>재단 마케팅 자료를 바탕으로 신규 개원·타사 거래처 전환용 제안서를 구성합니다.</p>
+      <button class="launch" onclick="showPage('proposal')">제안서 작성하기 →</button>
+    </div>
+    <div class="card">
+      <h3>🎯 숙성영업 관리</h3>
+      <p>추후 재방문하거나 연락할 거래처와 영업 진행 상황을 기록합니다.</p>
+      <button class="launch" onclick="showPage('crm')">거래처 관리하기 →</button>
+    </div>
+    <div class="card">
+      <h3>📚 학술교육자료</h3>
+      <p>검사 안내서, 학술 발표자료, 직원 교육자료와 세미나 자료를 한곳에서 관리합니다.</p>
+      <button class="launch" onclick="showPage('academy')">학술교육자료 열기 →</button>
+    </div>
+    <div class="card">
+      <h3>🏥 개원·채용정보</h3>
+      <p>기존 자동수집 프로그램이 생성한 공고 데이터를 확인합니다.</p>
+      <button class="launch" onclick="showPage('jobs')">공고 확인하기 →</button>
+    </div>
+  </div>
+</section>
+
+<!-- 제안서 -->
+<section class="page" id="proposal">
+  <h2>제안서 자동생성</h2>
+  <p class="subtitle">재단 마케팅 자료를 참고해 신규 개원·타사 거래 전환 제안서를 구성하고 PDF로 저장합니다.</p>
+
+  <div class="card">
+    <div class="grid">
+      <div>
+        <label for="pClinic">병원·의원명</label>
+        <input id="pClinic" placeholder="예: ○○내과의원">
+      </div>
+      <div>
+        <label for="pManager">담당자</label>
+        <input id="pManager" placeholder="예: 원장님">
+      </div>
+      <div>
+        <label for="pType">제안 유형</label>
+        <select id="pType">
+          <option value="opening">신규 개원 제안</option>
+          <option value="conversion">타사 거래처 전환 제안</option>
+        </select>
+      </div>
+      <div>
+        <label for="pDate">작성일</label>
+        <input id="pDate" type="date">
+      </div>
+    </div>
+
+    <label for="pSituation">거래처 현황 및 고민</label>
+    <textarea id="pSituation" placeholder="예: 현재 외부 의뢰 검사가 적고, 검사 항목 확대에 관심이 있음"></textarea>
+
+    <label for="pNeeds">중점 제안 내용</label>
+    <textarea id="pNeeds" placeholder="예: 검사 항목 확대, 의뢰 편의성 개선, 수익 구조 검토"></textarea>
+
+    <label for="pAction">후속 조치 및 일정</label>
+    <textarea id="pAction" placeholder="예: 다음 주 방문하여 검사 목록과 의뢰 조건 협의"></textarea>
+
+    <!-- 신규 개원·타사 전환 제안 가격 및 조건 -->
+    <div class="card" style="margin-top:16px;">
+      <h3>제안 단가 및 적용 조건</h3>
+      <p class="meta">기준 단가와 승인된 할인율을 입력하면 제안 단가를 계산합니다. 승인 전 할인율은 확정 조건으로 제시하지 마세요.</p>
+      <div class="grid">
+        <div>
+          <label for="pPriceItem">제안 대상 품목·서비스</label>
+          <input id="pPriceItem" placeholder="예: 검사 패키지 또는 검사 의뢰 서비스">
+        </div>
+        <div>
+          <label for="pBasePrice">기준 단가(원)</label>
+          <input id="pBasePrice" type="number" min="0" step="1" placeholder="기준 금액 입력">
+        </div>
+        <div>
+          <label for="pDiscountRate">승인 할인율(%)</label>
+          <input id="pDiscountRate" type="number" min="0" max="100" step="0.1" placeholder="승인된 할인율 입력">
+        </div>
+        <div>
+          <label>예상 할인 금액</label>
+          <div id="pDiscountAmountDisplay" class="notice" style="margin:0;min-height:42px;">기준 단가와 할인율 입력 후 계산</div>
+        </div>
+        <div>
+          <label>계산된 제안 단가</label>
+          <div id="pProposedPriceDisplay" class="notice" style="margin:0;min-height:42px;">기준 단가와 할인율 입력 후 계산</div>
+        </div>
+        <div>
+          <label for="pValidPeriod">적용 기간</label>
+          <input id="pValidPeriod" placeholder="예: 계약 후 12개월 / 협의 후 확정">
+        </div>
+      </div>
+      <label for="pOfferConditions">할인·계약 적용 조건</label>
+      <textarea id="pOfferConditions" placeholder="예: 대상 검사, 월 의뢰량, 계약 기간, 할인 적용 범위 등"></textarea>
+      <label for="pSupport">지원 및 운영 조건</label>
+      <textarea id="pSupport" placeholder="예: 검체 수거 횟수, 결과 연계, 초기 의뢰 안내, 담당자 교육 등"></textarea>
+    </div>
+    
+    <!-- 재단 마케팅 자료 참고 영역 -->
+    <div class="card" style="margin-top:16px;">
+      <h3>재단 마케팅 자료 참고</h3>
+      <p class="meta">
+        재단에서 배포한 검사 안내서와 서비스 소개 자료를 첨부하세요.
+        자료는 이 브라우저에서 처리하며 파일 자체를 외부 서버에 업로드하지 않습니다.
+      </p>
+
+      <label for="b3pMarketingFiles">
+        마케팅 자료 선택 (PDF 또는 PPTX, 여러 개 선택 가능)
+      </label>
+
+      <input
+        id="b3pMarketingFiles"
+        type="file"
+        accept=".pdf,.pptx,application/pdf,application/vnd.openxmlformats-officedocument.presentationml.presentation"
+        multiple
+      >
+
+      <div class="toolbar" style="margin-top:12px;">
+        <button
+          type="button"
+          class="btn secondary"
+          onclick="extractMarketingFiles()">
+          자료 내용 추출
+        </button>
+
+        <button
+          type="button"
+          class="btn secondary"
+          onclick="clearMarketingMaterials()">
+          자료 초기화
+        </button>
+      </div>
+
+      <p id="b3pMarketingStatus" class="meta">
+        아직 첨부된 자료가 없습니다.
+      </p>
+
+      <label for="b3pMarketingText">
+        추출된 마케팅 자료 내용
+      </label>
+
+      <textarea
+        id="b3pMarketingText"
+        placeholder="PDF 또는 PPTX를 선택하고 자료 내용 추출 버튼을 누르면 이곳에 내용이 표시됩니다. 추출 결과를 검토하고 필요한 부분을 직접 수정할 수 있습니다."
+        style="min-height:180px;"
+      ></textarea>
+
+      <p class="meta">
+        추출한 내용은 PDF 제안서의 핵심 검사·서비스 카드와 제안 포인트 구성에 사용됩니다. 원문을 별도 부록으로 붙이지 않습니다.
+      </p>
+    </div>
+
+    <div class="toolbar">
+      <button class="btn" onclick="generateProposal()">제안서 초안 만들기</button>
+      <button class="btn secondary" onclick="copyProposal()">내용 복사</button>
+      <button class="btn secondary" onclick="downloadProposal()">Word 파일 저장</button>
+      <button class="btn secondary" onclick="downloadProposalPDF()">PDF 저장</button>
+    </div>
+    <div id="proposalPreview">위 항목을 입력한 뒤 ‘제안서 초안 만들기’를 누르세요.</div>
+    <p class="meta">생성되는 문서는 수정 가능한 초안입니다. 실제 검사 가능 여부, 가격 및 계약 조건은 내부 확인 후 사용해 주세요.</p>
+  </div>
+</section>
+
+<!-- 숙성영업 -->
+<section class="page" id="crm">
+  <h2>숙성영업 관리</h2>
+  <p class="subtitle">추후 재방문하거나 연락할 거래처와 영업 진행 상황을 기록합니다.</p>
+
+  <div class="notice">
+    기록은 현재 브라우저에 저장됩니다. 브라우저 데이터 삭제나 기기 변경 시 기록이 사라질 수 있으므로 주기적으로 백업해 주세요.
+  </div>
+
+  <div class="card">
+    <h3>거래처 등록 및 수정</h3>
+    <input type="hidden" id="crmId">
+    <div class="grid">
+      <div>
+        <label for="cClinic">병원·의원명 *</label>
+        <input id="cClinic" placeholder="병원명">
+      </div>
+      <div>
+        <label for="cArea">지역</label>
+        <select id="cArea">
+          <option>김해</option>
+          <option>부산 강서구</option>
+          <option>부산 사하구</option>
+          <option>부산 사상구</option>
+          <option>기타</option>
+        </select>
+      </div>
+      <div>
+        <label for="cContact">담당자</label>
+        <input id="cContact" placeholder="원장님 또는 담당자">
+      </div>
+      <div>
+        <label for="cStatus">진행 상태</label>
+        <select id="cStatus">
+          <option>관심 확인</option>
+          <option>자료 전달</option>
+          <option>재방문 예정</option>
+          <option>조건 협의</option>
+          <option>계약 완료</option>
+          <option>보류</option>
+        </select>
+      </div>
+      <div>
+        <label for="cLast">최근 접촉일</label>
+        <input id="cLast" type="date">
+      </div>
+      <div>
+        <label for="cNext">다음 연락 예정일</label>
+        <input id="cNext" type="date">
+      </div>
+    </div>
+
+    <label for="cMemo">영업 내용 및 다음 조치</label>
+    <textarea id="cMemo" placeholder="상담 내용, 관심 검사, 거절 사유, 다음 방문 계획 등"></textarea>
+    
+    <!-- 거래처별 고수익 검사 분석 -->
+    <div class="card" style="margin-top:16px;">
+      <h3>거래처별 고수익 검사 확대 및 차액 분석</h3>
+      <p class="meta">
+        아래 검사 분석은 현재 등록하거나 수정 중인 거래처에 연결됩니다.
+        차액은 재단 청구액에서 병원 청구액을 뺀 금액입니다.
+      </p>
+
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;min-width:720px;">
+          <thead>
+            <tr>
+              <th style="padding:8px;border-bottom:1px solid #ddd;">검사명</th>
+              <th style="padding:8px;border-bottom:1px solid #ddd;">재단 청구액(원)</th>
+              <th style="padding:8px;border-bottom:1px solid #ddd;">병원 청구액(원)</th>
+              <th style="padding:8px;border-bottom:1px solid #ddd;">월 검사 건수</th>
+              <th style="padding:8px;border-bottom:1px solid #ddd;">건당 차액</th>
+              <th style="padding:8px;border-bottom:1px solid #ddd;">월간 차액</th>
+              <th style="padding:8px;border-bottom:1px solid #ddd;">삭제</th>
+            </tr>
+          </thead>
+          <tbody id="crmTestRows"></tbody>
+        </table>
+      </div>
+
+      <div class="toolbar" style="margin-top:12px;">
+        <button type="button" class="btn secondary"
+          onclick="addCrmTestRow()">검사 항목 추가</button>
+      </div>
+
+      <div style="margin-top:12px;padding:12px;background:#f5f7fa;border-radius:8px;">
+        <strong>월간 차액 합계: </strong>
+        <span id="crmTotalDifference">0원</span>
+        <p class="meta" style="margin-bottom:0;">
+          참고용 계산값이며 실제 순이익이나 확정 수익을 의미하지 않습니다.
+        </p>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <button class="btn" onclick="saveCrm()">거래처 저장</button>
+      <button class="btn secondary" onclick="clearCrmForm()">입력 초기화</button>
+      <button class="btn secondary" onclick="exportCrm()">CSV 백업</button>
+      <button class="btn secondary" onclick="document.getElementById('crmImport').click()">CSV 복원</button>
+      <input type="file" id="crmImport" accept=".csv,text/csv" style="display:none" onchange="importCrm(event)">
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <input id="crmSearch" placeholder="병원명·지역·메모 검색" oninput="renderCrm()">
+    <select id="crmFilter" onchange="renderCrm()">
+      <option value="">전체 진행 상태</option>
+      <option>관심 확인</option>
+      <option>자료 전달</option>
+      <option>재방문 예정</option>
+      <option>조건 협의</option>
+      <option>계약 완료</option>
+      <option>보류</option>
+    </select>
+  </div>
+  <div id="crmList"></div>
+</section>
+
+<!-- 학술교육자료 -->
+<section class="page" id="academy">
+  <h2>학술교육자료</h2>
+  <p class="subtitle">검사 안내, 학술 발표, 세미나 및 지점 교육에 필요한 자료를 한곳에서 관리합니다.</p>
+
+  <div class="notice">
+    첨부 파일은 현재 사용 중인 브라우저의 로컬 저장소에 보관됩니다. GitHub나 외부 서버로 전송되지 않습니다.
+    같은 컴퓨터와 브라우저에서 다시 확인할 수 있으며, 브라우저 데이터 삭제나 기기 변경 전에 원본 파일을 별도로 백업해 주세요.
+  </div>
+
+  <div class="card">
+    <h3>자료 등록</h3>
+    <label for="academyTitle">자료 제목 (선택)</label>
+    <input id="academyTitle" placeholder="예: 2026년 고수익 검사 교육 / 검사 안내서 모음">
+
+    <label for="academyCategory">자료 분류</label>
+    <select id="academyCategory">
+      <option value="검사 안내·홍보물">검사 안내·홍보물</option>
+      <option value="학술 발표자료">학술 발표자료</option>
+      <option value="직원 교육자료">직원 교육자료</option>
+      <option value="세미나·교육 행사">세미나·교육 행사</option>
+      <option value="보험·수가 자료">보험·수가 자료</option>
+      <option value="영업 참고자료">영업 참고자료</option>
+      <option value="기타">기타</option>
+    </select>
+
+    <label for="academyNotes">메모 (선택)</label>
+    <textarea id="academyNotes" placeholder="예: 교육 대상, 발표자, 적용 지점, 자료의 주요 내용 등"></textarea>
+
+    <label for="academyFiles">첨부 파일 선택 (여러 파일 가능)</label>
+    <input id="academyFiles" type="file" multiple accept=".pdf,.ppt,.pptx,.pptm,.xls,.xlsx,.xlsm,.csv,.doc,.docx,.docm,.txt,.rtf,.jpg,.jpeg,.png,.gif,.webp,.mp4,.mp3,.zip,.7z">
+    <p class="meta">PDF, PowerPoint, Excel, Word, CSV, 이미지 및 일부 동영상·압축파일을 첨부할 수 있습니다. 파일 자체를 업로드 서버로 보내지 않습니다.</p>
+
+    <div class="toolbar">
+      <button class="btn" type="button" onclick="saveAcademicMaterials()">자료 저장</button>
+      <button class="btn secondary" type="button" onclick="clearAcademicForm()">입력 초기화</button>
+      <button class="btn secondary" type="button" onclick="renderAcademicMaterials()">목록 새로고침</button>
+    </div>
+    <p id="academyStatus" class="meta" role="status">첨부된 자료를 확인할 수 있습니다.</p>
+  </div>
+
+  <div class="toolbar" style="margin-top:16px;">
+    <input id="academySearch" placeholder="자료 제목·파일명·메모 검색" oninput="renderAcademicMaterials()">
+    <select id="academyFilter" onchange="renderAcademicMaterials()">
+      <option value="">전체 자료 분류</option>
+      <option>검사 안내·홍보물</option>
+      <option>학술 발표자료</option>
+      <option>직원 교육자료</option>
+      <option>세미나·교육 행사</option>
+      <option>보험·수가 자료</option>
+      <option>영업 참고자료</option>
+      <option>기타</option>
+    </select>
+  </div>
+  <div id="academyList"></div>
+</section>
+
+<!-- 개원·채용정보 -->
+<section class="page" id="jobs">
+  <h2>개원·채용정보</h2>
+  <p class="subtitle">기존 자동수집 프로그램의 results.json 데이터를 불러옵니다.</p>
+
+  <div class="notice">
+    이 화면은 공고 데이터를 새로 수집하지 않습니다. 기존 GitHub Actions 또는 수집 프로그램이 생성한 results.json 파일을 읽습니다.
+  </div>
+
+  <div class="toolbar">
+    <select id="jobArea" onchange="renderJobs()">
+      <option value="">전체 지역</option>
+      <option value="김해">김해</option>
+      <option value="강서">부산 강서구</option>
+      <option value="사하">부산 사하구</option>
+      <option value="사상">부산 사상구</option>
+      <option value="부산">부산 전체</option>
+    </select>
+    <input id="jobSearch" placeholder="병원명·공고·키워드 검색" oninput="renderJobs()">
+    <button class="btn secondary" onclick="loadJobs()">공고 새로고침</button>
+  </div>
+
+  <p id="jobStatus" class="meta">공고 데이터를 불러오는 중입니다.</p>
+  <div id="jobList"></div>
+</section>
+
+</main>
+
+<footer>부산3지점 통합 영업 대시보드 · 개원·채용정보는 기존 results.json 연동</footer>
+
+<script>
+const $ = id => document.getElementById(id);
+let jobs = [];
+let crmRecords = [];
+
+const CRM_KEY = "busan3_crm_records_v1";
+
+function showPage(name) {
+  document.querySelectorAll(".page").forEach(el => el.classList.remove("active"));
+  document.querySelectorAll(".navbtn").forEach(el => el.classList.toggle("active", el.dataset.page === name));
+  const page = $(""+name);
+  if (page) page.classList.add("active");
+  if (name === "jobs") loadJobs();
+  if (name === "crm") renderCrm();
+  if (name === "academy") renderAcademicMaterials();
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+document.querySelectorAll(".navbtn").forEach(btn => {
+  btn.addEventListener("click", () => showPage(btn.dataset.page));
+});
+
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, ch => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+  })[ch]);
+}
+
+function formatDate(value) {
+  if (!value) return "-";
+  return String(value).slice(0,10);
+}
+
+/* 제안서 */
+  
+// ===== 재단 마케팅 자료 읽기: 브라우저 내부 처리 =====
+
+let b3pPdfJsPromise = null;
+
+async function getB3PPdfJs() {
+  if (!b3pPdfJsPromise) {
+    b3pPdfJsPromise = import("./vendor/pdf.mjs")
+      .then(pdfjs => {
+        pdfjs.GlobalWorkerOptions.workerSrc =
+          new URL("./vendor/pdf.worker.mjs", document.baseURI).href;
+        return pdfjs;
+      })
+      .catch(error => {
+        b3pPdfJsPromise = null;
+        throw new Error(
+          "PDF.js 파일을 불러오지 못했습니다. docs/vendor 폴더의 pdf.mjs와 pdf.worker.mjs 파일을 확인해 주세요. " +
+          error.message
+        );
+      });
+  }
+
+  return b3pPdfJsPromise;
+}
+
+
+async function extractPdfMarketingText(file) {
+  const pdfjs = await getB3PPdfJs();
+  const data = new Uint8Array(await file.arrayBuffer());
+
+  // PDF 문서와 로딩 작업을 별도로 보관합니다.
+  const loadingTask = pdfjs.getDocument({ data });
+  const pdf = await loadingTask.promise;
+  const pages = [];
+
+  try {
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+      const page = await pdf.getPage(pageNum);
+      const content = await page.getTextContent();
+
+      const pageText = content.items
+        .map(item => {
+          if (typeof item.str !== "string") return "";
+          return item.str + (item.hasEOL ? "\n" : " ");
+        })
+        .join("")
+        .replace(/[ \t]+\n/g, "\n")
+        .replace(/\n{3,}/g, "\n\n")
+        .trim();
+
+      if (pageText) {
+        pages.push(
+          `--- ${file.name} / ${pageNum}페이지 ---\n${pageText}`
+        );
+      }
+    }
+  } finally {
+    // destroy()는 PDF 문서 객체가 아닌 로딩 작업에 호출합니다.
+    if (typeof loadingTask.destroy === "function") {
+      await loadingTask.destroy();
+    }
+  }
+
+  if (!pages.length) {
+    return (
+      `--- ${file.name} ---\n` +
+      "추출된 텍스트가 없습니다. 스캔 이미지 PDF이거나 이미지로만 구성된 자료일 수 있습니다."
+    );
+  }
+
+  return pages.join("\n\n");
+}
+
+
+// PPTX는 ZIP 내부의 슬라이드 XML에서 텍스트를 읽습니다.
+function getPptxZipEntries(buffer) {
+  const view = new DataView(buffer);
+  const decoder = new TextDecoder("utf-8");
+  const minOffset = Math.max(0, buffer.byteLength - 65557);
+  let eocd = -1;
+
+  // ZIP 파일 끝의 중앙 디렉터리 정보를 찾습니다.
+  for (let pos = buffer.byteLength - 22; pos >= minOffset; pos--) {
+    if (
+      pos + 4 <= buffer.byteLength &&
+      view.getUint32(pos, true) === 0x06054b50
+    ) {
+      eocd = pos;
+      break;
+    }
+  }
+
+  if (eocd < 0) {
+    throw new Error("PPTX ZIP 구조를 읽을 수 없습니다.");
+  }
+
+  const entryCount = view.getUint16(eocd + 10, true);
+  const centralOffset = view.getUint32(eocd + 16, true);
+  const entries = [];
+  let ptr = centralOffset;
+
+  for (let i = 0; i < entryCount; i++) {
+    if (
+      ptr + 46 > buffer.byteLength ||
+      view.getUint32(ptr, true) !== 0x02014b50
+    ) {
+      throw new Error("PPTX 내부 파일 목록을 읽을 수 없습니다.");
+    }
+
+    const flags = view.getUint16(ptr + 8, true);
+    const method = view.getUint16(ptr + 10, true);
+    const compressedSize = view.getUint32(ptr + 20, true);
+    const nameLength = view.getUint16(ptr + 28, true);
+    const extraLength = view.getUint16(ptr + 30, true);
+    const commentLength = view.getUint16(ptr + 32, true);
+    const localOffset = view.getUint32(ptr + 42, true);
+
+    const nameStart = ptr + 46;
+    const name = decoder.decode(
+      new Uint8Array(buffer, nameStart, nameLength)
+    );
+
+    entries.push({
+      name,
+      flags,
+      method,
+      compressedSize,
+      localOffset
+    });
+
+    ptr += 46 + nameLength + extraLength + commentLength;
+  }
+
+  return { entries, view };
+}
+
+async function inflatePptxEntry(buffer, entry, view) {
+  if (entry.flags & 1) {
+    throw new Error("암호가 설정된 PPTX 파일은 처리할 수 없습니다.");
+  }
+
+  const local = entry.localOffset;
+
+  if (
+    local + 30 > buffer.byteLength ||
+    view.getUint32(local, true) !== 0x04034b50
+  ) {
+    throw new Error("PPTX 슬라이드 데이터를 읽을 수 없습니다.");
+  }
+
+  const nameLength = view.getUint16(local + 26, true);
+  const extraLength = view.getUint16(local + 28, true);
+  const start = local + 30 + nameLength + extraLength;
+  const end = start + entry.compressedSize;
+
+  if (end > buffer.byteLength) {
+    throw new Error("PPTX 파일 데이터가 잘려 있습니다.");
+  }
+
+  const compressed = new Uint8Array(buffer, start, entry.compressedSize);
+
+  // 압축 방식 0은 그대로 저장된 데이터, 8은 DEFLATE입니다.
+  if (entry.method === 0) {
+    return new Uint8Array(compressed);
+  }
+
+  if (entry.method !== 8) {
+    throw new Error("지원하지 않는 PPTX 압축 방식입니다.");
+  }
+
+  if (typeof DecompressionStream === "undefined") {
+    throw new Error(
+      "이 브라우저는 PPTX 압축 해제를 지원하지 않습니다. 최신 Edge 또는 Chrome에서 다시 시도해 주세요."
+    );
+  }
+
+  const stream = new Blob([compressed])
+    .stream()
+    .pipeThrough(new DecompressionStream("deflate-raw"));
+
+  return new Uint8Array(await new Response(stream).arrayBuffer());
+}
+
+async function extractPptxMarketingText(file) {
+  const buffer = await file.arrayBuffer();
+  const { entries, view } = getPptxZipEntries(buffer);
+
+  const slides = entries
+    .filter(entry =>
+      /^ppt\/slides\/slide\d+\.xml$/i.test(entry.name)
+    )
+    .sort((a, b) => {
+      const numA = Number(a.name.match(/slide(\d+)\.xml/i)[1]);
+      const numB = Number(b.name.match(/slide(\d+)\.xml/i)[1]);
+      return numA - numB;
+    });
+
+  if (!slides.length) {
+    throw new Error("PPTX 파일에서 슬라이드를 찾지 못했습니다.");
+  }
+
+  const drawingNamespace =
+    "http://schemas.openxmlformats.org/drawingml/2006/main";
+  const decoder = new TextDecoder("utf-8");
+  const results = [];
+
+  for (let i = 0; i < slides.length; i++) {
+    const bytes = await inflatePptxEntry(buffer, slides[i], view);
+    const xmlText = decoder.decode(bytes);
+    const xml = new DOMParser().parseFromString(
+      xmlText,
+      "application/xml"
+    );
+
+    if (xml.getElementsByTagName("parsererror").length) {
+      continue;
+    }
+
+    const paragraphs = Array.from(
+      xml.getElementsByTagNameNS(drawingNamespace, "p")
+    );
+
+    const textLines = paragraphs
+      .map(paragraph =>
+        Array.from(
+          paragraph.getElementsByTagNameNS(drawingNamespace, "t")
+        )
+          .map(node => node.textContent || "")
+          .join("")
+          .trim()
+      )
+      .filter(Boolean);
+
+    if (textLines.length) {
+      results.push(
+        `--- ${file.name} / 슬라이드 ${i + 1} ---\n` +
+        textLines.join("\n")
+      );
+    }
+  }
+
+  if (!results.length) {
+    return (
+      `--- ${file.name} ---\n` +
+      "추출된 텍스트가 없습니다. 이미지로만 구성된 슬라이드일 수 있습니다."
+    );
+  }
+
+  return results.join("\n\n");
+}
+
+async function extractMarketingFiles() {
+  const input = $("b3pMarketingFiles");
+  const output = $("b3pMarketingText");
+  const status = $("b3pMarketingStatus");
+  const files = Array.from(input.files || []);
+
+  if (!files.length) {
+    alert("먼저 PDF 또는 PPTX 자료를 선택해 주세요.");
+    return;
+  }
+
+  const allResults = [];
+  const failures = [];
+  status.textContent = "자료를 읽는 중입니다. 파일 크기에 따라 시간이 걸릴 수 있습니다.";
+
+  for (const file of files) {
+    try {
+      if (file.size > 50 * 1024 * 1024) {
+        throw new Error("파일이 50MB를 초과합니다.");
+      }
+
+      const lowerName = file.name.toLowerCase();
+      let extracted = "";
+
+      if (lowerName.endsWith(".pdf")) {
+        extracted = await extractPdfMarketingText(file);
+      } else if (lowerName.endsWith(".pptx")) {
+        extracted = await extractPptxMarketingText(file);
+      } else {
+        throw new Error("PDF 또는 PPTX 파일만 지원합니다.");
+      }
+
+      allResults.push(extracted);
+    } catch (error) {
+      failures.push(`${file.name}: ${error.message}`);
+    }
+
+    status.textContent =
+      `처리 중: ${allResults.length + failures.length}/${files.length}개 파일`;
+  }
+
+  // 대량 문서로 화면이 지나치게 커지는 것을 방지합니다.
+  const combined = allResults.join("\n\n====================\n\n");
+  const maxChars = 150000;
+  output.value = combined.length > maxChars
+    ? combined.slice(0, maxChars) +
+      "\n\n[화면 표시 제한으로 이후 내용은 생략했습니다.]"
+    : combined;
+
+  if (failures.length) {
+    status.textContent =
+      `완료: 성공 ${allResults.length}개, 실패 ${failures.length}개.\n` +
+      failures.join("\n");
+  } else {
+    status.textContent =
+      `완료: ${allResults.length}개 파일의 텍스트를 추출했습니다.`;
+  }
+
+  if (!allResults.length) {
+    alert(
+      "자료 내용을 추출하지 못했습니다.\n\n" +
+      failures.join("\n") +
+      "\n\n파일 경로, 형식, 암호 설정 여부를 확인해 주세요."
+    );
+  } else if (failures.length) {
+    alert(
+      "일부 파일을 추출하지 못했습니다. 아래 상태 메시지를 확인해 주세요."
+    );
+  }
+}
+
+function clearMarketingMaterials() {
+  $("b3pMarketingFiles").value = "";
+  $("b3pMarketingText").value = "";
+  $("b3pMarketingStatus").textContent = "자료가 초기화되었습니다.";
+}
+  
+// 모든 PDF/PPTX에 공통으로 사용하는 마케팅 자료 분류 기능
+function buildMarketingProposalSection() {
+  const input = document.getElementById("b3pMarketingText");
+  const raw = input ? input.value.trim() : "";
+
+  if (!raw) {
+    return "";
+  }
+
+  // 추출된 페이지·슬라이드 제목을 기준으로 자료 출처를 구분합니다.
+  const sourceBlocks = [];
+  let current = {
+    source: "첨부 자료",
+    lines: []
+  };
+
+  raw.split(/\r?\n/).forEach(line => {
+    const match = line.trim().match(/^---\s*(.*?)\s*---$/);
+
+    if (match) {
+      if (current.lines.length) sourceBlocks.push(current);
+      current = {
+        source: match[1],
+        lines: []
+      };
+    } else {
+      current.lines.push(line);
+    }
+  });
+
+  if (current.lines.length) sourceBlocks.push(current);
+
+  // PDF 추출 과정에서 발생한 불필요한 공백을 정리합니다.
+  function cleanLine(value) {
+    return String(value || "")
+      .replace(/[ \t]+/g, " ")
+      .replace(/\s+([,.;:!?%)\]])/g, "$1")
+      .replace(/([(\\[])\s+/g, "$1")
+      .trim();
+  }
+
+  // 검사명에 의존하지 않고 내용의 일반적인 주제로 분류합니다.
+  const categories = [
+    {
+      title: "검사 및 운영 정보",
+      pattern: /검사|항목|검체|검사방법|검사 일정|소요일|결과보고|의뢰|수거|운송|보관|채취|서비스|지원|장비|전산|연계|운영/i
+    },
+    {
+      title: "검사 대상 및 임상적 활용",
+      pattern: /적응증|대상|환자|질환|위험도|진단|평가|관리|선별|권고|유용|임상|예방|증상|고위험|추적/i
+    },
+    {
+      title: "보험·수가·가격 정보",
+      pattern: /보험|수가|급여|비급여|EDI|청구|가격|단가|할인|계약|본인부담|질가산|정산|수익/i
+    },
+    {
+      title: "근거 및 참고 자료",
+      pattern: /출처|가이드라인|가이드|권고사항|참고문헌|통계|논문|학회|기준|발표|연구|지침/i
+    }
+  ];
+
+  const collected = categories.map(category => ({
+    title: category.title,
+    items: []
+  }));
+
+  const seen = new Set();
+
+  sourceBlocks.forEach(block => {
+    block.lines.forEach(originalLine => {
+      const cleaned = cleanLine(originalLine);
+
+      if (cleaned.length < 8) return;
+
+      // 한 줄이 긴 경우 문장 단위로 나누어 분류합니다.
+      const segments = cleaned
+        .split(/(?<=[.!?])\s+|;\s+/)
+        .map(part => part.trim())
+        .filter(part => part.length >= 8);
+
+      segments.forEach(segment => {
+        categories.forEach((category, index) => {
+          if (!category.pattern.test(segment)) return;
+
+          const key = category.title + "|" + segment;
+          if (seen.has(key)) return;
+
+          seen.add(key);
+          collected[index].items.push({
+            text: segment.length > 350
+              ? segment.slice(0, 350) + "…"
+              : segment,
+            source: block.source
+          });
+        });
+      });
+    });
+  });
+
+  const sections = collected
+    .filter(category => category.items.length > 0)
+    .map(category => {
+      const items = category.items.slice(0, 8);
+
+      return category.title + "\n" +
+        items.map((item, index) =>
+          `${index + 1}. ${item.text}\n   [출처: ${item.source}]`
+        ).join("\n");
+    });
+
+  if (!sections.length) {
+    return (
+      "첨부 자료의 텍스트는 추출되었으나 주제별 자동 분류가 되지 않았습니다.\n" +
+      "추출된 원문을 검토한 후 필요한 내용을 직접 제안서에 반영해 주세요."
+    );
+  }
+
+  return (
+    "첨부 마케팅 자료 참고 내용\n\n" +
+    sections.join("\n\n") +
+    "\n\n확인 사항\n" +
+    "위 내용은 첨부 자료의 텍스트를 일반적인 주제별로 분류한 초안입니다. " +
+    "분류가 정확하지 않을 수 있으므로 원문과 출처를 확인한 후 사용하세요. " +
+    "자료에 명시되지 않은 할인율, 계약 조건, 검사 효과는 임의로 추정하지 않습니다."
+  );
+}
+
+function getProposalPricing() {
+  const item = $("pPriceItem") ? $("pPriceItem").value.trim() : "";
+  const baseRaw = $("pBasePrice") ? $("pBasePrice").value.trim() : "";
+  const rateRaw = $("pDiscountRate") ? $("pDiscountRate").value.trim() : "";
+  const hasBase = baseRaw !== "" && Number.isFinite(Number(baseRaw)) && Number(baseRaw) >= 0;
+  const hasRate = rateRaw !== "" && Number.isFinite(Number(rateRaw)) && Number(rateRaw) >= 0 && Number(rateRaw) <= 100;
+  const basePrice = hasBase ? Number(baseRaw) : null;
+  const discountRate = hasRate ? Number(rateRaw) : null;
+  const calculated = hasBase && hasRate;
+  const discountAmount = calculated ? Math.round(basePrice * discountRate / 100) : null;
+  const proposedPrice = calculated ? basePrice - discountAmount : null;
+  return {
+    item,
+    hasBase,
+    hasRate,
+    basePrice,
+    discountRate,
+    calculated,
+    discountAmount,
+    proposedPrice,
+    validPeriod: $("pValidPeriod") ? $("pValidPeriod").value.trim() : "",
+    conditions: $("pOfferConditions") ? $("pOfferConditions").value.trim() : "",
+    support: $("pSupport") ? $("pSupport").value.trim() : ""
+  };
+}
+
+function calculateProposalPricing() {
+  const pricing = getProposalPricing();
+  const amount = $("pDiscountAmountDisplay");
+  const proposed = $("pProposedPriceDisplay");
+  const formatWon = value => Number(value).toLocaleString("ko-KR") + "원";
+
+  if (amount) {
+    if (pricing.calculated) {
+      amount.textContent = formatWon(pricing.discountAmount);
+    } else if (pricing.hasBase && !pricing.hasRate) {
+      amount.textContent = "승인 할인율 입력 필요";
+    } else if (!pricing.hasBase && pricing.hasRate) {
+      amount.textContent = "기준 단가 입력 필요";
+    } else {
+      amount.textContent = "기준 단가와 할인율 입력 후 계산";
+    }
+  }
+
+  if (proposed) {
+    if (pricing.calculated) {
+      proposed.textContent = formatWon(pricing.proposedPrice);
+    } else {
+      proposed.textContent = "기준 단가와 승인 할인율 입력 후 계산";
+    }
+  }
+
+  return pricing;
+}
+
+function generateProposal() {
+  const clinic = $("pClinic").value.trim() || "거래처명 미입력";
+  const manager = $("pManager").value.trim() || "원장님";
+  const date = $("pDate").value || new Date().toISOString().slice(0, 10);
+  const situation = $("pSituation").value.trim() || "거래처 현황 추가 확인 필요";
+  const needs = $("pNeeds").value.trim() || "거래처별 필요 사항 확인 후 구체화";
+  const action = $("pAction").value.trim() || "담당자와 후속 일정 협의";
+  const type = $("pType").value;
+  const pricing = calculateProposalPricing();
+  const fmtWon = value => Number(value).toLocaleString("ko-KR") + "원";
+
+  const titles = {
+    opening: "신규 개원 검사 의뢰 지원 제안",
+    conversion: "타사 거래처 전환 제안"
+  };
+
+  const priceText = pricing.calculated
+    ? `- 기준 단가: ${fmtWon(pricing.basePrice)}
+- 승인 할인율: ${pricing.discountRate}%
+- 할인 금액: ${fmtWon(pricing.discountAmount)}
+- 계산된 제안 단가: ${fmtWon(pricing.proposedPrice)}`
+    : `- 기준 단가: ${pricing.hasBase ? fmtWon(pricing.basePrice) : "미입력"}
+- 승인 할인율: ${pricing.hasRate ? pricing.discountRate + "%" : "내부 승인 기준 확인 후 입력"}
+- 할인 금액 및 제안 단가: 기준 단가와 승인 할인율 확인 후 계산`;
+
+  const content =
+`부산3지점 영업 제안서
+
+1. 제안 개요
+- 거래처: ${clinic}
+- 담당자: ${manager}
+- 작성일: ${date}
+- 제안 유형: ${titles[type] || "맞춤형 영업 제안"}
+
+2. 거래처 현황 및 제안 배경
+${situation}
+
+3. 맞춤형 제안 내용
+${needs}
+
+4. 제안 단가 및 적용 조건
+- 제안 대상: ${pricing.item || "미입력"}
+${priceText}
+- 적용 기간: ${pricing.validPeriod || "거래처 협의 후 확정"}
+- 할인·계약 적용 조건: ${pricing.conditions || "내부 승인 및 거래처 협의 후 확정"}
+- 지원 및 운영 조건: ${pricing.support || "거래처별 필요와 제공 가능 범위를 확인 후 협의"}
+
+5. 추진 일정 및 후속 조치
+${action}
+
+6. 확인 사항
+할인율과 제안 단가는 재단 내부 승인 기준에 따라 확정합니다. 첨부 마케팅 자료의 검사 정보와 임상적 설명은 원문 및 최신 기준을 확인한 후 사용하며, 자료에 없는 검사 효과나 계약 조건은 임의로 확정하지 않습니다.
+
+씨젠의료재단 부산3지점 드림`;
+
+  $("proposalPreview").textContent = content;
+}
+
+function copyProposal() {
+  const text = $("proposalPreview").textContent;
+  if (!text || text.includes("위 항목을 입력한 뒤")) {
+    alert("먼저 제안서 초안을 만들어 주세요.");
+    return;
+  }
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text)
+      .then(() => alert("제안서 내용을 복사했습니다."))
+      .catch(() => fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
+
+function fallbackCopy(text) {
+  const area = document.createElement("textarea");
+  area.value = text;
+  document.body.appendChild(area);
+  area.select();
+  try {
+    document.execCommand("copy");
+    alert("제안서 내용을 복사했습니다.");
+  } catch (e) {
+    alert("복사에 실패했습니다. 내용을 선택해 직접 복사해 주세요.");
+  }
+  area.remove();
+}
+
+/* 인포그래픽형 제안서 PDF — 마케팅 자료 내용에 맞춰 동적으로 구성 */
+function downloadProposalPDF() {
+  const clinic = $("pClinic").value.trim() || "거래처명 미입력";
+  const manager = $("pManager").value.trim() || "원장님";
+  const date = $("pDate").value || new Date().toISOString().slice(0, 10);
+  const situation = $("pSituation").value.trim() || "거래처 상황을 확인하고 맞춤 제안 방향을 협의합니다.";
+  const needs = $("pNeeds").value.trim() || "재단 마케팅 자료를 바탕으로 적합한 검사·서비스를 검토합니다.";
+  const action = $("pAction").value.trim() || "담당자와 후속 일정 협의";
+  const type = $("pType").value;
+  const marketingText = $("b3pMarketingText") ? $("b3pMarketingText").value.trim() : "";
+  const pricing = getProposalPricing();
+  const money = value => Number(value || 0).toLocaleString("ko-KR") + "원";
+  const esc = value => escapeHtml(String(value ?? ""));
+
+  const titles = {
+    opening: "신규 개원 검사 의뢰 제안",
+    conversion: "타사 거래처 전환 제안"
+  };
+
+  // 추출 결과에서 파일명 및 페이지/슬라이드별 본문을 읽습니다.
+  const rawLines = marketingText.split(/\r?\n/);
+  const sourceLabels = [];
+  const blocks = [];
+  let currentSource = "첨부 마케팅 자료";
+  let currentLines = [];
+  const flush = () => {
+    if (currentLines.length) blocks.push({ source: currentSource, lines: currentLines.slice() });
+    currentLines = [];
+  };
+
+  rawLines.forEach(line => {
+    const match = line.trim().match(/^---\s*(.*?)\s*---$/);
+    if (match) {
+      flush();
+      currentSource = match[1]
+        .replace(/\s*\/\s*\d+\s*(?:페이지|슬라이드)\s*$/i, "")
+        .replace(/\s*\/\s*(?:페이지|슬라이드)\s*\d+\s*$/i, "")
+        .trim();
+      if (currentSource && !sourceLabels.includes(currentSource)) sourceLabels.push(currentSource);
+    } else if (line.trim() && !/^={5,}$/.test(line.trim())) {
+      currentLines.push(line.trim());
+    }
+  });
+  flush();
+
+  const simplifyFilename = value => String(value || "")
+    .replace(/\.(pdf|pptx)$/i, "")
+    .replace(/\b\d+\s*[Pp]\b/g, "")
+    .replace(/(홍보물|마케팅자료|마케팅|안내서|소개자료|리플렛|브로슈어|최종본|수정본)/g, "")
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  const topicFromFile = sourceLabels.length ? simplifyFilename(sourceLabels[0]) : "";
+  const plainText = marketingText.replace(/---\s*.*?\s*---/g, " ").replace(/\s+/g, " ").trim();
+  const isCardio = /심혈관|심뇌|동맥경화|동맥|지질|콜레스테롤|심장|혈관|apolipoprotein|lipoprotein/i.test((topicFromFile + " " + plainText).slice(0, 12000));
+  const topic = topicFromFile.length >= 3 && topicFromFile.length <= 38
+    ? topicFromFile
+    : (isCardio ? "심혈관 위험 평가" : (type === "opening" ? "신규 개원 검사 서비스" : "검사 의뢰 전환"));
+  const headline = topic.length > 28 ? topic.slice(0, 27) + "…" : topic;
+  const subtitle = needs.length > 70 ? needs.slice(0, 69) + "…" : needs;
+
+  // 원문은 그대로 붙이지 않고, 짧은 핵심 문장 후보로 정리합니다.
+  const tidy = value => String(value || "")
+    .replace(/[\t ]+/g, " ")
+    .replace(/\s+([,.;:!?%)\]])/g, "$1")
+    .replace(/([(\[] )/g, "$1")
+    .trim();
+
+  const candidatePool = [];
+  blocks.forEach(block => {
+    block.lines.forEach(line => {
+      const normalized = tidy(line);
+      if (normalized.length < 14) return;
+      if (/^(출처|항목명|검사명|검체|보험\s*정보|수가|검사\s*일정|검사방법|적응증)\b/i.test(normalized)) return;
+      const pieces = normalized.split(/(?<=[.!?。！？])\s+|(?<=다)\s+(?=[가-힣])/);
+      pieces.forEach(piece => {
+        const text = tidy(piece);
+        if (text.length < 14 || /^[-*•·※]/.test(text) && text.length < 26) return;
+        if (/^(출처|자료에 따르면|참고문헌|누\s*\d|\d{4}\s*년\s*건강보험통계)/i.test(text)) return;
+        candidatePool.push({ text, source: block.source });
+      });
+    });
+  });
+
+  const shorten = (value, max = 92) => {
+    const text = tidy(value);
+    if (text.length <= max) return text;
+    const cut = text.slice(0, max - 1);
+    const space = cut.lastIndexOf(" ");
+    return (space > max * 0.52 ? cut.slice(0, space) : cut).trim() + "…";
+  };
+
+  function pickPoints(pattern, limit = 2) {
+    const ranked = candidatePool
+      .filter(item => pattern.test(item.text))
+      .map(item => {
+        let score = 0;
+        if (item.text.length >= 26 && item.text.length <= 150) score += 4;
+        if (/[.!?。！？]$/.test(item.text)) score += 2;
+        if (/유용|권고|평가|활용|확인|관리|제공|개선|운영|지원|위험|대상|검체|일정|결과/.test(item.text)) score += 3;
+        if (item.text.length > 180) score -= 3;
+        if (/출처|참고|아래 검사|질가산료/.test(item.text)) score -= 5;
+        return { ...item, score };
+      })
+      .sort((a, b) => b.score - a.score || a.text.length - b.text.length);
+    const used = new Set();
+    const results = [];
+    for (const item of ranked) {
+      const key = item.text.toLowerCase();
+      if (used.has(key)) continue;
+      used.add(key);
+      results.push({ text: shorten(item.text, 95), source: item.source });
+      if (results.length >= limit) break;
+    }
+    return results;
+  }
+
+  const servicePoints = pickPoints(/검사|검체|일정|소요일|결과보고|의뢰|수거|운송|보관|채취|서비스|지원|장비|전산|연계|운영|검진|시스템|방법/i, 3);
+  const clinicalPoints = pickPoints(/적응증|대상|환자|질환|위험도|진단|평가|관리|선별|권고|유용|임상|예방|증상|고위험|추적|가이드라인|지표|콜레스테롤|심혈관/i, 3);
+  const evidencePoints = pickPoints(/보험|수가|급여|비급여|EDI|청구|가격|단가|할인|계약|본인부담|질가산|가이드라인|권고|출처|통계|지침|기준/i, 2);
+
+  // 범용 표지 항목: 문서에 실제로 존재하는 필드만 표시합니다.
+  const fieldDefinitions = [
+    { label: "검사·서비스 항목", pattern: /^(?:항목명|검사명|검사\s*항목|서비스명|제공\s*서비스)\s*(.*)$/i },
+    { label: "검체", pattern: /^검체\s*(.*)$/i },
+    { label: "검사 일정", pattern: /^(?:검사\s*일정|검사\s*소요일|보고\s*일정|결과\s*보고\s*일정)\s*(.*)$/i },
+    { label: "검사 방법", pattern: /^(?:검사\s*방법|검사방법|분석\s*방법)\s*(.*)$/i },
+    { label: "보험·수가", pattern: /^(?:보험\s*정보|보험정보|수가(?:\s*\([^)]*\))?|급여\s*정보)\s*(.*)$/i },
+    { label: "적응증·활용", pattern: /^(?:적응증|검사\s*목적|활용\s*목적|대상\s*환자)\s*(.*)$/i }
+  ];
+  const keyFacts = [];
+  const labelsSeen = new Set();
+  for (let i = 0; i < rawLines.length; i++) {
+    const compact = rawLines[i].trim().replace(/\s+/g, " ");
+    if (!compact || /^---|^={5,}/.test(compact)) continue;
+    for (const def of fieldDefinitions) {
+      const match = compact.match(def.pattern);
+      if (!match || labelsSeen.has(def.label)) continue;
+      let value = tidy(match[1] || "");
+      if (!value && i + 1 < rawLines.length) {
+        const next = rawLines[i + 1].trim().replace(/\s+/g, " ");
+        if (next && !/^(?:검체|검사\s*일정|검사방법|검사\s*방법|보험\s*정보|수가|적응증|항목명|검사명)\b/i.test(next)) value = tidy(next);
+      }
+      if (value) {
+        keyFacts.push({ label: def.label, value: shorten(value, 70) });
+        labelsSeen.add(def.label);
+      }
+    }
+  }
+
+  // 핵심 정보 표가 비어 있을 때는 실제 추출된 문장 후보를 넣습니다.
+  if (!keyFacts.length) {
+    [
+      { label: "검사·서비스", point: servicePoints[0] },
+      { label: "활용 포인트", point: clinicalPoints[0] },
+      { label: "참고 내용", point: evidencePoints[0] || servicePoints[1] }
+    ].forEach(item => {
+      if (item.point) keyFacts.push({ label: item.label, value: item.point.text });
+    });
+  }
+
+  const badgeDefinitions = [
+    ["검체 정보", /검체/i],
+    ["검사 일정", /검사\s*일정|소요일|보고\s*일정|월\s*[-~–]\s*토/i],
+    ["보험·수가", /보험|수가|급여|비급여|EDI/i],
+    ["근거 자료", /출처|가이드라인|권고사항|논문|통계|연구/i]
+  ];
+  const badges = badgeDefinitions.filter(item => item[1].test(plainText)).map(item => item[0]).slice(0, 4);
+
+  const cardiacHeroImage = "data:image/jpeg;base64,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";
+  const heroVisual = isCardio
+    ? `<img class="hero-image" src="${cardiacHeroImage}" alt="심혈관 건강 관련 일러스트">`
+    : `<div class="lab-visual" aria-hidden="true"><div class="lab-orbit orbit-one"></div><div class="lab-orbit orbit-two"></div><div class="lab-vial vial-one"><i></i></div><div class="lab-vial vial-two"><i></i></div><div class="lab-vial vial-three"><i></i></div><div class="lab-caption">DIAGNOSTIC<br>INSIGHT</div></div>`;
+
+  const buildList = (items, fallback, css = "") => {
+    const content = items.length
+      ? items.map((item, i) => `<div class="point-row"><span class="point-index ${css}">${String(i + 1).padStart(2, "0")}</span><div class="point-copy"><p>${esc(item.text)}</p><small>${esc(simplifyFilename(item.source))}</small></div></div>`).join("")
+      : `<div class="fallback-point">${esc(fallback)}</div>`;
+    return content;
+  };
+
+  const keyFactHtml = keyFacts.slice(0, 6).map((fact, i) => `
+    <tr><td>${esc(fact.label)}</td><td>${esc(fact.value)}</td></tr>
+  `).join("") || `<tr><td colspan="2">첨부 자료를 읽으면 핵심 정보가 이 영역에 표시됩니다.</td></tr>`;
+
+  const serviceHtml = buildList(servicePoints.slice(0, 2), "검사·서비스 자료에서 확인된 핵심 정보를 검토합니다.", "blue");
+  const clinicalHtml = buildList(clinicalPoints.slice(0, 2), "관련 환자군과 임상적 활용은 첨부 자료 원문에서 확인해 주세요.", "teal");
+  const evidenceHtml = buildList(evidencePoints.slice(0, 2), "보험·수가 및 근거 사항은 해당 자료에서 확인되는 경우에만 반영합니다.", "purple");
+
+  const fmtPeriod = pricing.validPeriod || "협의 후 확정";
+  const priceItem = pricing.item || "제안 대상 미입력";
+  const basePrice = pricing.hasBase ? money(pricing.basePrice) : "미입력";
+  const rate = pricing.hasRate ? `${pricing.discountRate}%` : "승인 기준 확인 필요";
+  const discount = pricing.calculated ? money(pricing.discountAmount) : "확정 전";
+  const proposalPrice = pricing.calculated ? money(pricing.proposedPrice) : "승인 후 확정";
+  const condition = pricing.conditions || "대상 품목·물량·기간은 내부 승인 후 협의";
+  const support = pricing.support || "수거·결과 연계·초기 안내는 실제 제공 범위 확인 후 협의";
+  const sources = sourceLabels.length
+    ? sourceLabels.map(name => simplifyFilename(name)).filter(Boolean).slice(0, 3).map(esc).join(" · ")
+    : "첨부 자료 없음";
+
+  const popup = window.open("", "_blank");
+  if (!popup) {
+    alert("PDF 출력 창이 차단되었습니다. 브라우저의 팝업 차단을 해제한 뒤 다시 눌러 주세요.");
+    return;
+  }
+
+  const report = `<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${esc(clinic)}_인포그래픽형_영업제안서</title>
+<style>
+@page{size:A4 landscape;margin:3.5mm}
+*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body{margin:0;background:#eef4f8;color:#203c58;font-family:Arial,"Malgun Gothic","맑은 고딕",sans-serif;font-size:8pt;line-height:1.38}
+.report{width:100%;max-width:285mm;margin:0 auto;background:#fff;overflow:hidden}
+.brandline{display:flex;align-items:center;justify-content:space-between;color:#54708b;border-bottom:1.4px solid #15918a;padding:0 1mm 2mm;margin-bottom:2.5mm;font-size:7pt}
+.brandname{color:#173e68;font-weight:900;letter-spacing:.2px}
+.hero{height:33mm;border-radius:3mm;overflow:hidden;display:grid;grid-template-columns:1.55fr 1fr;position:relative;background:linear-gradient(105deg,#e7f5fc 0%,#f8fcff 58%,#e4f5f3 100%);border:1px solid #c7e1f1;margin-bottom:2.5mm}
+.hero-copy{padding:4mm 5mm;position:relative;z-index:2}
+.eyebrow{display:inline-block;background:#1b5a91;color:white;border-radius:9mm;padding:1mm 2.4mm;font-size:6.5pt;font-weight:900;letter-spacing:.5px}
+.hero h1{font-size:22pt;line-height:1.08;margin:2.2mm 0 1.6mm;color:#14518a;letter-spacing:-.6px}
+.hero-subtitle{margin:0;color:#355a79;font-size:9pt;font-weight:700;max-width:150mm}
+.hero-small{margin:1.6mm 0 0;color:#6c8295;font-size:6.9pt}
+.hero-art{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 55% 40%,rgba(78,163,207,.23),transparent 55%)}
+.hero-art:before{content:"";position:absolute;width:42mm;height:42mm;border:1px solid rgba(36,132,172,.2);border-radius:50%;right:12mm;top:-7mm}
+.hero-art:after{content:"";position:absolute;width:30mm;height:30mm;border:1px solid rgba(36,132,172,.15);border-radius:50%;right:18mm;top:-1mm}
+.hero-image{position:relative;z-index:1;width:78mm;height:34mm;object-fit:cover;object-position:center;border-radius:0 0 0 11mm;mix-blend-mode:multiply}
+.lab-visual{position:relative;width:76mm;height:35mm}
+.lab-orbit{position:absolute;border:1px solid #9ccdda;border-radius:50%;transform:rotate(-23deg)}
+.orbit-one{width:62mm;height:25mm;left:7mm;top:4mm}.orbit-two{width:50mm;height:20mm;left:13mm;top:7mm;transform:rotate(28deg)}
+.lab-vial{position:absolute;bottom:5mm;width:8mm;height:21mm;border:1.5px solid #2b84a4;border-radius:2mm 2mm 3mm 3mm;background:linear-gradient(#d4eefb,#72bfda);box-shadow:inset 0 -5mm rgba(255,255,255,.35)}
+.lab-vial:before{content:"";position:absolute;top:-3mm;left:1mm;width:5mm;height:3mm;border-radius:1mm 1mm 0 0;background:#1a5c93}
+.lab-vial i{position:absolute;left:1mm;right:1mm;bottom:2mm;height:5mm;background:rgba(31,144,163,.35);border-radius:0 0 2mm 2mm}
+.vial-one{left:18mm;transform:rotate(-10deg)}.vial-two{left:34mm;bottom:7mm;height:24mm;background:linear-gradient(#e8f9fd,#a9e4de)}.vial-three{left:50mm;transform:rotate(10deg)}
+.lab-caption{position:absolute;right:1mm;bottom:1mm;color:#4c88a0;font-size:5.5pt;font-weight:900;letter-spacing:1px;text-align:center}
+.meta-strip{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:2mm;margin-bottom:2.5mm}
+.meta-item{border:1px solid #dce9f1;border-radius:2mm;padding:1.8mm 2.5mm;background:#fff;min-width:0}
+.meta-label{font-size:6.2pt;color:#7b91a5}.meta-value{font-size:8pt;font-weight:900;color:#173d65;overflow-wrap:anywhere}
+.top-grid{display:grid;grid-template-columns:1.02fr 1.16fr 1.02fr;gap:1.7mm;margin-bottom:1.7mm;align-items:stretch}
+.bottom-grid{display:grid;grid-template-columns:1.02fr .92fr 1.16fr;gap:1.7mm;align-items:stretch}
+.panel{border:1px solid #cfe1ed;border-radius:2.7mm;background:linear-gradient(165deg,#fff 0%,#f7fbfe 100%);overflow:hidden;min-width:0;break-inside:avoid}
+.panel:nth-child(2){background:linear-gradient(165deg,#fff 0%,#f1faf8 100%)}
+.panel:nth-child(3){background:linear-gradient(165deg,#fff 0%,#f7f6ff 100%)}
+.panel-head{display:flex;align-items:center;gap:1.5mm;padding:1.7mm 2.2mm 1.7mm 1.5mm;background:linear-gradient(100deg,#153f6c 0%,#1a6595 78%,#e1f1fb 78%);color:#fff;margin-bottom:2mm}
+.panel-num{display:inline-flex;flex:0 0 7mm;width:7mm;height:7mm;border-radius:50%;align-items:center;justify-content:center;background:#fff;color:#194e7c;border:1px solid #c5e4f7;font-size:10pt;font-weight:900}
+.panel-head h2{margin:0;font-size:9.4pt;line-height:1.15;color:white}
+.panel-body{padding:0 2.4mm 2.3mm}
+.subhead{color:#1c5d92;font-size:8pt;font-weight:900;margin:0 0 1mm}
+.small-copy{margin:0 0 1.6mm;color:#3c5872;font-size:7.2pt;line-height:1.42;overflow-wrap:anywhere}
+.goalbox{background:#eaf4fc;border:1px solid #d1e5f5;border-radius:2mm;padding:2mm;margin-top:1.5mm}
+.goalbox b{display:block;color:#1b5b91;margin-bottom:1mm;font-size:7.5pt}
+.goal-lines{display:grid;grid-template-columns:1fr 1fr;gap:1mm}
+.goal-pill{background:#fff;border-radius:1.5mm;padding:1.1mm 1.3mm;color:#345c7b;font-size:6.5pt;font-weight:700}
+.fact-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:6.8pt}
+.fact-table td{border:1px solid #d8e7f1;padding:1.45mm 1.6mm;vertical-align:top;overflow-wrap:anywhere}
+.fact-table td:first-child{width:28%;color:#1c5b8e;font-weight:900;background:#edf6fd}
+.fact-table td:last-child{color:#35516b;background:rgba(255,255,255,.7)}
+.point-row{display:flex;align-items:flex-start;gap:1.7mm;padding:1.4mm 0;border-bottom:1px solid #e5edf4}
+.point-row:last-child{border-bottom:0}
+.point-index{flex:0 0 6mm;width:6mm;height:6mm;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;background:#248bd1;font-size:6.5pt;font-weight:900}
+.point-index.teal{background:#20a28e}.point-index.purple{background:#7964c5}.point-index.blue{background:#2589cf}
+.point-copy{min-width:0;flex:1}.point-copy p{margin:0;color:#2f4e67;font-size:6.85pt;line-height:1.4;overflow-wrap:anywhere}.point-copy small{display:block;color:#8496a7;font-size:5.6pt;margin-top:.5mm;overflow-wrap:anywhere}
+.fallback-point{padding:2mm;border-radius:2mm;background:#f2f7fb;color:#607991;font-size:7pt}
+.feature-stack{display:grid;gap:1.2mm}
+.feature-strip{display:grid;grid-template-columns:10mm 1fr;gap:1.7mm;align-items:center;padding:1.6mm;border-radius:2mm;background:#eaf5fc;border:1px solid #d9eaf4}
+.feature-strip:nth-child(2){background:#eaf8f3;border-color:#d5eee3}.feature-strip:nth-child(3){background:#f1effc;border-color:#e2def8}
+.feature-symbol{width:9mm;height:9mm;border-radius:50%;background:linear-gradient(135deg,#37b5e9,#1672b4);color:#fff;display:flex;align-items:center;justify-content:center;font-size:9pt;font-weight:900}
+.feature-strip:nth-child(2) .feature-symbol{background:linear-gradient(135deg,#5bc8a0,#1b967f)}.feature-strip:nth-child(3) .feature-symbol{background:linear-gradient(135deg,#a69ae8,#6b57bd)}
+.feature-strip b{display:block;font-size:7.2pt;color:#155b8b;margin-bottom:.5mm}.feature-strip p{margin:0;font-size:6.5pt;color:#466279;line-height:1.35}
+.outcomes{display:grid;grid-template-columns:1fr 1fr;gap:1.2mm}
+.outcome{padding:1.8mm 1.3mm;text-align:center;border:1px solid #e0eaf2;background:#fff;border-radius:2mm;min-width:0}
+.outcome-icon{margin:0 auto 1mm;width:8mm;height:8mm;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#e7f3fc;color:#1c71ac;font-size:10pt;font-weight:900}
+.outcome:nth-child(2) .outcome-icon{background:#e3f7f0;color:#16947e}.outcome:nth-child(3) .outcome-icon{background:#f1edfd;color:#7861bd}.outcome:nth-child(4) .outcome-icon{background:#e8f5f8;color:#1a8293}
+.outcome b{display:block;color:#214f77;font-size:6.7pt;margin-bottom:.5mm}.outcome p{margin:0;color:#6d8296;font-size:5.9pt;line-height:1.3}
+.terms-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1mm;margin-bottom:1.5mm}
+.term{border-radius:1.6mm;border:1px solid #d9e8f0;background:#fff;padding:1.25mm 1mm;min-width:0}
+.term .term-label{display:block;color:#8394a4;font-size:5.6pt;margin-bottom:.6mm}.term .term-value{display:block;color:#1a5b8c;font-size:7pt;font-weight:900;overflow-wrap:anywhere}
+.price-callout{display:grid;grid-template-columns:.75fr 1fr;gap:1.5mm;padding:1.6mm 1.8mm;border-radius:2mm;background:linear-gradient(100deg,#e8f5fb,#e7f7f3);border:1px solid #d0e9e6;margin-bottom:1.4mm}
+.price-callout .price-label{font-size:6pt;color:#5e788b}.price-callout .price-value{font-size:11pt;color:#107c77;font-weight:900;line-height:1.2}
+.price-callout .discount-label{font-size:6pt;color:#5e788b}.price-callout .discount-value{font-size:8pt;color:#164d7c;font-weight:900}
+.condition-line{font-size:6pt;color:#587187;margin:1mm 0;line-height:1.32}
+.timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:1mm;margin-top:1.4mm}
+.time-step{position:relative;text-align:center;padding:1.2mm .5mm .8mm;border-top:1.2mm solid #2d90c6;background:#f4f9fc;min-width:0}
+.time-step:nth-child(2){border-top-color:#23a38d}.time-step:nth-child(3){border-top-color:#816ac9}.time-step:nth-child(4){border-top-color:#53aab5}
+.time-step b{display:block;font-size:5.7pt;color:#1c567f;margin-bottom:.5mm}.time-step span{display:block;font-size:5.5pt;color:#688095;line-height:1.25;overflow-wrap:anywhere}
+.footer{display:flex;justify-content:space-between;gap:4mm;align-items:center;margin-top:1mm;padding:1.2mm 2mm;background:linear-gradient(90deg,#153d68,#1c6592);color:#fff;border-radius:1.5mm;font-size:6pt}
+.footer strong{font-size:6.8pt}.footer .sources{text-align:right;color:#d5e8f5;max-width:65%;overflow-wrap:anywhere}
+.disclaimer{font-size:5.5pt;color:#6d8092;margin-top:.5mm;line-height:1.25}
+.no-print{text-align:center;margin:3mm 0 0}.print-btn{border:0;border-radius:6px;background:#173e68;color:white;font-weight:800;padding:8px 18px;cursor:pointer}
+@media screen{body{padding:14px}.report{max-width:1200px;padding:8px;box-shadow:0 4px 24px rgba(24,54,82,.12);border-radius:9px}}
+@media print{body{background:#fff}.report{max-width:none;padding:0;box-shadow:none}.no-print{display:none!important}}
+</style></head><body><main class="report">
+  <div class="brandline"><div class="brandname">씨젠의료재단 · 부산3지점</div><div>맞춤형 검사·서비스 영업 제안</div></div>
+  <header class="hero"><div class="hero-copy"><span class="eyebrow">맞춤형 영업 제안서 · ${esc(type === "opening" ? "신규 개원" : "타사 거래 전환")}</span><h1>${esc(headline)}</h1><p class="hero-subtitle">${esc(subtitle)}</p><p class="hero-small">거래처 상황과 첨부 마케팅 자료를 바탕으로 구성한 협의용 초안입니다.</p></div><div class="hero-art">${heroVisual}</div></header>
+  <div class="meta-strip"><div class="meta-item"><div class="meta-label">제안 대상 거래처</div><div class="meta-value">${esc(clinic)}</div></div><div class="meta-item"><div class="meta-label">담당자</div><div class="meta-value">${esc(manager)}</div></div><div class="meta-item"><div class="meta-label">작성일</div><div class="meta-value">${esc(date)}</div></div></div>
+
+  <div class="top-grid">
+    <section class="panel"><div class="panel-head"><span class="panel-num">1</span><h2>제안 개요</h2></div><div class="panel-body"><div class="subhead">제안 배경</div><p class="small-copy">${esc(shorten(situation, 138))}</p><div class="goalbox"><b>이번 제안의 중점</b><p class="small-copy" style="margin:0">${esc(shorten(needs, 118))}</p><div class="goal-lines" style="margin-top:1.5mm"><span class="goal-pill">✓ 자료 근거 확인</span><span class="goal-pill">✓ 거래 조건 협의</span><span class="goal-pill">✓ 운영 가능성 검토</span><span class="goal-pill">✓ 후속 일정 관리</span></div></div></div></section>
+
+    <section class="panel"><div class="panel-head"><span class="panel-num">2</span><h2>주요 검사·서비스 정보</h2></div><div class="panel-body"><table class="fact-table"><tbody>${keyFactHtml}</tbody></table><div class="badge-row" style="display:flex;flex-wrap:wrap;gap:1mm;margin-top:1.5mm">${badges.length ? badges.map((b,i)=>`<span class="goal-pill">${esc(b)}</span>`).join("") : `<span class="goal-pill">자료의 관련 내용을 기준으로 구성</span>`}</div></div></section>
+
+    <section class="panel"><div class="panel-head"><span class="panel-num">3</span><h2>핵심 활용 포인트</h2></div><div class="panel-body"><div class="subhead">검사·운영 정보</div>${serviceHtml}<div class="subhead" style="margin-top:1.5mm">임상적 활용</div>${clinicalHtml}</div></section>
+  </div>
+
+  <div class="bottom-grid">
+    <section class="panel"><div class="panel-head"><span class="panel-num">4</span><h2>자료에서 확인한 주요 메시지</h2></div><div class="panel-body"><div class="feature-stack">
+      <div class="feature-strip"><div class="feature-symbol">01</div><div><b>검사·서비스 포인트</b><p>${esc(shorten(servicePoints[0]?.text || needs, 92))}</p></div></div>
+      <div class="feature-strip"><div class="feature-symbol">02</div><div><b>활용·대상 포인트</b><p>${esc(shorten(clinicalPoints[0]?.text || situation, 92))}</p></div></div>
+      <div class="feature-strip"><div class="feature-symbol">03</div><div><b>근거·운영 확인</b><p>${esc(shorten(evidencePoints[0]?.text || "실제 적용 기준과 거래처별 운영 조건을 확인합니다.", 92))}</p></div></div>
+    </div></div></section>
+
+    <section class="panel"><div class="panel-head"><span class="panel-num">5</span><h2>기대 효과</h2></div><div class="panel-body"><div class="outcomes">
+      <div class="outcome"><div class="outcome-icon">◎</div><b>검사 선택 폭 검토</b><p>거래처 진료 특성에 맞는 서비스 확인</p></div>
+      <div class="outcome"><div class="outcome-icon">＋</div><b>진료 활용 보완</b><p>자료에 제시된 활용 정보를 확인</p></div>
+      <div class="outcome"><div class="outcome-icon">↗</div><b>운영 편의 검토</b><p>의뢰·수거·결과 절차 협의</p></div>
+      <div class="outcome"><div class="outcome-icon">✓</div><b>후속 성과 관리</b><p>실제 의뢰와 운영 반응 점검</p></div>
+    </div></div></section>
+
+    <section class="panel"><div class="panel-head"><span class="panel-num">6</span><h2>제안 조건 및 진행 일정</h2></div><div class="panel-body">
+      <div class="price-callout"><div><div class="price-label">계산된 제안 단가</div><div class="price-value">${esc(proposalPrice)}</div></div><div><div class="discount-label">승인 할인율 · 할인 금액</div><div class="discount-value">${esc(rate)} · ${esc(discount)}</div></div></div>
+      <div class="terms-row"><div class="term"><span class="term-label">제안 대상</span><span class="term-value">${esc(shorten(priceItem, 26))}</span></div><div class="term"><span class="term-label">기준 단가</span><span class="term-value">${esc(basePrice)}</span></div><div class="term"><span class="term-label">적용 기간</span><span class="term-value">${esc(shorten(fmtPeriod, 23))}</span></div></div>
+      <p class="condition-line"><b>적용 조건:</b> ${esc(shorten(condition, 92))}</p><p class="condition-line"><b>지원 사항:</b> ${esc(shorten(support, 92))}</p>
+      <div class="timeline"><div class="time-step"><b>01 · 현황 확인</b><span>검사·운영 조건 검토</span></div><div class="time-step"><b>02 · 조건 협의</b><span>승인 가격·지원 확인</span></div><div class="time-step"><b>03 · 도입 준비</b><span>의뢰 절차 안내</span></div><div class="time-step"><b>04 · 후속 관리</b><span>${esc(shorten(action, 34))}</span></div></div>
+    </div></section>
+  </div>
+
+  <div class="footer"><strong>씨젠의료재단 부산3지점 · 거래처 협의용 초안</strong><span class="sources">참고 자료: ${sources}</span></div>
+  <div class="disclaimer">※ 제안서의 검사 정보는 첨부 자료에서 추출한 내용을 요약한 것이므로 원문을 확인한 후 사용해 주세요. 할인율·제안 단가는 승인된 기준 입력값을 바탕으로 계산하며, 내부 승인 전에는 확정 조건으로 제시하지 않습니다. 자료에 없는 검사 효과나 계약 조건을 임의로 확정하지 않습니다.</div>
+  <div class="no-print"><button class="print-btn" onclick="window.print()">PDF 저장 / 인쇄</button><span style="font-size:7pt;color:#6d8092;margin-left:3mm">인쇄 창에서 ‘PDF로 저장’을 선택하세요.</span></div>
+</main></body></html>`;
+
+  popup.document.open();
+  popup.document.write(report);
+  popup.document.close();
+  setTimeout(() => {
+    try { popup.focus(); popup.print(); } catch (e) { /* 사용자가 출력 버튼을 누를 수 있습니다. */ }
+  }, 700);
+}
+
+function downloadProposal() {
+  const content = $("proposalPreview").textContent;
+  if (!content || content.includes("위 항목을 입력한 뒤")) {
+    alert("먼저 제안서 초안을 만들어 주세요.");
+    return;
+  }
+
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <style>body{font-family:Arial,'Malgun Gothic',sans-serif;line-height:1.8;margin:35px;white-space:pre-wrap}</style>
+  </head><body>${escapeHtml(content)}</body></html>`;
+
+  const blob = new Blob(["\ufeff", html], {type:"application/msword"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "부산3지점_영업제안서.doc";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+/* 숙성영업 거래처별 검사 분석 */
+function addCrmTestRow(name = "", foundation = "", hospital = "", count = "") {
+  const tbody = $("crmTestRows");
+  if (!tbody) return;
+
+  const row = document.createElement("tr");
+
+  row.innerHTML = `
+    <td style="padding:5px;border-bottom:1px solid #eee;">
+      <input class="crm-test-name" placeholder="검사명"
+        style="width:120px;">
+    </td>
+    <td style="padding:5px;border-bottom:1px solid #eee;">
+      <input class="crm-test-foundation" type="number" min="0" step="1"
+        placeholder="0" style="width:105px;">
+    </td>
+    <td style="padding:5px;border-bottom:1px solid #eee;">
+      <input class="crm-test-hospital" type="number" min="0" step="1"
+        placeholder="0" style="width:105px;">
+    </td>
+    <td style="padding:5px;border-bottom:1px solid #eee;">
+      <input class="crm-test-count" type="number" min="0" step="1"
+        placeholder="0" style="width:85px;">
+    </td>
+    <td class="crm-test-difference"
+      style="padding:8px;text-align:right;border-bottom:1px solid #eee;">0원</td>
+    <td class="crm-test-monthly"
+      style="padding:8px;text-align:right;border-bottom:1px solid #eee;">0원</td>
+    <td style="padding:5px;border-bottom:1px solid #eee;">
+      <button type="button" class="btn secondary crm-test-delete">삭제</button>
+    </td>
+  `;
+
+  row.querySelector(".crm-test-name").value = name;
+  row.querySelector(".crm-test-foundation").value = foundation;
+  row.querySelector(".crm-test-hospital").value = hospital;
+  row.querySelector(".crm-test-count").value = count;
+
+  tbody.appendChild(row);
+
+  row.querySelectorAll("input").forEach(input => {
+    input.addEventListener("input", calculateCrmTests);
+  });
+
+  row.querySelector(".crm-test-delete").addEventListener("click", () => {
+    row.remove();
+    calculateCrmTests();
+  });
+
+  calculateCrmTests();
+}
+
+function getCrmTests() {
+  return Array.from(document.querySelectorAll("#crmTestRows tr"))
+    .map(row => {
+      const name = row.querySelector(".crm-test-name").value.trim();
+      const foundation =
+        Number(row.querySelector(".crm-test-foundation").value) || 0;
+      const hospital =
+        Number(row.querySelector(".crm-test-hospital").value) || 0;
+      const count =
+        Number(row.querySelector(".crm-test-count").value) || 0;
+
+      return {
+        name,
+        foundation,
+        hospital,
+        count,
+        difference: foundation - hospital,
+        monthly: (foundation - hospital) * count
+      };
+    })
+    .filter(test =>
+      test.name || test.foundation || test.hospital || test.count
+    );
+}
+
+function calculateCrmTests() {
+  const tbody = $("crmTestRows");
+  if (!tbody) return { tests: [], total: 0 };
+
+  let total = 0;
+
+  tbody.querySelectorAll("tr").forEach(row => {
+    const foundation =
+      Number(row.querySelector(".crm-test-foundation").value) || 0;
+    const hospital =
+      Number(row.querySelector(".crm-test-hospital").value) || 0;
+    const count =
+      Number(row.querySelector(".crm-test-count").value) || 0;
+
+    const difference = foundation - hospital;
+    const monthly = difference * count;
+
+    total += monthly;
+
+    row.querySelector(".crm-test-difference").textContent =
+      difference.toLocaleString("ko-KR") + "원";
+    row.querySelector(".crm-test-monthly").textContent =
+      monthly.toLocaleString("ko-KR") + "원";
+  });
+
+  const totalElement = $("crmTotalDifference");
+  if (totalElement) {
+    totalElement.textContent = total.toLocaleString("ko-KR") + "원";
+  }
+
+  return { tests: getCrmTests(), total };
+}
+
+function renderCrmTests(tests = []) {
+  const tbody = $("crmTestRows");
+  if (!tbody) return;
+
+  tbody.innerHTML = "";
+
+  if (Array.isArray(tests)) {
+    tests.forEach(test => {
+      addCrmTestRow(
+        test.name || "",
+        test.foundation ?? "",
+        test.hospital ?? "",
+        test.count ?? ""
+      );
+    });
+  }
+
+  calculateCrmTests();
+}
+
+/* 숙성영업 관리 */
+function loadCrm() {
+  try {
+    const saved = localStorage.getItem(CRM_KEY);
+    crmRecords = saved ? JSON.parse(saved) : [];
+    if (!Array.isArray(crmRecords)) crmRecords = [];
+  } catch (e) {
+    crmRecords = [];
+  }
+}
+
+function persistCrm() {
+  try {
+    localStorage.setItem(CRM_KEY, JSON.stringify(crmRecords));
+    return true;
+  } catch (e) {
+    alert("브라우저 저장 공간에 저장하지 못했습니다. CSV 백업을 이용해 주세요.");
+    return false;
+  }
+}
+
+function clearCrmForm() {
+  ["crmId","cClinic","cContact","cLast","cNext","cMemo"].forEach(
+    id => $(id).value = ""
+  );
+  $("cArea").value = "김해";
+  $("cStatus").value = "관심 확인";
+  renderCrmTests([]);
+}
+
+function saveCrm() {
+  const clinic = $("cClinic").value.trim();
+  if (!clinic) {
+    alert("병원·의원명을 입력해 주세요.");
+    $("cClinic").focus();
+    return;
+  }
+
+  const id = $("crmId").value || (Date.now().toString() + Math.random().toString(36).slice(2,7));
+  const record = {
+    id,
+    clinic,
+    area:$("cArea").value,
+    contact:$("cContact").value.trim(),
+    status:$("cStatus").value,
+    last:$("cLast").value,
+    next:$("cNext").value,
+        memo:$("cMemo").value.trim(),
+    tests:getCrmTests(),
+    updated:new Date().toISOString()
+  };
+
+  const idx = crmRecords.findIndex(item => item.id === id);
+  if (idx >= 0) crmRecords[idx] = record;
+  else crmRecords.unshift(record);
+
+  if (persistCrm()) {
+    renderCrm();
+    updateStats();
+    clearCrmForm();
+    alert("거래처를 저장했습니다.");
+  }
+}
+
+function editCrm(id) {
+  const r = crmRecords.find(item => item.id === id);
+  if (!r) return;
+  $("crmId").value = r.id;
+  $("cClinic").value = r.clinic || "";
+  $("cArea").value = r.area || "김해";
+  $("cContact").value = r.contact || "";
+  $("cStatus").value = r.status || "관심 확인";
+  $("cLast").value = r.last || "";
+  $("cNext").value = r.next || "";
+    $("cMemo").value = r.memo || "";
+  renderCrmTests(Array.isArray(r.tests) ? r.tests : []);
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+function deleteCrm(id) {
+  const r = crmRecords.find(item => item.id === id);
+  if (!r || !confirm(r.clinic + " 거래처 기록을 삭제할까요?")) return;
+  crmRecords = crmRecords.filter(item => item.id !== id);
+  persistCrm();
+  renderCrm();
+  updateStats();
+}
+
+function renderCrm() {
+  const query = ($("crmSearch").value || "").trim().toLowerCase();
+  const filter = $("crmFilter").value;
+  const today = new Date().toISOString().slice(0,10);
+
+  const filtered = crmRecords.filter(r => {
+    const haystack = [r.clinic,r.area,r.contact,r.status,r.memo].join(" ").toLowerCase();
+    return (!query || haystack.includes(query)) && (!filter || r.status === filter);
+  }).sort((a,b) => {
+    const ad = a.next || "9999-99-99";
+    const bd = b.next || "9999-99-99";
+    return ad.localeCompare(bd);
+  });
+
+  if (!filtered.length) {
+    $("crmList").innerHTML = '<div class="empty">등록된 거래처가 없거나 검색 결과가 없습니다.<br>위 입력란에서 첫 거래처를 등록해 주세요.</div>';
+    updateStats();
+    return;
+  }
+
+  $("crmList").innerHTML = filtered.map(r => {
+    const overdue = r.next && r.next <= today && r.status !== "계약 완료";
+    return `<article class="item">
+      <h3>${escapeHtml(r.clinic)}</h3>
+      <span class="pill">${escapeHtml(r.area || "지역 미입력")}</span>
+      <span class="pill">${escapeHtml(r.status || "상태 미입력")}</span>
+      ${overdue ? '<span class="pill" style="background:#fee2e2;color:#991b1b">연락 확인 필요</span>' : ""}
+      <p><b>담당자:</b> ${escapeHtml(r.contact || "-")}</p>
+      <p><b>최근 접촉:</b> ${escapeHtml(formatDate(r.last))} &nbsp; <b>다음 연락:</b> ${escapeHtml(formatDate(r.next))}</p>
+      <p>${escapeHtml(r.memo || "영업 메모 없음").replace(/\n/g,"<br>")}</p>
+      <p class="meta">최종 수정: ${escapeHtml(formatDate(r.updated))}</p>
+      <div class="toolbar">
+        <button class="btn small" onclick="editCrm('${escapeHtml(r.id)}')">수정</button>
+        <button class="btn danger small" onclick="deleteCrm('${escapeHtml(r.id)}')">삭제</button>
+      </div>
+    </article>`;
+  }).join("");
+
+  updateStats();
+}
+
+function csvEscape(value) {
+  return '"' + String(value ?? "").replace(/"/g,'""') + '"';
+}
+
+
+function exportCrm() {
+  const headers = [
+    "id", "clinic", "area", "contact", "status",
+    "last", "next", "memo", "updated", "tests"
+  ];
+
+  const lines = [headers.map(csvEscape).join(",")];
+
+  crmRecords.forEach(r => {
+    const row = headers.map(h => {
+      const value = h === "tests"
+        ? JSON.stringify(Array.isArray(r.tests) ? r.tests : [])
+        : r[h];
+      return csvEscape(value);
+    });
+    lines.push(row.join(","));
+  });
+
+  const blob = new Blob(
+    ["\ufeff" + lines.join("\r\n")],
+    { type: "text/csv;charset=utf-8" }
+  );
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "부산3지점_숙성영업_백업.csv";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+
+function parseCsv(text) {
+  const rows = [];
+  let row = [], field = "", quoted = false;
+  for (let i=0; i<text.length; i++) {
+    const c = text[i];
+    if (quoted) {
+      if (c === '"' && text[i+1] === '"') { field += '"'; i++; }
+      else if (c === '"') quoted = false;
+      else field += c;
+    } else {
+      if (c === '"' && field === "") quoted = true;
+      else if (c === ",") { row.push(field); field = ""; }
+      else if (c === "\n") { row.push(field); rows.push(row); row=[]; field=""; }
+      else if (c !== "\r") field += c;
+    }
+  }
+  row.push(field);
+  if (row.some(v => v !== "")) rows.push(row);
+  return rows;
+}
+
+function importCrm(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const rows = parseCsv(String(reader.result || "").replace(/^\uFEFF/,""));
+      if (rows.length < 2) throw new Error("복원할 데이터가 없습니다.");
+      const headers = rows[0];
+      
+const imported = rows.slice(1).map(row => {
+  const r = {};
+  headers.forEach((h, i) => r[h] = row[i] || "");
+
+  if (r.tests) {
+    try {
+      r.tests = JSON.parse(r.tests);
+      if (!Array.isArray(r.tests)) r.tests = [];
+    } catch (e) {
+      r.tests = [];
+    }
+  } else {
+    r.tests = [];
+  }
+
+  return r;
+}).filter(r => r.clinic);
+
+
+      if (!confirm(imported.length + "개 거래처를 가져옵니다. 기존 기록과 합쳐집니다. 진행할까요?")) return;
+
+      imported.forEach(r => {
+        if (!r.id) r.id = Date.now().toString() + Math.random().toString(36).slice(2,7);
+        const idx = crmRecords.findIndex(old => old.id === r.id);
+        if (idx >= 0) crmRecords[idx] = {...crmRecords[idx],...r};
+        else crmRecords.push(r);
+      });
+      persistCrm();
+      renderCrm();
+      updateStats();
+      alert("CSV 복원이 완료되었습니다.");
+    } catch (e) {
+      alert("CSV를 읽지 못했습니다. 이 대시보드에서 저장한 백업 파일인지 확인해 주세요.");
+    } finally {
+      event.target.value = "";
+    }
+  };
+  reader.readAsText(file, "UTF-8");
+}
+
+/* 학술교육자료: 브라우저 내부 IndexedDB 보관 */
+const ACADEMY_DB_NAME = "busan3_academic_library_v1";
+const ACADEMY_STORE = "materials";
+let academyDbPromise = null;
+
+function openAcademyDb() {
+  if (!window.indexedDB) {
+    return Promise.reject(new Error("이 브라우저에서는 로컬 파일 보관 기능을 사용할 수 없습니다. 최신 Edge 또는 Chrome에서 열어 주세요."));
+  }
+  if (!academyDbPromise) {
+    academyDbPromise = new Promise((resolve, reject) => {
+      const request = indexedDB.open(ACADEMY_DB_NAME, 1);
+      request.onupgradeneeded = () => {
+        const db = request.result;
+        if (!db.objectStoreNames.contains(ACADEMY_STORE)) {
+          const store = db.createObjectStore(ACADEMY_STORE, { keyPath: "id" });
+          store.createIndex("category", "category", { unique: false });
+          store.createIndex("uploadedAt", "uploadedAt", { unique: false });
+        }
+      };
+      request.onsuccess = () => {
+        const db = request.result;
+        db.onversionchange = () => db.close();
+        resolve(db);
+      };
+      request.onerror = () => {
+        academyDbPromise = null;
+        reject(request.error || new Error("학술자료 저장소를 열지 못했습니다."));
+      };
+      request.onblocked = () => {
+        academyDbPromise = null;
+        reject(new Error("다른 탭에서 자료 저장소를 사용 중입니다. 다른 대시보드 탭을 닫고 다시 시도해 주세요."));
+      };
+    });
+  }
+  return academyDbPromise;
+}
+
+function academyNewId() {
+  return (window.crypto && typeof crypto.randomUUID === "function")
+    ? crypto.randomUUID()
+    : Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 12);
+}
+
+function formatBytes(bytes) {
+  const size = Number(bytes || 0);
+  if (size < 1024) return size + " B";
+  if (size < 1024 * 1024) return (size / 1024).toFixed(1) + " KB";
+  return (size / (1024 * 1024)).toFixed(1) + " MB";
+}
+
+function clearAcademicForm() {
+  if ($("academyTitle")) $("academyTitle").value = "";
+  if ($("academyNotes")) $("academyNotes").value = "";
+  if ($("academyFiles")) $("academyFiles").value = "";
+  if ($("academyStatus")) $("academyStatus").textContent = "입력 내용을 초기화했습니다.";
+}
+
+async function saveAcademicMaterials() {
+  const files = Array.from(($('academyFiles') && $('academyFiles').files) || []);
+  const status = $('academyStatus');
+  if (!files.length) {
+    alert("먼저 첨부할 파일을 선택해 주세요.");
+    return;
+  }
+
+  const title = ($('academyTitle').value || '').trim();
+  const category = $('academyCategory').value || '기타';
+  const notes = ($('academyNotes').value || '').trim();
+  const maxFileSize = 100 * 1024 * 1024;
+  const tooLarge = files.filter(file => file.size > maxFileSize);
+  if (tooLarge.length) {
+    alert("100MB를 초과하는 파일은 저장할 수 없습니다. 큰 파일은 나누거나 압축한 뒤 다시 선택해 주세요.\n\n" + tooLarge.map(file => file.name).join("\n"));
+    return;
+  }
+
+  try {
+    status.textContent = "브라우저 저장소에 자료를 저장하고 있습니다…";
+    const db = await openAcademyDb();
+    await new Promise((resolve, reject) => {
+      const tx = db.transaction(ACADEMY_STORE, "readwrite");
+      const store = tx.objectStore(ACADEMY_STORE);
+      const now = new Date().toISOString();
+      files.forEach((file, index) => {
+        const recordTitle = title
+          ? (files.length === 1 ? title : `${title} (${index + 1})`)
+          : file.name.replace(/\.[^.]+$/, "");
+        store.add({
+          id: academyNewId(),
+          title: recordTitle,
+          category,
+          notes,
+          fileName: file.name,
+          fileType: file.type || "application/octet-stream",
+          fileSize: file.size,
+          uploadedAt: now,
+          fileBlob: file
+        });
+      });
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error || new Error("자료 저장 중 오류가 발생했습니다."));
+      tx.onabort = () => reject(tx.error || new Error("자료 저장이 취소되었습니다."));
+    });
+    status.textContent = `${files.length}개 파일을 저장했습니다. 이 브라우저에서 확인할 수 있습니다.`;
+    clearAcademicForm();
+    if (status) status.textContent = `${files.length}개 파일을 저장했습니다. 이 브라우저에서 확인할 수 있습니다.`;
+    await renderAcademicMaterials();
+  } catch (error) {
+    status.textContent = "자료를 저장하지 못했습니다: " + (error.message || error);
+    alert("학술교육자료를 저장하지 못했습니다. 브라우저 저장 공간이 충분한지 확인해 주세요.\n\n" + (error.message || error));
+  }
+}
+
+async function getAllAcademicMaterials() {
+  const db = await openAcademyDb();
+  return await new Promise((resolve, reject) => {
+    const tx = db.transaction(ACADEMY_STORE, "readonly");
+    const request = tx.objectStore(ACADEMY_STORE).getAll();
+    request.onsuccess = () => resolve(request.result || []);
+    request.onerror = () => reject(request.error || new Error("자료 목록을 읽지 못했습니다."));
+  });
+}
+
+async function renderAcademicMaterials() {
+  const list = $('academyList');
+  const status = $('academyStatus');
+  if (!list) return;
+  const search = ($('academySearch')?.value || '').trim().toLowerCase();
+  const filter = $('academyFilter')?.value || '';
+  try {
+    const all = await getAllAcademicMaterials();
+    all.sort((a, b) => String(b.uploadedAt || '').localeCompare(String(a.uploadedAt || '')));
+    const filtered = all.filter(item => {
+      const haystack = [item.title, item.fileName, item.category, item.notes].join(' ').toLowerCase();
+      return (!search || haystack.includes(search)) && (!filter || item.category === filter);
+    });
+
+    if (status) status.textContent = `저장 자료 ${all.length}개 · 현재 표시 ${filtered.length}개`;
+    if (!filtered.length) {
+      list.innerHTML = '<div class="empty">아직 저장된 학술교육자료가 없습니다.<br>위에서 PDF, Excel, PowerPoint 등 파일을 선택해 저장해 주세요.</div>';
+      return;
+    }
+
+    list.innerHTML = filtered.map(item => {
+      const type = String(item.fileName || '').split('.').pop().toUpperCase() || 'FILE';
+      return `<article class="item academy-item">
+        <div class="row" style="align-items:flex-start;">
+          <div style="flex:0 0 auto;min-width:62px;">
+            <div style="width:54px;height:58px;border-radius:9px;background:#eaf1ff;color:#17365d;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;">${escapeHtml(type.slice(0,5))}</div>
+          </div>
+          <div style="flex:1;min-width:180px;">
+            <h3>${escapeHtml(item.title || item.fileName || '제목 없음')}</h3>
+            <span class="pill">${escapeHtml(item.category || '기타')}</span>
+            <p class="meta" style="overflow-wrap:anywhere;">파일: ${escapeHtml(item.fileName || '')} · ${escapeHtml(formatBytes(item.fileSize))}</p>
+            ${item.notes ? `<p>${escapeHtml(item.notes).replace(/\n/g, '<br>')}</p>` : ''}
+            <p class="meta">등록일: ${escapeHtml(formatDate(item.uploadedAt))}</p>
+          </div>
+        </div>
+        <div class="toolbar">
+          <button class="btn small" type="button" onclick="downloadAcademicMaterial('${escapeHtml(item.id)}')">자료 다운로드</button>
+          <button class="btn secondary small" type="button" onclick="deleteAcademicMaterial('${escapeHtml(item.id)}')">삭제</button>
+        </div>
+      </article>`;
+    }).join('');
+  } catch (error) {
+    list.innerHTML = `<div class="empty">학술자료 저장소를 열지 못했습니다.<br>${escapeHtml(error.message || String(error))}</div>`;
+    if (status) status.textContent = "학술자료 저장소 확인이 필요합니다.";
+  }
+}
+
+async function downloadAcademicMaterial(id) {
+  try {
+    const db = await openAcademyDb();
+    const item = await new Promise((resolve, reject) => {
+      const tx = db.transaction(ACADEMY_STORE, "readonly");
+      const request = tx.objectStore(ACADEMY_STORE).get(id);
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error || new Error("자료를 열지 못했습니다."));
+    });
+    if (!item || !item.fileBlob) {
+      alert("파일을 찾지 못했습니다. 원본 파일이 브라우저 저장소에서 삭제되었을 수 있습니다.");
+      return;
+    }
+    const url = URL.createObjectURL(item.fileBlob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = item.fileName || item.title || 'academic-material';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1500);
+  } catch (error) {
+    alert("자료를 다운로드하지 못했습니다.\n" + (error.message || error));
+  }
+}
+
+async function deleteAcademicMaterial(id) {
+  if (!confirm("이 학술교육자료를 브라우저 저장소에서 삭제할까요?")) return;
+  try {
+    const db = await openAcademyDb();
+    await new Promise((resolve, reject) => {
+      const tx = db.transaction(ACADEMY_STORE, "readwrite");
+      tx.objectStore(ACADEMY_STORE).delete(id);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error || new Error("자료 삭제 중 오류가 발생했습니다."));
+    });
+    await renderAcademicMaterials();
+  } catch (error) {
+    alert("자료 삭제에 실패했습니다.\n" + (error.message || error));
+  }
+}
+
+/* 개원·채용정보 */
+function normalizeJob(job) {
+  if (typeof job === "string") {
+    return {title:job, clinic:"", area:"", date:"", url:"", description:""};
+  }
+  job = job || {};
+  return {
+    title:job.title || job.subject || job.post_title || job.name || job.position || "제목 없음",
+    clinic:job.clinic || job.hospital || job.company || job.organization || job.institution || "",
+    area:job.area || job.region || job.location || job.address || "",
+    date:job.date || job.created_at || job.posted_at || job.reg_date || job.datetime || "",
+    url:job.url || job.link || job.href || job.source_url || "",
+    description:job.description || job.content || job.summary || job.detail || "",
+    source:job.source || job.site || ""
+  };
+}
+
+function findJobArray(data) {
+  if (Array.isArray(data)) return data;
+  if (!data || typeof data !== "object") return [];
+  for (const key of ["results","jobs","items","data","posts","announcements"]) {
+    if (Array.isArray(data[key])) return data[key];
+  }
+  return [];
+}
+
+async function loadJobs() {
+  $("jobStatus").textContent = "공고 데이터를 불러오는 중입니다.";
+  try {
+    const response = await fetch("./results.json?ts=" + Date.now(), {cache:"no-store"});
+    if (!response.ok) throw new Error("HTTP " + response.status);
+    const data = await response.json();
+    jobs = findJobArray(data).map(normalizeJob);
+    $("jobStatus").textContent = "불러온 공고: " + jobs.length + "건";
+    renderJobs();
+    updateStats();
+  } catch (e) {
+    jobs = [];
+    $("jobStatus").textContent = "공고 데이터를 불러오지 못했습니다. results.json 경로와 파일 내용을 확인해 주세요.";
+    $("jobList").innerHTML = `<div class="empty">공고 데이터 연결에 실패했습니다.<br>
+      기존 자동수집 프로그램이 results.json을 생성하는지 확인해 주세요.<br>
+      파일 위치는 index.html과 같은 docs 폴더여야 합니다.</div>`;
+    updateStats();
+  }
+}
+
+function renderJobs() {
+  const query = ($("jobSearch").value || "").trim().toLowerCase();
+  const area = $("jobArea").value;
+  const filtered = jobs.filter(j => {
+    const all = [j.title,j.clinic,j.area,j.description,j.source].join(" ").toLowerCase();
+    const matchesQuery = !query || all.includes(query);
+    const matchesArea = !area || (area === "부산"
+      ? /부산|강서|사하|사상/.test(j.area + " " + j.title + " " + j.clinic)
+      : (j.area + " " + j.title + " " + j.clinic).includes(area));
+    return matchesQuery && matchesArea;
+  });
+
+  if (!filtered.length) {
+    $("jobList").innerHTML = '<div class="empty">표시할 공고가 없습니다.<br>지역 필터를 변경하거나 공고 데이터를 새로고침해 주세요.</div>';
+    return;
+  }
+
+  $("jobList").innerHTML = filtered.map(j => {
+    const safeUrl = /^https?:\/\//i.test(j.url) ? j.url : "";
+    return `<article class="item">
+      <h3>${escapeHtml(j.title)}</h3>
+      ${j.clinic ? `<p><b>기관:</b> ${escapeHtml(j.clinic)}</p>` : ""}
+      ${j.area ? `<p><b>지역:</b> ${escapeHtml(j.area)}</p>` : ""}
+      ${j.date ? `<p class="meta">등록일: ${escapeHtml(formatDate(j.date))}</p>` : ""}
+      ${j.description ? `<p>${escapeHtml(j.description)}</p>` : ""}
+      ${j.source ? `<p class="meta">출처: ${escapeHtml(j.source)}</p>` : ""}
+      ${safeUrl ? `<p><a href="${escapeHtml(safeUrl)}" target="_blank" rel="noopener noreferrer">공고 원문 열기 ↗</a></p>` : ""}
+    </article>`;
+  }).join("");
+}
+
+function updateStats() {
+  $("statCrm").textContent = crmRecords.length;
+  const today = new Date().toISOString().slice(0,10);
+  $("statFollow").textContent = crmRecords.filter(r =>
+    r.next && r.next <= today && r.status !== "계약 완료"
+  ).length;
+  $("statJobs").textContent = jobs.length;
+}
+
+loadCrm();
+clearCrmForm();
+renderCrm();
+updateStats();
+$("pDate").value = new Date().toISOString().slice(0,10);
+["pBasePrice", "pDiscountRate"].forEach(id => {
+  const input = $(id);
+  if (input) input.addEventListener("input", calculateProposalPricing);
+});
+calculateProposalPricing();
+loadJobs();
+renderAcademicMaterials();
+</script>
+</body>
+</html>
