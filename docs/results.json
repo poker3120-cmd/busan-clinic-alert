@@ -1,16 +1,16 @@
 {
-  "updated_at": "2026-10-20T08:27:02+09:00",
+  "updated_at": "2026-10-21T08:24:35+09:00",
   "summary": {
     "total": 2,
     "search_requests": 44,
-    "raw_count": 205,
+    "raw_count": 242,
     "errors": 0,
     "rejected_region": 0,
-    "rejected_source": 128,
-    "rejected_content": 74,
+    "rejected_source": 169,
+    "rejected_content": 70,
     "uncertain_region": 2,
-    "job_site_matches": 0,
-    "opening_news_matches": 3
+    "job_site_matches": 1,
+    "opening_news_matches": 2
   },
   "results": [
     {
@@ -26,13 +26,13 @@
     },
     {
       "region": "지역 확인 필요",
-      "source": "국민일보",
-      "title": "내포어린이병원 2028년 개원⋯충남도·단국대병원 MOU - 국민일보",
-      "link": "https://news.google.com/rss/articles/CBMiWEFVX3lxTE1SOUtpX3puU0dvTV9hSXVucDdmdmRpczl6Vlk0ejE5cmQ2T1ZtZEl6UzM4MW1EX08wR2dNeVJGaEpwemtuMjZ1dF9iZjlLeWotSDdTeEJ1ZTc?oc=5",
-      "date": "2026-10-14",
-      "timestamp": 1791945071,
-      "opening": true,
-      "date_unknown": false,
+      "source": "잡코리아",
+      "title": "취업 & 채용 공고 - 실시간 채용 정보 검색/확인하기 | 잡코리아",
+      "link": "https://www.jobkorea.co.kr/recruit/joblist",
+      "date": "게시일 확인 필요",
+      "timestamp": 0,
+      "opening": false,
+      "date_unknown": true,
       "region_matched": false
     }
   ]
