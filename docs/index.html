@@ -6,12 +6,16 @@
 <title>부산3지점 통합 영업 대시보드</title>
 <style>
 :root {
-  --navy:#17365d;
-  --blue:#2563eb;
-  --bg:#f3f6fb;
-  --line:#e1e7ef;
-  --text:#1f2937;
-  --muted:#64748b;
+  --navy:#9f1028;
+  --blue:#c41230;
+  --red-dark:#7f1024;
+  --red:#c41230;
+  --red-soft:#fff0f2;
+  --bg:#f7f4f5;
+  --line:#ead8dc;
+  --text:#292329;
+  --muted:#786b70;
+  --shadow:0 8px 24px rgba(112,16,36,.07);
 }
 * { box-sizing:border-box; }
 body {
@@ -45,11 +49,12 @@ header h1 { margin:0 0 8px; font-size:25px; }
 header p { margin:0; color:#dbeafe; font-size:14px; }
 nav {
   display:flex;
-  gap:7px;
+  gap:9px;
   flex-wrap:wrap;
-  background:white;
-  padding:12px max(12px,calc((100% - 1200px)/2));
+  background:rgba(255,255,255,.97);
+  padding:13px max(12px,calc((100% - 1200px)/2));
   border-bottom:1px solid var(--line);
+  box-shadow:0 5px 18px rgba(112,16,36,.06);
   position:sticky;
   top:0;
   z-index:10;
@@ -58,16 +63,18 @@ button,.navbtn {
   font:inherit;
   cursor:pointer;
 }
-.navbtn {
-  border:0;
-  border-radius:8px;
-  background:#eef2f7;
-  color:#334155;
-  padding:11px 15px;
+ .navbtn {
+  border:1px solid transparent;
+  border-radius:9px;
+  background:#f8f3f4;
+  color:#67535a;
+  padding:11px 16px;
   font-weight:700;
+  transition:background .18s ease, color .18s ease, box-shadow .18s ease, transform .18s ease;
 }
-.navbtn.active { background:#c41230; color:white; }
-main { max-width:1200px; margin:auto; padding:22px 16px 50px; }
+.navbtn:hover { background:var(--red-soft); color:var(--red-dark); border-color:#f1cbd3; }
+.navbtn.active { background:linear-gradient(135deg,#d51a3a,#a70e29); color:white; box-shadow:0 4px 12px rgba(164,14,41,.22); }
+main { max-width:1200px; margin:auto; padding:26px 16px 50px; }
 .page { display:none; }
 .page.active { display:block; }
 h2 { margin:0 0 8px; font-size:23px; }
@@ -78,14 +85,16 @@ h2 { margin:0 0 8px; font-size:23px; }
   gap:15px;
 }
 .grid3 { grid-template-columns:repeat(3,minmax(0,1fr)); }
-.card {
-  background:white;
+ .card {
+  background:rgba(255,255,255,.96);
   border:1px solid var(--line);
+  border-top:3px solid #cf2945;
   border-radius:13px;
   padding:19px;
   min-width:0;
+  box-shadow:var(--shadow);
 }
-.card h3 { margin:0 0 9px; font-size:17px; }
+.card h3 { margin:0 0 9px; font-size:17px; color:#6f1428; }
 .card p { color:var(--muted); font-size:14px; line-height:1.6; }
 .launch {
   display:block;
@@ -93,22 +102,27 @@ h2 { margin:0 0 8px; font-size:23px; }
   margin-top:13px;
   border:0;
   border-radius:8px;
-  background:var(--navy);
+  background:linear-gradient(135deg,#d51a3a,#a70e29);
   color:white;
   padding:12px;
   font-weight:700;
+  box-shadow:0 4px 10px rgba(164,14,41,.13);
 }
-.stat { font-size:30px; font-weight:800; color:var(--navy); }
+.stat { font-size:30px; font-weight:800; color:var(--red-dark); }
 label { display:block; font-size:13px; font-weight:700; margin:13px 0 6px; }
 input,select,textarea {
   width:100%;
-  border:1px solid #cbd5e1;
+  border:1px solid #dfcbd0;
   border-radius:8px;
   padding:11px;
   background:white;
   color:var(--text);
   font:inherit;
   font-size:14px;
+}
+input:focus,select:focus,textarea:focus {
+  outline:3px solid rgba(196,18,48,.12);
+  border-color:#c41230;
 }
 textarea { min-height:95px; resize:vertical; }
 .row {
@@ -118,34 +132,39 @@ textarea { min-height:95px; resize:vertical; }
   flex-wrap:wrap;
 }
 .row > * { flex:1; min-width:130px; }
-.btn {
+ .btn {
   border:0;
-  border-radius:8px;
-  background:var(--blue);
+  border-radius:9px;
+  background:linear-gradient(135deg,#d51a3a,#a70e29);
   color:white;
   padding:11px 15px;
   font-weight:700;
+  box-shadow:0 3px 9px rgba(164,14,41,.14);
+  transition:filter .18s ease, transform .18s ease;
 }
-.btn.secondary { background:#e8edf5; color:#334155; }
-.btn.danger { background:#b91c1c; }
+.btn:hover,.launch:hover { filter:brightness(1.06); transform:translateY(-1px); }
+.btn.secondary { background:#f8ecef; color:#8d1830; border:1px solid #efd1d8; box-shadow:none; }
+.btn.danger { background:#8f1025; }
 .btn.small { padding:7px 10px; font-size:12px; }
 .toolbar { display:flex; gap:8px; flex-wrap:wrap; margin:14px 0; }
 .toolbar > * { flex:1; min-width:140px; }
 .item {
   background:white;
   border:1px solid var(--line);
+  border-left:3px solid #d62a46;
   border-radius:10px;
   padding:15px;
   margin:10px 0;
   overflow-wrap:anywhere;
+  box-shadow:0 3px 12px rgba(112,16,36,.035);
 }
 .item h3 { margin:0 0 8px; font-size:16px; }
 .item p { margin:6px 0; font-size:14px; line-height:1.55; }
 .meta { font-size:12px; color:var(--muted); }
 .pill {
   display:inline-block;
-  background:#eaf1ff;
-  color:#1d4ed8;
+  background:#fff0f2;
+  color:#a3122e;
   border-radius:20px;
   padding:4px 9px;
   font-size:12px;
@@ -161,11 +180,11 @@ textarea { min-height:95px; resize:vertical; }
   line-height:1.7;
 }
 .notice {
-  background:#eff6ff;
-  border:1px solid #bfdbfe;
+  background:#fff5f6;
+  border:1px solid #f0c9d1;
   padding:12px;
   border-radius:8px;
-  color:#1e40af;
+  color:#8d1830;
   font-size:13px;
   line-height:1.6;
   margin:12px 0;
@@ -175,6 +194,8 @@ footer {
   padding:22px;
   color:var(--muted);
   font-size:12px;
+  border-top:1px solid var(--line);
+  background:rgba(255,255,255,.65);
 }
 #proposalPreview {
   background:white;
