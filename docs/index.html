@@ -1356,6 +1356,18 @@ function downloadProposalPDF() {
      art='<svg viewBox="0 0 180 120" role="img" aria-label="간암 위험도 검사에 맞춘 간 일러스트"><defs><linearGradient id="organFill" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e95c67"/><stop offset="1" stop-color="#a81828"/></linearGradient></defs><circle cx="90" cy="60" r="54" fill="#b51f30" opacity=".09"/><path d="M28 56 C37 32 63 25 91 34 C112 39 126 31 145 43 C156 50 153 67 140 78 C125 91 104 91 88 83 C73 76 57 84 42 76 C31 71 24 65 28 56Z" fill="url(#organFill)" stroke="#8e1728" stroke-width="2"/><path d="M92 36 C89 49 91 64 88 82 M91 52 C105 52 116 48 128 44 M89 63 C72 61 58 65 44 72" fill="none" stroke="#ffd9dd" stroke-width="2.2" stroke-linecap="round"/><circle cx="125" cy="61" r="10" fill="#fff" opacity=".9"/><circle cx="125" cy="61" r="5" fill="#c41230"/></svg>';
    } else if(/헬리코박터|h\.?\s*pylori|위암|위\s*검사|위장|클라리스로마이신|내성 돌연변이/.test(artText)){
      art='<svg viewBox="0 0 180 120" role="img" aria-label="헬리코박터 검사에 맞춘 위와 세균 일러스트"><defs><linearGradient id="organFill" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f28a8d"/><stop offset="1" stop-color="#c41230"/></linearGradient></defs><circle cx="90" cy="60" r="54" fill="#b51f30" opacity=".09"/><path d="M73 24 C72 38 76 46 84 51 C91 56 103 53 108 64 C116 80 102 94 84 92 C62 91 46 76 48 60 C49 49 57 44 61 35 C64 29 63 24 63 20" fill="url(#organFill)" stroke="#a81828" stroke-width="2.5" stroke-linecap="round"/><path d="M73 27 C72 42 79 48 88 53" fill="none" stroke="#ffe0e3" stroke-width="3" stroke-linecap="round"/><g fill="#fff" stroke="#c41230" stroke-width="1.8"><ellipse cx="122" cy="40" rx="10" ry="5" transform="rotate(-25 122 40)"/><ellipse cx="136" cy="62" rx="9" ry="4.5" transform="rotate(25 136 62)"/><ellipse cx="118" cy="83" rx="10" ry="5" transform="rotate(-35 118 83)"/></g><g stroke="#c41230" stroke-width="1.5" stroke-linecap="round"><path d="M113 35 l-5 -5 M115 45 l-5 5 M130 57 l-2 -7 M142 59 l7 -4 M112 79 l-6 -3 M123 87 l2 6"/></g></svg>';
+   } else if(/심혈관|심장|관상동맥|심근|심부전|troponin|nt-probnp|혈관/.test(artText)){
+     art='<svg viewBox="0 0 180 120" role="img" aria-label="심혈관 검사에 맞춘 심장 일러스트"><circle cx="90" cy="60" r="54" fill="#b51f30" opacity=".09"/><path d="M90 94 C78 81 43 60 43 42 C43 20 69 17 90 39 C111 17 137 20 137 42 C137 60 102 81 90 94Z" fill="#d83c50" stroke="#a81828" stroke-width="2.5"/><path d="M89 40 L89 58 L77 67 L85 76 L80 86 M91 51 L105 59 L100 72 L110 78" fill="none" stroke="#ffe4e7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M24 62 H48 L56 51 L66 74 L76 60 H104 L113 49 L121 68 L130 61 H156" fill="none" stroke="#b51f30" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+   } else if(/갑상선|thyroid|tsh|유리 t4|free t4|갑상샘/.test(artText)){
+     art='<svg viewBox="0 0 180 120" role="img" aria-label="갑상선 검사에 맞춘 갑상선 일러스트"><circle cx="90" cy="60" r="54" fill="#b51f30" opacity=".09"/><path d="M86 40 C72 23 51 31 50 49 C49 67 67 80 85 67 L90 59 L95 67 C113 80 131 67 130 49 C129 31 108 23 94 40 L90 47Z" fill="#d94b5d" stroke="#a81828" stroke-width="2.5"/><path d="M90 43 V85" stroke="#a81828" stroke-width="5" stroke-linecap="round"/><path d="M75 88 H105" stroke="#f0a5ad" stroke-width="4" stroke-linecap="round"/></svg>';
+   } else if(/신장|콩팥|신기능|크레아티닌|cystatin|시스타틴/.test(artText)){
+     art='<svg viewBox="0 0 180 120" role="img" aria-label="신장 검사에 맞춘 신장 일러스트"><circle cx="90" cy="60" r="54" fill="#b51f30" opacity=".09"/><path d="M66 27 C43 24 34 48 42 69 C49 87 68 92 79 77 C88 65 79 55 70 52 C61 49 58 41 66 27Z" fill="#d94b5d" stroke="#a81828" stroke-width="2.5"/><path d="M114 27 C137 24 146 48 138 69 C131 87 112 92 101 77 C92 65 101 55 110 52 C119 49 122 41 114 27Z" fill="#d94b5d" stroke="#a81828" stroke-width="2.5"/><path d="M79 61 C87 63 87 74 90 84 M101 61 C93 63 93 74 90 84" fill="none" stroke="#a81828" stroke-width="3" stroke-linecap="round"/></svg>';
+   } else if(/유방|breast|유방암|brca/.test(artText)){
+     art='<svg viewBox="0 0 180 120" role="img" aria-label="유방 검사에 맞춘 유방 건강 일러스트"><circle cx="90" cy="60" r="54" fill="#b51f30" opacity=".09"/><path d="M90 25 V95 M90 42 C76 33 56 36 49 52 C42 68 57 83 77 79 C86 77 90 70 90 61 M90 42 C104 33 124 36 131 52 C138 68 123 83 103 79 C94 77 90 70 90 61" fill="#f5b6be" stroke="#a81828" stroke-width="2.5" stroke-linejoin="round"/><circle cx="67" cy="59" r="6" fill="#c41230"/><circle cx="113" cy="59" r="6" fill="#c41230"/></svg>';
+   } else if(/대장|대장암|대변|분변|결장|대장내시경|colon/.test(artText)){
+     art='<svg viewBox="0 0 180 120" role="img" aria-label="대장 검사에 맞춘 대장 일러스트"><circle cx="90" cy="60" r="54" fill="#b51f30" opacity=".09"/><path d="M63 35 C48 35 45 45 48 56 L48 75 C48 87 58 91 68 86 L72 81 L108 81 L112 86 C122 91 132 87 132 75 L132 56 C135 45 132 35 117 35 L105 35 L105 47 L117 47 L117 72 L103 72 L103 65 L77 65 L77 72 L63 72 L63 47 L75 47 L75 35Z" fill="#e56b78" stroke="#a81828" stroke-width="3" stroke-linejoin="round"/></svg>';
+   } else if(/폐암|폐기능|폐질환|lung|호흡기/.test(artText)){
+     art='<svg viewBox="0 0 180 120" role="img" aria-label="폐 검사에 맞춘 폐 일러스트"><circle cx="90" cy="60" r="54" fill="#b51f30" opacity=".09"/><path d="M87 31 V58 L74 43 C68 37 63 43 59 53 L45 79 C39 92 53 97 67 89 L84 77 L87 58 M93 31 V58 L106 43 C112 37 117 43 121 53 L135 79 C141 92 127 97 113 89 L96 77 L93 58" fill="#e56b78" stroke="#a81828" stroke-width="2.5" stroke-linejoin="round"/><path d="M90 24 V59 M90 42 L76 52 M90 42 L104 52" fill="none" stroke="#a81828" stroke-width="3" stroke-linecap="round"/></svg>';
    } else if(/pcr|dna|유전자|돌연변이|분자진단/.test(artText)){
      art='<svg viewBox="0 0 180 120" role="img" aria-label="분자진단 검사에 맞춘 DNA 일러스트"><circle cx="90" cy="60" r="54" fill="#b51f30" opacity=".09"/><path d="M61 23 C119 38 61 82 119 97 M119 23 C61 38 119 82 61 97" fill="none" stroke="#c41230" stroke-width="4" stroke-linecap="round"/><g stroke="#e98b94" stroke-width="2.5" stroke-linecap="round"><path d="M75 29 H105 M85 40 H95 M75 51 H105 M85 62 H95 M75 73 H105 M85 84 H95 M75 93 H105"/></g><circle cx="90" cy="60" r="7" fill="#fff" stroke="#c41230" stroke-width="2"/></svg>';
    } else {
@@ -1391,9 +1403,34 @@ function downloadProposal() {
     return;
   }
 
-  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
-  <style>body{font-family:Arial,'Malgun Gothic',sans-serif;line-height:1.8;margin:35px;white-space:pre-wrap}</style>
-  </head><body>${escapeHtml(content)}</body></html>`;
+  const lines = content.split("\n");
+  const title = lines[0] || "부산3지점 영업 제안서";
+  const body = lines.slice(1).map(line => {
+    const safe = escapeHtml(line);
+    if (/^\d+\. /.test(line)) return '<h2>'+safe+'</h2>';
+    if (/^참고 자료|^원문에서 확인된/.test(line)) return '<h3>'+safe+'</h3>';
+    if (/^씨젠의료재단 부산3지점 드림/.test(line)) return '<p class="sign">'+safe+'</p>';
+    if (/^[•]/.test(line)) return '<p class="bullet">'+safe+'</p>';
+    return line.trim() ? '<p>'+safe+'</p>' : '<div class="space"></div>';
+  }).join("");
+  const html = `<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8">
+  <style>
+  @page{size:A4;margin:18mm 17mm}
+  body{font-family:Arial,'Malgun Gothic',sans-serif;line-height:1.65;color:#333;margin:0;font-size:10.5pt}
+  .brand{display:flex;align-items:center;gap:14px;border-bottom:3px solid #c41230;padding:0 0 12px;margin-bottom:22px}
+  .brand img{width:155px;max-height:48px;object-fit:contain}
+  .brand span{font-size:9pt;font-weight:bold;color:#a81828}
+  h1{font-size:23pt;line-height:1.3;color:#a81828;margin:0 0 18px;padding:0 0 14px;border-bottom:1px solid #efd1d7}
+  h2{font-size:13pt;color:#a81828;border-left:4px solid #c41230;padding:4px 0 4px 10px;margin:22px 0 8px;page-break-after:avoid}
+  h3{font-size:11pt;color:#8f2634;margin:14px 0 6px}
+  p{margin:5px 0;white-space:pre-wrap;overflow-wrap:anywhere}
+  .space{height:5px}.bullet{padding-left:8px}.sign{margin-top:28px;text-align:right;font-weight:bold;color:#a81828}
+  .foot{margin-top:30px;border-top:1px solid #ead8dc;padding-top:8px;color:#786b70;font-size:8pt}
+  </style></head><body>
+  <div class="brand"><img src="https://pr.seegenemedical.com/user/img/re/ci/ci05.png" alt="씨젠의료재단 로고"><span>부산3지점 · 맞춤형 영업 제안서</span></div>
+  <h1>${escapeHtml(title)}</h1>${body}
+  <div class="foot">씨젠의료재단 부산3지점 · 거래처 협의용 초안 | 검사 적용·수가·계약 조건은 최신 원문 및 내부 승인 기준 확인 후 확정</div>
+  </body></html>`;
 
   const blob = new Blob(["\ufeff", html], {type:"application/msword"});
   const url = URL.createObjectURL(blob);
