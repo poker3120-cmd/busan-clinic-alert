@@ -36,6 +36,9 @@ header::before {
   z-index:-1;
   background:linear-gradient(90deg,rgba(105,0,20,.82) 0%,rgba(155,0,30,.66) 48%,rgba(155,0,30,.12) 100%);
 }
+header .brand-lockup { display:flex; align-items:center; gap:18px; position:relative; z-index:1; }
+header .brand-logo { display:block; width:210px; max-width:35%; height:auto; padding:9px 12px; border-radius:8px; background:rgba(255,255,255,.97); box-shadow:0 3px 12px rgba(60,0,10,.18); }
+header .brand-copy { min-width:0; }
 header h1 { text-shadow:0 2px 8px rgba(60,0,10,.28); }
 header p { color:#fff1f3; }
 header h1 { margin:0 0 8px; font-size:25px; }
@@ -185,6 +188,9 @@ footer {
 }
 @media(max-width:700px) {
   header h1 { font-size:21px; }
+  header .brand-lockup { gap:12px; }
+  header .brand-logo { width:145px; max-width:38%; padding:7px; }
+  header { padding-top:25px; padding-bottom:25px; min-height:125px; }
   .grid,.grid3 { grid-template-columns:1fr; }
   nav { position:static; }
   .navbtn { flex:1 1 40%; }
@@ -195,8 +201,13 @@ footer {
 <body>
 
 <header>
-  <h1>부산3지점 통합 영업 대시보드</h1>
-  <p>영업관리.계획 | 김해 · 부산 서부권</p>
+  <div class="brand-lockup">
+    <img class="brand-logo" src="https://pr.seegenemedical.com/user/img/re/ci/ci05.png" alt="재단법인 씨젠의료재단 공식 로고">
+    <div class="brand-copy">
+      <h1>부산3지점 통합 영업 대시보드</h1>
+      <p>영업관리 · 계획 | 김해 · 부산 서부권</p>
+    </div>
+  </div>
 </header>
 
 <nav>
