@@ -1,15 +1,15 @@
 {
-  "updated_at": "2026-10-25T08:20:41+09:00",
+  "updated_at": "2026-10-26T08:21:05+09:00",
   "summary": {
-    "total": 1,
+    "total": 2,
     "search_requests": 44,
-    "raw_count": 459,
+    "raw_count": 383,
     "errors": 0,
     "rejected_region": 0,
-    "rejected_source": 348,
-    "rejected_content": 109,
-    "uncertain_region": 1,
-    "job_site_matches": 0,
+    "rejected_source": 259,
+    "rejected_content": 121,
+    "uncertain_region": 2,
+    "job_site_matches": 1,
     "opening_news_matches": 2
   },
   "results": [
@@ -23,6 +23,17 @@
       "opening": true,
       "date_unknown": false,
       "region_matched": true
+    },
+    {
+      "region": "지역 확인 필요",
+      "source": "잡코리아",
+      "title": "취업 & 채용 공고 - 실시간 채용 정보 검색/확인하기 | 잡코리아",
+      "link": "https://www.jobkorea.co.kr/recruit/joblist",
+      "date": "게시일 확인 필요",
+      "timestamp": 0,
+      "opening": false,
+      "date_unknown": true,
+      "region_matched": false
     }
   ]
 }
