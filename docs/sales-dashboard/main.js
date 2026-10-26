@@ -540,7 +540,7 @@ async function loadClinicJobs() {
 /* ---------- 이벤트 배선 ---------- */
 
 function wireNavigation() {
-  $(".navbtn").forEach((btn) => btn.addEventListener("click", () => showPage(btn.dataset.page)));
+  $$(".navbtn").forEach((btn) => btn.addEventListener("click", () => showPage(btn.dataset.page)));
   $("jobArea")?.addEventListener("change", renderClinicJobs);
   $("jobSearch")?.addEventListener("input", renderClinicJobs);
   $("jobReload")?.addEventListener("click", loadClinicJobs);
