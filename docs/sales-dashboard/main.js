@@ -90,6 +90,9 @@ function showPage(name) {
   if (name === "materials") {
     renderAnalysis();
   }
+  if (name === "jobs") {
+    loadClinicJobs();
+  }
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -471,10 +474,76 @@ function renderProposalPreview() {
   requestAnimationFrame(fitProposalScaler);
 }
 
+/* ---------- 신규개원·채용정보 ---------- */
+let clinicJobs = [];
+let clinicJobsLoaded = false;
+
+function jobRegionMatches(item, area) {
+  if (!area) return true;
+  const region = String(item.region || "");
+  const title = String(item.title || "");
+  const text = region + " " + title;
+  if (area === "김해") return /김해/.test(text);
+  if (area === "강서") return /강서/.test(text);
+  if (area === "사하") return /사하/.test(text);
+  if (area === "사상") return /사상/.test(text);
+  return true;
+}
+
+function renderClinicJobs() {
+  const list = $("jobList");
+  if (!list) return;
+  const area = $("jobArea")?.value || "";
+  const query = ($("jobSearch")?.value || "").trim().toLowerCase();
+  const filtered = clinicJobs.filter((item) =>
+    jobRegionMatches(item, area) &&
+    (!query || (String(item.title || "") + " " + String(item.region || "") + " " + String(item.source || "")).toLowerCase().includes(query))
+  );
+  $("jobCount").textContent = String(filtered.length);
+  if (!filtered.length) {
+    list.innerHTML = '<div class="card"><h3>표시할 공고가 없습니다.</h3><p>지역 필터를 전체로 바꾸거나 다른 검색어를 입력해 주세요. 수집 결과가 없는 경우 다음 자동 업데이트를 기다려 주세요.</p></div>';
+    return;
+  }
+  list.innerHTML = filtered.map((item) => {
+    const title = escapeHtml(item.title || "제목 없음");
+    const region = escapeHtml(item.region || "지역 확인 필요");
+    const source = escapeHtml(item.source || "출처 미상");
+    const date = escapeHtml(item.date || "게시일 확인 필요");
+    const link = String(item.link || "");
+    const safeLink = /^https?:\/\//i.test(link) ? link : "";
+    return '<article class="card job-card"><div class="job-card-top"><span class="job-region">' + region + '</span><span class="job-date">' + date + '</span></div><h3>' + title + '</h3><p class="meta">출처: ' + source + '</p>' + (safeLink ? '<a class="btn job-link" href="' + escapeHtml(safeLink) + '" target="_blank" rel="noopener noreferrer">공고·기사 열기 ↗</a>' : '') + '</article>';
+  }).join("");
+}
+
+async function loadClinicJobs() {
+  const status = $("jobStatus");
+  if (!status) return;
+  status.textContent = "공고 데이터를 불러오는 중입니다.";
+  try {
+    const response = await fetch("../results.json?ts=" + Date.now(), { cache: "no-store" });
+    if (!response.ok) throw new Error("HTTP " + response.status);
+    const data = await response.json();
+    clinicJobs = Array.isArray(data.results) ? data.results : [];
+    clinicJobsLoaded = true;
+    $("jobUpdated").textContent = "마지막 업데이트: " + String(data.updated_at || "날짜 정보 없음").replace("T", " ").slice(0, 16);
+    status.textContent = "자동수집 결과 " + clinicJobs.length + "건 · 공고를 선택하면 원문이 새 탭에서 열립니다.";
+    renderClinicJobs();
+  } catch (error) {
+    clinicJobsLoaded = false;
+    clinicJobs = [];
+    $("jobUpdated").textContent = "업데이트 날짜를 확인할 수 없습니다.";
+    status.textContent = "공고 데이터를 불러오지 못했습니다. 잠시 후 새로고침해 주세요.";
+    $("jobList").innerHTML = '<div class="card"><h3>데이터 연결을 확인해 주세요.</h3><p>기존 자동수집 결과 파일(results.json)을 읽지 못했습니다.</p></div>';
+  }
+}
+
 /* ---------- 이벤트 배선 ---------- */
 
 function wireNavigation() {
-  $$(".navbtn").forEach((btn) => btn.addEventListener("click", () => showPage(btn.dataset.page)));
+  $(".navbtn").forEach((btn) => btn.addEventListener("click", () => showPage(btn.dataset.page)));
+  $("jobArea")?.addEventListener("change", renderClinicJobs);
+  $("jobSearch")?.addEventListener("input", renderClinicJobs);
+  $("jobReload")?.addEventListener("click", loadClinicJobs);
   document.addEventListener("click", (event) => {
     const launcher = event.target.closest("[data-page]");
     if (launcher && !launcher.classList.contains("navbtn")) {
