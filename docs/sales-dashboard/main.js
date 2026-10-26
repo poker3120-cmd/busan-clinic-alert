@@ -11,7 +11,7 @@ import { state, emptyAnalysis, saveAnalysis, loadAnalysis, saveFlyer, loadFlyer,
   saveTraining, loadTraining, saveProposal, loadProposal,
   clearMaterials, resetFlyer, resetTraining, defaultFlyer, defaultTraining } from "./state.js";
 
-import { extractFiles } from "./extract.js";
+import { extractFiles } from "./extract.js?v=20261027d";
 import { analyze } from "./analyze.js";
 import { sampleUnits, sampleFileReport } from "./demo.js";
 
