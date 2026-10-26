@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head><meta charset="UTF-8"><title>fetch test</title></head>
+<body>
+<pre id="out">START</pre>
+<script type="module">
+const files = [
+  "css/style.css",
+  "js/main.js",
+  "images/ci-seegene.png",
+  "vendor/pdf.worker.min.js",
+  ".nojekyll"
+];
+const lines = [];
+for (const f of files) {
+  try {
+    const res = await fetch("./" + f, { cache: "no-store" });
+    const buf = await res.arrayBuffer();
+    lines.push(`FILE ${f} status=${res.status} type=${res.headers.get("content-type")} bytes=${buf.byteLength}`);
+  } catch (error) {
+    lines.push(`FILE ${f} ERROR=${error.message}`);
+  }
+}
+lines.push("ORIGIN=" + location.origin);
+lines.push("PROTO=" + location.protocol);
+lines.forEach((l) => console.log(l));
+document.getElementById("out").textContent = lines.join("\n") + "\nDONE";
+</script>
+</body>
+</html>
