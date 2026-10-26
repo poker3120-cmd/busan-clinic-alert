@@ -1605,3 +1605,14 @@ textarea.mono { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; 
   .navbtn { flex: 1 1 100%; }
   .brand-logo { width: 140px; }
 }
+
+
+/* 신규개원·채용정보 통합 화면 */
+.job-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 14px; }
+.job-card { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+.job-card h3 { margin: 4px 0 0; line-height: 1.5; overflow-wrap: anywhere; }
+.job-card-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; flex-wrap: wrap; }
+.job-region { display: inline-block; border-radius: 20px; background: var(--red-soft); color: var(--red-dark); padding: 5px 10px; font-size: 12px; font-weight: 800; }
+.job-date { color: var(--muted); font-size: 12px; }
+.job-link { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; margin-top: 4px; }
+@media (max-width: 700px) { .job-list { grid-template-columns: 1fr; } }
