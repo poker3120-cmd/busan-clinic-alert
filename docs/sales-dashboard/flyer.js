@@ -67,7 +67,7 @@ export function renderFlyerHtml(flyer, image, denseLevel = 0) {
   const head = `
     <div class="fl-head">
       <div class="fl-head-top">
-        <img class="fl-logo" src="images/ci-seegene.png" alt="재단법인 씨젠의료재단 로고">
+        <img class="fl-logo" src="./ci-seegene.png" alt="재단법인 씨젠의료재단 로고">
         ${f.kicker ? `<span class="fl-kicker">${escapeHtml(f.kicker)}</span>` : ""}
       </div>
       <h1 class="fl-title ${titleClass}">${escapeHtml(title)}</h1>
