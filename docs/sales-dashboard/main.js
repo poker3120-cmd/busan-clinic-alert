@@ -1391,6 +1391,9 @@ export function loadExtractedResult(result, options = {}) {
       state.flyer.imageCaption = truncate(selected.name || "", 40);
       saveFlyer();
     }
+    // 방금 만든 개념도도 자료 화면의 추출 이미지 목록에 즉시 표시합니다.
+    renderImageGallery();
+    renderHomeStats();
   }
 
   return analysis;
