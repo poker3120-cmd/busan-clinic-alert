@@ -19,7 +19,7 @@ import { sampleUnits, sampleFileReport } from "./demo.js";
 import {
   normalizeFlyer, renderFlyerHtml, renderFlyerEditor,
   findBestDense, findBestFit, measureFlyerHeight, flyerToPlainText,
-} from "./flyer.js";
+} from "./flyer.js?v=20261027g";
 
 import {
   normalizeTraining, renderTrainingHtml, renderTrainingEditor,
