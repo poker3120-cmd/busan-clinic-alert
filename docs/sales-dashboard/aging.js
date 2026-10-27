@@ -227,8 +227,8 @@ function detectHeader(matrix) {
     detectedClient: best.client,
     detectedItem: best.item,
     detectedCount: best.count,
-    // 헤더 다음 첫 데이터 행은 여유 레코드이므로 비교 대상에서 제외합니다.
-    rows: matrix.slice(best.index + 2).filter((row) => row.some((cell) => cleanCell(cell))),
+    // matrix 전달 전에 시트 첫 행을 제외하므로, 헤더 바로 다음 행부터 데이터입니다.
+    rows: matrix.slice(best.index + 1).filter((row) => row.some((cell) => cleanCell(cell))),
   };
 }
 
@@ -573,7 +573,8 @@ async function readFiles() {
       } else {
         throw new Error(file.name + "은 지원하지 않는 형식입니다. .xlsx 또는 .csv 파일로 첨부해 주세요. 구형 .xls는 .xlsx로 다시 저장해 주세요.");
       }
-      const detected = detectHeader(workbook.rows);
+      // 요청사항: 워크시트의 첫 번째 행은 여유 레코드이므로 먼저 제외합니다.
+      const detected = detectHeader(workbook.rows.slice(1));
       const filenameCustomer = customerFromFilename(file.name);
       const initialClientMapping = detected.detectedClient >= 0
         ? detected.detectedClient
