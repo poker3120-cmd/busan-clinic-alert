@@ -192,17 +192,19 @@ function detectHeader(matrix) {
     const nonempty = row.filter(Boolean);
     if (nonempty.length < 2) continue;
     const client = findColumn(row, CLIENT_ALIASES);
-    const item = findColumn(row, ITEM_ALIASES);
-    const count = findColumn(row, COUNT_ALIASES);
-    let score = (client >= 0 ? 5 : 0) + (item >= 0 ? 4 : 0) + (count >= 0 ? 3 : 0);
-    if (client >= 0 && item < 0 && nonempty.length >= 3) score += 2;
-    if (nonempty.some((v) => /거래처|검사|항목|건수|의뢰/.test(v))) score += 1;
+    // 사용자가 내려받는 양식은 C열=검사명, D열=건수로 고정되어 있습니다.
+    const item = row.length > 2 ? 2 : -1;
+    const count = row.length > 3 ? 3 : -1;
+    let score = (client >= 0 ? 6 : 0) + (item >= 0 ? 2 : 0) + (count >= 0 ? 2 : 0);
+    if (client >= 0 && item >= 0 && count >= 0) score += 2;
+    if (nonempty.some((v) => /거래처|병원|의원/.test(v))) score += 1;
     if (score > (best?.score ?? -1)) best = { index, headers: row, client, item, count, score };
   }
   if (!best || best.client < 0 || best.score < 5) {
     // 첫 행을 사용자 지정 매핑에서 살릴 수 있도록 낮은 점수라도 보관합니다.
     const index = Math.min(Math.max(matrix.findIndex((row) => row.some((v) => cleanCell(v))), 0), Math.max(matrix.length - 1, 0));
-    best = { index, headers: (matrix[index] || []).map(cleanCell), client: -1, item: -1, count: -1, score: 0 };
+    const headers = (matrix[index] || []).map(cleanCell);
+    best = { index, headers, client: -1, item: headers.length > 2 ? 2 : -1, count: headers.length > 3 ? 3 : -1, score: 0 };
   }
   return {
     headerRow: best.index,
@@ -233,38 +235,34 @@ function renderMappings() {
   }
   host.hidden = false;
   host.innerHTML = `
-    <h3>2. 열 확인</h3>
-    <p class="meta">자동으로 찾은 열을 확인해 주세요. 각 파일의 월과 열을 다르게 지정할 수도 있습니다. 가로형 표는 ‘항목=열 이름’을 선택합니다.</p>
+    <h3>2. 거래처 열 확인</h3>
+    <p class="meta">검사명은 C열, 건수는 D열로 고정했습니다. 거래처 열만 자동 인식 결과를 확인해 주세요. 자동 인식이 잘못된 파일은 거래처 열을 직접 바꿀 수 있습니다.</p>
     <div class="table-wrap">
       <table class="aging-map-table">
-        <thead><tr><th>파일 / 시트</th><th>월</th><th>거래처 열</th><th>검사 항목 열</th><th>건수 열</th></tr></thead>
+        <thead><tr><th>파일 / 시트</th><th>월</th><th>거래처 열</th><th>검사명</th><th>건수</th></tr></thead>
         <tbody>${parsedFiles.map((file, index) => {
           const headers = file.headers.map((value, idx) => ({ value: idx, label: value || `열 ${idx + 1}` }));
           const colOptions = [{ value: -1, label: "선택 안 함" }, ...headers];
-          const itemOptions = [
-            { value: "__wide__", label: "항목 = 열 이름(가로형 표)" },
-            ...colOptions,
-          ];
           return `<tr>
             <td><strong>${escapeHtml(file.name)}</strong><div class="meta">${escapeHtml(file.sheetName)} · ${file.rows.length}개 데이터 행</div></td>
             <td><input class="aging-month" type="month" data-aging-month="${index}" value="${escapeHtml(file.period)}" aria-label="비교 월"></td>
             <td><select data-aging-map="client" data-aging-index="${index}">${selectHtml(colOptions, file.mapping.client)}</select></td>
-            <td><select data-aging-map="item" data-aging-index="${index}">${selectHtml(itemOptions, file.mapping.item)}</select></td>
-            <td><select data-aging-map="count" data-aging-index="${index}">${selectHtml(colOptions, file.mapping.count)}</select></td>
+            <td><span class="aging-fixed-column">C열 고정</span><div class="meta">${escapeHtml(file.headers[2] || "검사명")}</div></td>
+            <td><span class="aging-fixed-column">D열 고정</span><div class="meta">${escapeHtml(file.headers[3] || "건수")}</div></td>
           </tr>`;
         }).join("")}</tbody>
       </table>
     </div>
     <div class="toolbar mt-12">
-      <button type="button" class="btn" id="agingCompareButton">선택한 열로 월별 비교</button>
-      <button type="button" class="btn secondary" id="agingResetMapping">열 자동 재설정</button>
+      <button type="button" class="btn" id="agingCompareButton">월별 비교 실행</button>
+      <button type="button" class="btn secondary" id="agingResetMapping">거래처 열 자동 재설정</button>
     </div>
   `;
   $("agingCompareButton").disabled = parsedFiles.length < 2;
   $("agingCompareButton").addEventListener("click", runComparison);
   $("agingResetMapping").addEventListener("click", () => {
     parsedFiles.forEach((file) => {
-      file.mapping = { client: file.detectedClient, item: file.detectedItem >= 0 ? file.detectedItem : "__wide__", count: file.detectedCount };
+      file.mapping = { client: file.detectedClient, item: 2, count: 3 };
     });
     renderMappings();
     runComparison();
@@ -301,16 +299,14 @@ function normalizeMonth(file, index) {
 }
 
 function makeMonthData(file, monthIndex) {
-  const { client, item, count } = file.mapping;
-  const clientIndex = Number(client);
-  const itemValue = String(item);
-  const itemIndex = itemValue === "__wide__" ? -1 : Number(itemValue);
-  const countIndex = Number(count);
+  const clientIndex = Number(file.mapping.client);
+  const itemIndex = 2;  // 고정: C열 검사명
+  const countIndex = 3; // 고정: D열 건수
   if (!Number.isInteger(clientIndex) || clientIndex < 0 || !file.headers[clientIndex]) {
     throw new Error(file.name + "의 거래처 열을 지정해 주세요.");
   }
-  if (itemValue !== "__wide__" && (!Number.isInteger(itemIndex) || itemIndex < 0 || !file.headers[itemIndex])) {
-    throw new Error(file.name + "의 검사 항목 열을 지정해 주세요.");
+  if (file.headers.length <= countIndex) {
+    throw new Error(file.name + "에 D열(건수)이 없습니다. 내려받은 원본 엑셀 양식인지 확인해 주세요.");
   }
 
   const entries = new Map();
@@ -331,20 +327,10 @@ function makeMonthData(file, monthIndex) {
     if (rawClient) lastClient = rawClient;
     const clientName = rawClient || lastClient;
     if (!clientName) continue;
-    if (itemValue === "__wide__") {
-      for (let col = 0; col < file.headers.length; col++) {
-        if (col === clientIndex || col === countIndex) continue;
-        const itemName = cleanCell(file.headers[col]);
-        if (!itemName) continue;
-        const countValue = numberFromCell(row[col]);
-        if (countValue !== null && countValue > 0) add(clientName, itemName, countValue);
-      }
-    } else {
-      const itemName = cleanCell(row[itemIndex]);
-      if (!itemName || isSummaryText(itemName)) continue;
-      const quantity = countIndex >= 0 ? numberFromCell(row[countIndex]) : 1;
-      if (quantity !== null && quantity > 0) add(clientName, itemName, quantity);
-    }
+    const itemName = cleanCell(row[itemIndex]);
+    if (!itemName || isSummaryText(itemName)) continue;
+    const quantity = numberFromCell(row[countIndex]);
+    if (quantity !== null && quantity > 0) add(clientName, itemName, quantity);
   }
   return { month: normalizeMonth(file, monthIndex), entries };
 }
@@ -580,16 +566,15 @@ async function readFiles() {
         detectedCount: detected.detectedCount,
         mapping: {
           client: detected.detectedClient,
-          item: detected.detectedItem >= 0 ? detected.detectedItem : "__wide__",
-          count: detected.detectedCount,
+          item: 2,   // C열 고정: 검사명
+          count: 3,  // D열 고정: 건수
         },
       });
     }
     renderMappings();
-    const ready = parsedFiles.every((file) => Number(file.mapping.client) >= 0 &&
-      (file.mapping.item === "__wide__" || Number(file.mapping.item) >= 0));
+    const ready = parsedFiles.every((file) => Number(file.mapping.client) >= 0);
     if (ready) runComparison();
-    else setStatus("파일을 읽었습니다. ‘열 확인’에서 거래처·검사 항목·건수 열을 지정한 뒤 비교해 주세요.", "ok");
+    else setStatus("파일을 읽었습니다. 거래처 열을 지정한 뒤 월별 비교를 실행해 주세요.", "ok");
   } catch (error) {
     setStatus(error.message || "파일을 읽지 못했습니다.", "err");
   } finally {
