@@ -23,6 +23,7 @@ let parsedFiles = [];
 let comparedRows = [];
 let comparisonMonths = [];
 let monthlyOverview = [];
+let comparisonMode = "monthly"; // "annual-vs-current" compares prior-year annual history with the latest selected period
 let wired = false;
 
 function normalized(value) {
@@ -59,17 +60,51 @@ function parseXml(text, label) {
   return xml;
 }
 
-function parseMonthFromName(name) {
+function parsePeriodFromName(name) {
   const text = String(name || "");
-  let m = text.match(/(20\d{2})\s*[년._\- ]?\s*(0?[1-9]|1[0-2])\s*월?/);
-  if (m) return m[1] + "-" + String(Number(m[2])).padStart(2, "0");
-  m = text.match(/(?:^|[^0-9])(0?[1-9]|1[0-2])\s*월(?:[^0-9]|$)/);
-  if (m) return "";
-  return "";
+  // Full date range, e.g. 2025-01-01 ~ 2025-12-31
+  const range = text.match(/(20\d{2})\s*[-./]\s*(\d{1,2})\s*[-./]\s*(\d{1,2})\s*(?:~|～|〜|–|—|至)\s*(20\d{2})\s*[-./]\s*(\d{1,2})\s*[-./]\s*(\d{1,2})/);
+  if (range) {
+    const pad = (v) => String(Number(v)).padStart(2, "0");
+    const start = range[1] + "-" + pad(range[2]) + "-" + pad(range[3]);
+    const end = range[4] + "-" + pad(range[5]) + "-" + pad(range[6]);
+    const startYear = Number(range[1]), startMonth = Number(range[2]), startDay = Number(range[3]);
+    const endYear = Number(range[4]), endMonth = Number(range[5]), endDay = Number(range[6]);
+    const isAnnual = startYear === endYear && startMonth === 1 && startDay === 1 &&
+      endMonth === 12 && endDay === 31;
+    const isWholeMonth = startYear === endYear && startMonth === endMonth &&
+      startDay === 1 && new Date(endYear, endMonth, 0).getDate() === endDay;
+    return {
+      period: end.slice(0, 7),
+      periodStart: start,
+      periodEnd: end,
+      periodType: isAnnual ? "annual" : (isWholeMonth ? "month" : "range"),
+      periodLabel: start + " ~ " + end + (isAnnual ? " (연간)" : ""),
+    };
+  }
+
+  // Month in filename, e.g. 2026-08 or 2026년 8월
+  const m = text.match(/(20\d{2})\s*[년._\-/ ]?\s*(0?[1-9]|1[0-2])\s*월?/);
+  if (m) {
+    const year = Number(m[1]);
+    const month = Number(m[2]);
+    const mm = String(month).padStart(2, "0");
+    const lastDay = new Date(year, month, 0).getDate();
+    const start = year + "-" + mm + "-01";
+    const end = year + "-" + mm + "-" + String(lastDay).padStart(2, "0");
+    return {
+      period: year + "-" + mm,
+      periodStart: start,
+      periodEnd: end,
+      periodType: "month",
+      periodLabel: year + "-" + mm,
+    };
+  }
+  return { period: "", periodStart: "", periodEnd: "", periodType: "unknown", periodLabel: "" };
 }
 
 function monthLabel(file) {
-  return file.period || file.name.replace(/\.(xlsx|csv)$/i, "");
+  return file.periodLabel || file.period || file.name.replace(/\.(xlsx|csv)$/i, "");
 }
 
 // 거래처별로 저장된 보고서는 파일명에서 거래처명을 가져옵니다.
@@ -255,7 +290,7 @@ function renderMappings() {
     <p class="meta">검사명은 C열, 건수는 D열로 고정했습니다. 거래처 열이 없는 거래처별 보고서는 파일명에서 거래처명을 자동 적용합니다. 자동 인식이 잘못된 파일은 거래처 열을 직접 바꿀 수 있습니다.</p>
     <div class="table-wrap">
       <table class="aging-map-table">
-        <thead><tr><th>파일 / 시트</th><th>월</th><th>거래처 열</th><th>검사명</th><th>건수</th></tr></thead>
+        <thead><tr><th>파일 / 시트</th><th>인식한 기간</th><th>거래처 열</th><th>검사명</th><th>건수</th></tr></thead>
         <tbody>${parsedFiles.map((file, index) => {
           const headers = file.headers.map((value, idx) => ({ value: idx, label: value || `열 ${idx + 1}` }));
           const filenameOption = file.customerFromFilename
@@ -264,7 +299,7 @@ function renderMappings() {
           const colOptions = [{ value: -1, label: "선택 안 함" }, ...filenameOption, ...headers];
           return `<tr>
             <td><strong>${escapeHtml(file.name)}</strong><div class="meta">${escapeHtml(file.sheetName)} · ${file.rows.length}개 데이터 행</div></td>
-            <td><input class="aging-month" type="month" data-aging-month="${index}" value="${escapeHtml(file.period)}" aria-label="비교 월"></td>
+            <td><strong>${escapeHtml(file.periodLabel || file.period || "기간 미인식")}</strong><div class="meta">${file.periodType === "annual" ? "전년 연간 기준자료" : file.periodType === "month" ? "월간 자료" : "기간 확인"}</div></td>
             <td><select data-aging-map="client" data-aging-index="${index}">${selectHtml(colOptions, file.mapping.client)}</select></td>
             <td><span class="aging-fixed-column">C열 고정</span><div class="meta">${escapeHtml(file.headers[2] || "검사명")}</div></td>
             <td><span class="aging-fixed-column">D열 고정</span><div class="meta">${escapeHtml(file.headers[3] || "건수")}</div></td>
@@ -309,9 +344,12 @@ function isSummaryText(value) {
 
 function normalizeMonth(file, index) {
   return {
-    key: file.period || "file-" + index,
+    key: file.periodStart && file.periodEnd ? file.periodStart + "|" + file.periodEnd : (file.period || "file-" + index),
     label: monthLabel(file),
     period: file.period,
+    periodStart: file.periodStart || "",
+    periodEnd: file.periodEnd || "",
+    periodType: file.periodType || "unknown",
     fileName: file.name,
     uploadIndex: index,
   };
@@ -364,7 +402,12 @@ function statusFor(current, previous) {
 }
 
 function statusOrder(status) {
-  return ({ 신규: 0, 중단: 1, 증가: 2, 감소: 3, 유지: 4 })[status] ?? 5;
+  return ({
+    "신규 항목": 0, 신규: 0,
+    "기존 항목": 1,
+    "전년만 있음": 2,
+    중단: 3, 증가: 4, 감소: 5, 유지: 6,
+  })[status] ?? 7;
 }
 
 function runComparison() {
@@ -374,22 +417,20 @@ function runComparison() {
   }
   try {
     parsedFiles.forEach((file, index) => {
-      const monthInput = document.querySelector('[data-aging-month="' + index + '"]');
-      if (monthInput) file.period = monthInput.value;
       document.querySelectorAll('[data-aging-index="' + index + '"]').forEach((select) => {
         file.mapping[select.dataset.agingMap] = select.value;
       });
     });
 
     const datasets = parsedFiles.map((file, index) => makeMonthData(file, index));
-    const monthKeys = datasets.map((dataset) => dataset.month.period || "");
-    if (monthKeys.every(Boolean) && new Set(monthKeys).size < monthKeys.length) {
-      setStatus("같은 월이 중복 지정되어 있습니다. 각 파일의 월을 서로 다르게 지정해 주세요.", "err");
+    const rangeKeys = datasets.map((dataset) => dataset.month.key);
+    if (rangeKeys.every(Boolean) && new Set(rangeKeys).size < rangeKeys.length) {
+      setStatus("같은 기간의 파일이 중복 첨부되어 있습니다. 파일을 확인해 주세요.", "err");
       return;
     }
     datasets.sort((a, b) => {
-      const ap = a.month.period;
-      const bp = b.month.period;
+      const ap = a.month.periodEnd || a.month.period || "";
+      const bp = b.month.periodEnd || b.month.period || "";
       if (ap && bp) return ap.localeCompare(bp);
       if (ap && !bp) return -1;
       if (!ap && bp) return 1;
@@ -401,21 +442,44 @@ function runComparison() {
     datasets.forEach((dataset) => dataset.entries.forEach((_, key) => allKeys.add(key)));
     const lastIndex = datasets.length - 1;
     const prevIndex = Math.max(0, lastIndex - 1);
+    const currentPeriod = datasets[lastIndex]?.month;
+    const annualCandidates = datasets.map((dataset, index) => ({ dataset, index }))
+      .filter(({ dataset, index }) => index !== lastIndex &&
+        dataset.month.periodType === "annual" &&
+        currentPeriod?.periodStart &&
+        dataset.month.periodEnd < currentPeriod.periodStart);
+    const annualBaselineIndex = annualCandidates.length
+      ? annualCandidates[annualCandidates.length - 1].index
+      : -1;
+    comparisonMode = annualBaselineIndex >= 0 && currentPeriod?.periodType !== "annual"
+      ? "annual-vs-current"
+      : "monthly";
+
     comparedRows = Array.from(allKeys).map((key) => {
       const parts = key.split("\u001f");
       const client = parts[0];
       const item = parts.slice(1).join("\u001f");
       const counts = datasets.map((dataset) => dataset.entries.get(key)?.count || 0);
-      const previous = counts[prevIndex] || 0;
+      const previous = comparisonMode === "annual-vs-current"
+        ? (counts[annualBaselineIndex] || 0)
+        : (counts[prevIndex] || 0);
       const current = counts[lastIndex] || 0;
+      let status;
+      if (comparisonMode === "annual-vs-current") {
+        status = current > 0
+          ? (previous > 0 ? "기존 항목" : "신규 항목")
+          : (previous > 0 ? "전년만 있음" : "유지");
+      } else {
+        status = statusFor(current, previous);
+      }
       return {
         client, item, counts, previous, current,
-        delta: current - previous,
-        status: statusFor(current, previous),
+        delta: comparisonMode === "annual-vs-current" ? null : current - previous,
+        status,
       };
     }).filter((row) => row.counts.some((count) => count > 0))
       .sort((a, b) => statusOrder(a.status) - statusOrder(b.status) ||
-        Math.abs(b.delta) - Math.abs(a.delta) ||
+        (comparisonMode === "monthly" ? Math.abs(b.delta || 0) - Math.abs(a.delta || 0) : 0) ||
         a.client.localeCompare(b.client, "ko") ||
         a.item.localeCompare(b.item, "ko"));
 
@@ -449,24 +513,43 @@ function renderComparison() {
   $("agingExportCsv").disabled = false;
   const latestOverview = monthlyOverview[monthlyOverview.length - 1] || { clients: 0, itemPairs: 0, totalCount: 0 };
   const previousOverview = monthlyOverview[Math.max(0, monthlyOverview.length - 2)] || { clients: 0, itemPairs: 0, totalCount: 0 };
-  const added = comparedRows.filter((row) => row.status === "신규").length;
-  const stopped = comparedRows.filter((row) => row.status === "중단").length;
-  const increased = comparedRows.filter((row) => row.status === "증가").length;
-  const decreased = comparedRows.filter((row) => row.status === "감소").length;
   const countDelta = latestOverview.totalCount - previousOverview.totalCount;
-  $("agingSummary").innerHTML = `
-    <div class="grid grid4 aging-kpis">
-      <div class="card aging-kpi"><p>최신 월 거래처 수</p><strong>${formatNumber(latestOverview.clients)}곳</strong><span>전월 ${formatNumber(previousOverview.clients)}곳</span></div>
-      <div class="card aging-kpi"><p>검사 의뢰 건수 합계</p><strong>${formatNumber(latestOverview.totalCount)}</strong><span>${countDelta >= 0 ? "+" : ""}${formatNumber(countDelta)}건 · 전월 대비</span></div>
-      <div class="card aging-kpi"><p>신규 / 중단 항목</p><strong>${formatNumber(added)} / ${formatNumber(stopped)}</strong><span>거래처별 검사 조합 기준</span></div>
-      <div class="card aging-kpi"><p>증가 / 감소 항목</p><strong>${formatNumber(increased)} / ${formatNumber(decreased)}</strong><span>최신 월과 직전 월 비교</span></div>
-    </div>
-    <p class="meta mt-12">변화 표시는 ${escapeHtml(comparisonMonths[Math.max(0, comparisonMonths.length - 2)]?.label || "이전 월")} 대비 ${escapeHtml(comparisonMonths[comparisonMonths.length - 1]?.label || "최신 월")} 기준입니다. 건수 합계는 선택한 건수 열의 숫자를 합산합니다. 건수 열이 없으면 각 행을 1건으로 계산합니다.</p>
-  `;
+
+  if (comparisonMode === "annual-vs-current") {
+    const newlyAppeared = comparedRows.filter((row) => row.status === "신규 항목").length;
+    const existing = comparedRows.filter((row) => row.status === "기존 항목").length;
+    const notAppearedThisPeriod = comparedRows.filter((row) => row.status === "전년만 있음").length;
+    const currentItems = comparedRows.filter((row) => row.current > 0).length;
+    const baseline = comparisonMonths.find((month) => month.periodType === "annual");
+    const current = comparisonMonths[comparisonMonths.length - 1];
+    $("agingSummary").innerHTML = `
+      <div class="grid grid4 aging-kpis">
+        <div class="card aging-kpi"><p>올해 해당 기간 검사 항목</p><strong>${formatNumber(currentItems)}개</strong><span>${escapeHtml(current?.label || "선택 기간")} 기준</span></div>
+        <div class="card aging-kpi"><p>전년 연간 대비 신규 등장</p><strong>${formatNumber(newlyAppeared)}개</strong><span>전년 연간 자료에는 없던 항목</span></div>
+        <div class="card aging-kpi"><p>전년 이력 있는 항목</p><strong>${formatNumber(existing)}개</strong><span>전년 중 한 번 이상 의뢰</span></div>
+        <div class="card aging-kpi"><p>전년 이력만 있는 항목</p><strong>${formatNumber(notAppearedThisPeriod)}개</strong><span>올해 선택 기간에는 미발생</span></div>
+      </div>
+      <p class="meta mt-12">비교 기준: ${escapeHtml(baseline?.label || "전년 연간 자료")}의 거래처-검사 항목 이력과 ${escapeHtml(current?.label || "올해 선택 기간")}의 검사 항목을 비교했습니다. 연간 건수와 월간 건수는 기간 길이가 다르므로 증감량으로 직접 비교하지 않습니다. 신규/기존은 해당 거래처의 검사 항목이 전년 연간 자료에 있었는지를 기준으로 합니다.</p>
+    `;
+  } else {
+    const added = comparedRows.filter((row) => row.status === "신규").length;
+    const stopped = comparedRows.filter((row) => row.status === "중단").length;
+    const increased = comparedRows.filter((row) => row.status === "증가").length;
+    const decreased = comparedRows.filter((row) => row.status === "감소").length;
+    $("agingSummary").innerHTML = `
+      <div class="grid grid4 aging-kpis">
+        <div class="card aging-kpi"><p>최신 월 거래처 수</p><strong>${formatNumber(latestOverview.clients)}곳</strong><span>전월 ${formatNumber(previousOverview.clients)}곳</span></div>
+        <div class="card aging-kpi"><p>검사 의뢰 건수 합계</p><strong>${formatNumber(latestOverview.totalCount)}</strong><span>${countDelta >= 0 ? "+" : ""}${formatNumber(countDelta)}건 · 전월 대비</span></div>
+        <div class="card aging-kpi"><p>신규 / 중단 항목</p><strong>${formatNumber(added)} / ${formatNumber(stopped)}</strong><span>거래처별 검사 조합 기준</span></div>
+        <div class="card aging-kpi"><p>증가 / 감소 항목</p><strong>${formatNumber(increased)} / ${formatNumber(decreased)}</strong><span>최신 월과 직전 월 비교</span></div>
+      </div>
+      <p class="meta mt-12">변화 표시는 ${escapeHtml(comparisonMonths[Math.max(0, comparisonMonths.length - 2)]?.label || "이전 월")} 대비 ${escapeHtml(comparisonMonths[comparisonMonths.length - 1]?.label || "최신 월")} 기준입니다. 건수 합계는 선택한 건수 열의 숫자를 합산합니다.</p>
+    `;
+  }
 
   $("agingOverviewTable").innerHTML = `
     <table class="aging-table">
-      <thead><tr><th>월</th><th>거래처 수</th><th>거래처-항목 조합</th><th>건수 합계</th></tr></thead>
+      <thead><tr><th>기간</th><th>거래처 수</th><th>거래처-항목 조합</th><th>건수 합계</th></tr></thead>
       <tbody>${monthlyOverview.map((row) => `
         <tr><td><strong>${escapeHtml(row.month.label)}</strong></td><td>${formatNumber(row.clients)}</td><td>${formatNumber(row.itemPairs)}</td><td>${formatNumber(row.totalCount)}</td></tr>
       `).join("")}</tbody>
@@ -483,7 +566,7 @@ function renderComparison() {
 
   $("agingCompareTable").innerHTML = `
     <table class="aging-table aging-detail-table">
-      <thead><tr><th>상태</th><th>거래처</th><th>검사 항목</th>${comparisonMonths.map((month) => `<th class="num">${escapeHtml(month.label)}</th>`).join("")}<th class="num">전월 대비</th></tr></thead>
+      <thead><tr><th>구분</th><th>거래처</th><th>검사 항목</th>${comparisonMonths.map((month) => `<th class="num">${escapeHtml(month.label)}</th>`).join("")}${comparisonMode === "monthly" ? '<th class="num">전월 대비</th>' : ""}</tr></thead>
       <tbody>${buildDetailRows()}</tbody>
     </table>
   `;
@@ -506,16 +589,19 @@ function buildDetailRows() {
     (!itemQuery || normalized(row.item).includes(itemQuery)) &&
     (!status || row.status === status)
   );
-  if (!filtered.length) return '<tr><td colspan="' + (4 + comparisonMonths.length) + '" class="meta">조건에 맞는 비교 항목이 없습니다.</td></tr>';
+  const extraColumns = comparisonMode === "monthly" ? 1 : 0;
+  if (!filtered.length) return '<tr><td colspan="' + (3 + comparisonMonths.length + extraColumns) + '" class="meta">조건에 맞는 비교 항목이 없습니다.</td></tr>';
   return filtered.map((row) => {
-    const cls = row.status === "신규" ? "is-new" : row.status === "중단" ? "is-stopped" :
-      row.status === "증가" ? "is-up" : row.status === "감소" ? "is-down" : "";
-    const deltaText = (row.delta > 0 ? "+" : "") + formatNumber(row.delta);
+    const cls = row.status === "신규" || row.status === "신규 항목" ? "is-new" :
+      row.status === "중단" || row.status === "전년만 있음" ? "is-stopped" :
+      row.status === "증가" || row.status === "기존 항목" ? "is-up" :
+      row.status === "감소" ? "is-down" : "";
+    const deltaText = row.delta === null ? "" : (row.delta > 0 ? "+" : "") + formatNumber(row.delta);
     return `<tr>
       <td><span class="aging-status-badge ${cls}">${escapeHtml(row.status)}</span></td>
       <td>${escapeHtml(row.client)}</td><td>${escapeHtml(row.item)}</td>
       ${row.counts.map((count) => `<td class="num">${count ? formatNumber(count) : "—"}</td>`).join("")}
-      <td class="num ${row.delta > 0 ? "aging-positive" : row.delta < 0 ? "aging-negative" : ""}">${deltaText}</td>
+      ${comparisonMode === "monthly" ? `<td class="num ${row.delta > 0 ? "aging-positive" : row.delta < 0 ? "aging-negative" : ""}">${deltaText}</td>` : ""}
     </tr>`;
   }).join("");
 }
@@ -525,7 +611,7 @@ function renderDetailOnly() {
   if (!table) return;
   table.innerHTML = `
     <table class="aging-table aging-detail-table">
-      <thead><tr><th>상태</th><th>거래처</th><th>검사 항목</th>${comparisonMonths.map((month) => `<th class="num">${escapeHtml(month.label)}</th>`).join("")}<th class="num">전월 대비</th></tr></thead>
+      <thead><tr><th>구분</th><th>거래처</th><th>검사 항목</th>${comparisonMonths.map((month) => `<th class="num">${escapeHtml(month.label)}</th>`).join("")}${comparisonMode === "monthly" ? '<th class="num">전월 대비</th>' : ""}</tr></thead>
       <tbody>${buildDetailRows()}</tbody>
     </table>
   `;
@@ -537,13 +623,13 @@ function exportComparisonCsv() {
     return;
   }
   const escapeCsv = (value) => '"' + String(value ?? "").replace(/"/g, '""') + '"';
-  const header = ["상태", "거래처", "검사 항목", ...comparisonMonths.map((month) => month.label), "전월 대비"];
+  const header = ["구분", "거래처", "검사 항목", ...comparisonMonths.map((month) => month.label), ...(comparisonMode === "monthly" ? ["전월 대비"] : [])];
   const rows = comparedRows.map((row) => [
-    row.status, row.client, row.item, ...row.counts, row.delta,
+    row.status, row.client, row.item, ...row.counts, ...(comparisonMode === "monthly" ? [row.delta] : []),
   ]);
   const csv = "\uFEFF" + [header, ...rows].map((row) => row.map(escapeCsv).join(",")).join("\r\n");
-  downloadBlob(new Blob([csv], { type: "text/csv;charset=utf-8" }), "숙성항목_월별비교.csv");
-  setStatus("비교 결과 CSV 파일을 저장했습니다.", "ok");
+  downloadBlob(new Blob([csv], { type: "text/csv;charset=utf-8" }), comparisonMode === "annual-vs-current" ? "숙성항목_전년연간대비_올해기간.csv" : "숙성항목_월별비교.csv");
+  setStatus(comparisonMode === "annual-vs-current" ? "전년 연간 대비 올해 기간의 신규·기존 항목 CSV를 저장했습니다." : "비교 결과 CSV 파일을 저장했습니다.", "ok");
 }
 
 async function readFiles() {
@@ -598,7 +684,7 @@ async function readFiles() {
           : (filenameCustomer ? -2 : -1));
       parsedFiles.push({
         name: file.name,
-        period: parseMonthFromName(file.name),
+        ...parsePeriodFromName(file.name),
         sheetName: workbook.sheetName,
         headers: detected.headers,
         headerRow: detected.headerRow,
