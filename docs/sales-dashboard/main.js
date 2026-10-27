@@ -11,7 +11,8 @@ import { state, emptyAnalysis, saveAnalysis, loadAnalysis, saveFlyer, loadFlyer,
   saveTraining, loadTraining, saveProposal, loadProposal,
   clearMaterials, resetFlyer, resetTraining, defaultFlyer, defaultTraining } from "./state.js";
 
-import { extractFiles } from "./extract.js?v=20261027d";
+import { extractFiles } from "./extract.js?v=20261027e";
+import { createMedicalIllustration } from "./medical-illustration.js?v=20261027e";
 import { analyze } from "./analyze.js";
 import { sampleUnits, sampleFileReport } from "./demo.js";
 
@@ -59,6 +60,25 @@ function showSubtab(name) {
 function getImageById(id) {
   if (!id) return null;
   return state.images.find((img) => img.id === id) || null;
+}
+
+/* 추출한 개별 이미지가 없을 때는 PDF 전체 페이지를 중복 삽입하지 않고
+   검사명·원문 키워드에 맞는 로컬 의료 개념도를 자동 생성해 사용합니다. */
+function getBestFlyerImage() {
+  const actual = state.images.find((img) => !img.fullPage && !img.generated);
+  if (actual) return actual;
+
+  const topicText = [
+    state.analysis?.title || "",
+    state.analysis?.subtitle || "",
+    (state.files || []).map((file) => file.name || "").join(" "),
+    String(state.rawText || "").slice(0, 12000),
+  ].join("\n");
+  const illustration = createMedicalIllustration(topicText);
+  const existing = state.images.find((img) => img.id === illustration.id);
+  if (existing) return existing;
+  state.images.push(illustration);
+  return illustration;
 }
 
 function refreshFlyerImage() {
@@ -292,10 +312,10 @@ function buildFlyerFromAnalysis() {
     .find((text) => text && !usedInPoints.some((used) => used.includes(text.slice(0, 14))));
   f.note = truncate(noteCandidate || "", 120);
 
-  // 전체 페이지를 그린 이미지는 원본 복제가 되므로 자동 선택하지 않습니다.
-  const usable = state.images.filter((img) => !img.fullPage);
-  f.imageId = usable.length ? usable[0].id : null;
-  f.imageCaption = usable.length ? truncate(usable[0].name || "", 40) : "";
+  // 추출된 사진·도식이 있으면 우선 사용하고, 없으면 검사 주제별 개념도를 만듭니다.
+  const flyerImageChoice = getBestFlyerImage();
+  f.imageId = flyerImageChoice ? flyerImageChoice.id : null;
+  f.imageCaption = flyerImageChoice ? truncate(flyerImageChoice.name || "", 40) : "";
 
   state.flyer = normalizeFlyer(f);
   saveFlyer();
@@ -1362,12 +1382,13 @@ export function loadExtractedResult(result, options = {}) {
   renderAnalysis();
   renderHomeStats();
 
-  // 이미지를 새로 읽은 경우: 전체 페이지 렌더본(fullPage)은 제외하고 살아있는 이미지로 다시 연결합니다.
+  // 새 자료를 읽은 뒤 기존 홍보물도 새 검사 이미지로 연결합니다.
+  // PDF 전체 페이지 렌더본은 글자 중복 방지를 위해 자동 삽입하지 않습니다.
   if (options.imagesApplied && state.flyer) {
-    const usable = state.images.filter((img) => !img.fullPage);
-    if (!usable.some((img) => img.id === state.flyer.imageId)) {
-      state.flyer.imageId = usable.length ? usable[0].id : null;
-      state.flyer.imageCaption = usable.length ? truncate(usable[0].name || "", 40) : "";
+    const selected = getBestFlyerImage();
+    if (selected && selected.id !== state.flyer.imageId) {
+      state.flyer.imageId = selected.id;
+      state.flyer.imageCaption = truncate(selected.name || "", 40);
       saveFlyer();
     }
   }
