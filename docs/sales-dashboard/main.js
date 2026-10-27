@@ -12,7 +12,7 @@ import { state, emptyAnalysis, saveAnalysis, loadAnalysis, saveFlyer, loadFlyer,
   clearMaterials, resetFlyer, resetTraining, defaultFlyer, defaultTraining } from "./state.js";
 
 import { extractFiles } from "./extract.js?v=20261027e";
-import { createMedicalIllustration } from "./medical-illustration.js?v=20261027f";
+import { createMedicalIllustration } from "./medical-illustration.js?v=20261027g";
 import { analyze } from "./analyze.js";
 import { sampleUnits, sampleFileReport } from "./demo.js";
 
