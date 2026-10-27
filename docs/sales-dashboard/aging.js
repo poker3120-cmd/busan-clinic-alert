@@ -436,6 +436,7 @@ function runComparison() {
 function renderComparison() {
   const resultCard = $("agingResults");
   resultCard.hidden = false;
+  $("agingExportCsv").disabled = false;
   const latestOverview = monthlyOverview[monthlyOverview.length - 1] || { clients: 0, itemPairs: 0, totalCount: 0 };
   const previousOverview = monthlyOverview[Math.max(0, monthlyOverview.length - 2)] || { clients: 0, itemPairs: 0, totalCount: 0 };
   const added = comparedRows.filter((row) => row.status === "신규").length;
