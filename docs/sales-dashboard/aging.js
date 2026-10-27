@@ -564,6 +564,26 @@ function renderComparison() {
     ...clients.map((client) => ({ value: client, label: client })),
   ], clients.includes(previousValue) ? previousValue : "");
 
+  const statusFilter = $("agingStatusFilter");
+  const previousStatus = statusFilter.value;
+  const statusOptions = comparisonMode === "annual-vs-current"
+    ? [
+        { value: "", label: "전체 구분" },
+        { value: "신규 항목", label: "신규 항목" },
+        { value: "기존 항목", label: "기존 항목" },
+        { value: "전년만 있음", label: "전년만 있음" },
+      ]
+    : [
+        { value: "", label: "전체 상태" },
+        { value: "신규", label: "신규" },
+        { value: "중단", label: "중단" },
+        { value: "증가", label: "증가" },
+        { value: "감소", label: "감소" },
+        { value: "유지", label: "유지" },
+      ];
+  statusFilter.innerHTML = selectHtml(statusOptions,
+    statusOptions.some((option) => option.value === previousStatus) ? previousStatus : "");
+
   $("agingCompareTable").innerHTML = `
     <table class="aging-table aging-detail-table">
       <thead><tr><th>구분</th><th>거래처</th><th>검사 항목</th>${comparisonMonths.map((month) => `<th class="num">${escapeHtml(month.label)}</th>`).join("")}${comparisonMode === "monthly" ? '<th class="num">전월 대비</th>' : ""}</tr></thead>
