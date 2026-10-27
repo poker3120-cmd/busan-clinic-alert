@@ -314,6 +314,7 @@ function makeMonthData(file, monthIndex) {
   }
 
   const entries = new Map();
+  let lastClient = ""; // 거래처명이 셀 병합으로 한 번만 표시되는 엑셀 형식 보완
   const add = (clientName, itemName, quantity) => {
     const clientText = cleanCell(clientName);
     const itemText = cleanCell(itemName);
@@ -325,8 +326,11 @@ function makeMonthData(file, monthIndex) {
   };
 
   for (const row of file.rows) {
-    const clientName = cleanCell(row[clientIndex]);
-    if (!clientName || isSummaryText(clientName)) continue;
+    const rawClient = cleanCell(row[clientIndex]);
+    if (rawClient && isSummaryText(rawClient)) continue;
+    if (rawClient) lastClient = rawClient;
+    const clientName = rawClient || lastClient;
+    if (!clientName) continue;
     if (itemValue === "__wide__") {
       for (let col = 0; col < file.headers.length; col++) {
         if (col === clientIndex || col === countIndex) continue;
