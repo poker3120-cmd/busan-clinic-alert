@@ -72,6 +72,17 @@ function monthLabel(file) {
   return file.period || file.name.replace(/\.(xlsx|csv)$/i, "");
 }
 
+// 거래처별로 저장된 보고서는 파일명에서 거래처명을 가져옵니다.
+function customerFromFilename(name) {
+  let base = String(name || "").replace(/\.(xlsx|csv)$/i, "").trim();
+  base = base.replace(/\s*[（(]\s*검사항목별\s*[）)]/gi, " ").trim();
+  const dateIndex = base.search(/20\d{2}\s*(?:[-._년]\s*)\d{1,2}/);
+  if (dateIndex >= 0) base = base.slice(0, dateIndex);
+  base = base.replace(/[\s_\-~～]+$/g, "").trim();
+  if (!base || /^(검사항목별|검사실적|월간실적|거래처별|검사내역)$/i.test(base)) return "";
+  return base;
+}
+
 function parseCsv(text) {
   const rows = [];
   let row = [];
@@ -197,10 +208,14 @@ function detectHeader(matrix) {
     const count = row.length > 3 ? 3 : -1;
     let score = (client >= 0 ? 6 : 0) + (item >= 0 ? 2 : 0) + (count >= 0 ? 2 : 0);
     if (client >= 0 && item >= 0 && count >= 0) score += 2;
+    const itemHeader = !!row[2] && ITEM_ALIASES.some((alias) => normalized(row[2]) === normalized(alias));
+    const countHeader = !!row[3] && COUNT_ALIASES.some((alias) => normalized(row[3]) === normalized(alias));
+    if (itemHeader) score += 3;
+    if (countHeader) score += 3;
     if (nonempty.some((v) => /거래처|병원|의원/.test(v))) score += 1;
     if (score > (best?.score ?? -1)) best = { index, headers: row, client, item, count, score };
   }
-  if (!best || best.client < 0 || best.score < 5) {
+  if (!best || best.score < 5) {
     // 첫 행을 사용자 지정 매핑에서 살릴 수 있도록 낮은 점수라도 보관합니다.
     const index = Math.min(Math.max(matrix.findIndex((row) => row.some((v) => cleanCell(v))), 0), Math.max(matrix.length - 1, 0));
     const headers = (matrix[index] || []).map(cleanCell);
@@ -237,13 +252,16 @@ function renderMappings() {
   host.hidden = false;
   host.innerHTML = `
     <h3>2. 거래처 열 확인</h3>
-    <p class="meta">검사명은 C열, 건수는 D열로 고정했습니다. 거래처 열만 자동 인식 결과를 확인해 주세요. 자동 인식이 잘못된 파일은 거래처 열을 직접 바꿀 수 있습니다.</p>
+    <p class="meta">검사명은 C열, 건수는 D열로 고정했습니다. 거래처 열이 없는 거래처별 보고서는 파일명에서 거래처명을 자동 적용합니다. 자동 인식이 잘못된 파일은 거래처 열을 직접 바꿀 수 있습니다.</p>
     <div class="table-wrap">
       <table class="aging-map-table">
         <thead><tr><th>파일 / 시트</th><th>월</th><th>거래처 열</th><th>검사명</th><th>건수</th></tr></thead>
         <tbody>${parsedFiles.map((file, index) => {
           const headers = file.headers.map((value, idx) => ({ value: idx, label: value || `열 ${idx + 1}` }));
-          const colOptions = [{ value: -1, label: "선택 안 함" }, ...headers];
+          const filenameOption = file.customerFromFilename
+            ? [{ value: -2, label: "파일명 사용: " + file.customerFromFilename }]
+            : [];
+          const colOptions = [{ value: -1, label: "선택 안 함" }, ...filenameOption, ...headers];
           return `<tr>
             <td><strong>${escapeHtml(file.name)}</strong><div class="meta">${escapeHtml(file.sheetName)} · ${file.rows.length}개 데이터 행</div></td>
             <td><input class="aging-month" type="month" data-aging-month="${index}" value="${escapeHtml(file.period)}" aria-label="비교 월"></td>
@@ -263,7 +281,7 @@ function renderMappings() {
   $("agingCompareButton").addEventListener("click", runComparison);
   $("agingResetMapping").addEventListener("click", () => {
     parsedFiles.forEach((file) => {
-      file.mapping = { client: file.detectedClient, item: 2, count: 3 };
+      file.mapping = { client: file.detectedClient >= 0 ? file.detectedClient : (file.customerFromFilename ? -2 : -1), item: 2, count: 3 };
     });
     renderMappings();
     runComparison();
@@ -301,9 +319,10 @@ function normalizeMonth(file, index) {
 
 function makeMonthData(file, monthIndex) {
   const clientIndex = Number(file.mapping.client);
+  const useFilenameCustomer = clientIndex === -2 && !!file.customerFromFilename;
   const itemIndex = 2;  // 고정: C열 검사명
   const countIndex = 3; // 고정: D열 건수
-  if (!Number.isInteger(clientIndex) || clientIndex < 0 || !file.headers[clientIndex]) {
+  if (!useFilenameCustomer && (!Number.isInteger(clientIndex) || clientIndex < 0 || !file.headers[clientIndex])) {
     throw new Error(file.name + "의 거래처 열을 지정해 주세요.");
   }
   if (file.headers.length <= countIndex) {
@@ -323,7 +342,7 @@ function makeMonthData(file, monthIndex) {
   };
 
   for (const row of file.rows) {
-    const rawClient = cleanCell(row[clientIndex]);
+    const rawClient = useFilenameCustomer ? file.customerFromFilename : cleanCell(row[clientIndex]);
     if (rawClient && isSummaryText(rawClient)) continue;
     if (rawClient) lastClient = rawClient;
     const clientName = rawClient || lastClient;
@@ -555,6 +574,10 @@ async function readFiles() {
         throw new Error(file.name + "은 지원하지 않는 형식입니다. .xlsx 또는 .csv 파일로 첨부해 주세요. 구형 .xls는 .xlsx로 다시 저장해 주세요.");
       }
       const detected = detectHeader(workbook.rows);
+      const filenameCustomer = customerFromFilename(file.name);
+      const initialClientMapping = detected.detectedClient >= 0
+        ? detected.detectedClient
+        : (filenameCustomer ? -2 : -1);
       parsedFiles.push({
         name: file.name,
         period: parseMonthFromName(file.name),
@@ -565,15 +588,16 @@ async function readFiles() {
         detectedClient: detected.detectedClient,
         detectedItem: detected.detectedItem,
         detectedCount: detected.detectedCount,
+        customerFromFilename: filenameCustomer,
         mapping: {
-          client: detected.detectedClient,
+          client: initialClientMapping,
           item: 2,   // C열 고정: 검사명
           count: 3,  // D열 고정: 건수
         },
       });
     }
     renderMappings();
-    const ready = parsedFiles.every((file) => Number(file.mapping.client) >= 0);
+    const ready = parsedFiles.every((file) => Number(file.mapping.client) >= 0 || (Number(file.mapping.client) === -2 && !!file.customerFromFilename));
     if (ready) runComparison();
     else setStatus("파일을 읽었습니다. 거래처 열을 지정한 뒤 월별 비교를 실행해 주세요.", "ok");
   } catch (error) {
