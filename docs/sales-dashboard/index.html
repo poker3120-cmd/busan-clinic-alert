@@ -412,11 +412,11 @@
     <!-- ================= 숙성항목: 거래처 월별 검사 항목 비교 ================= -->
     <section class="page" id="aging">
       <h2>숙성항목 · 거래처 월별 항목 비교</h2>
-      <p class="subtitle">2개월 이상 거래처별 검사 항목 엑셀을 비교해 신규·중단·증가·감소 항목과 월별 건수 변화를 확인합니다.</p>
+      <p class="subtitle">월별 자료끼리 비교하거나, 전년 1년치 자료와 올해 한 달 자료를 비교해 신규 등장 검사 항목을 집계합니다.</p>
 
       <div class="card">
         <h3>1. 월별 엑셀 첨부</h3>
-        <p>월별 파일을 2개 이상 선택하세요. <strong>C열=검사명, D열=건수</strong>는 고정으로 읽고, 파일명에 <strong>2026-08</strong>, <strong>2026년 8월</strong>처럼 연·월이 있으면 비교 순서를 자동으로 잡습니다.</p>
+        <p>월별 파일을 2개 이상 선택하세요. <strong>C열=검사명, D열=건수</strong>는 고정으로 읽고, 파일명에 <strong>2026-08</strong>, <strong>2026년 8월</strong> 또는 <strong>2025-01-01 ~ 2025-12-31</strong>처럼 기간이 있으면 자동 인식합니다. 전년 연간 파일과 올해 월간 파일을 함께 넣으면 전년 대비 신규·기존 항목을 집계합니다.</p>
         <label for="agingFiles">거래처 월별 항목 엑셀 (.xlsx) 또는 CSV</label>
         <input id="agingFiles" type="file" multiple accept=".xlsx,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv">
         <p class="meta mt-8" id="agingFileNames">선택된 파일이 없습니다.</p>
@@ -541,6 +541,6 @@
   }
 })();
 </script>
-<script type="module" src="main.js?v=20261027p"></script>
+<script type="module" src="main.js?v=20261027q"></script>
 </body>
 </html>
