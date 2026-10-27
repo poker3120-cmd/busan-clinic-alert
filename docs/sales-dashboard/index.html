@@ -321,7 +321,7 @@
     <!-- ================= 제안서 ================= -->
     <section class="page" id="proposal">
       <h2>제안서 작성</h2>
-      <p class="subtitle">첨부 자료의 근거·임상 활용·검체·운영·수가 정보를 반영해 초안을 만듭니다. 생성된 문서는 수정 가능한 초안입니다.</p>
+      <p class="subtitle">신규 개원·타사 거래 전환은 3페이지 영업 제안서로, 기존 거래처 지원·관리는 검사자료 중심 제안서로 만듭니다. 생성된 문서는 수정 가능한 초안입니다.</p>
 
       <div class="card">
         <h3>1. 거래처 정보</h3>
@@ -340,18 +340,18 @@
           <div><label for="pDate">작성일</label><input id="pDate" type="date"></div>
         </div>
         <label for="pSituation">거래처 현황 및 고민</label>
-        <textarea id="pSituation" placeholder="예: 현재 외부 의뢰 검사가 적고, 검사 항목 확대에 관심이 있음"></textarea>
+        <textarea id="pSituation" placeholder="예: 개원 예정일, 현재 수탁사, 수거 시간·결과 확인·업무 대응에서 개선이 필요한 부분"></textarea>
         <label for="pNeeds">중점 제안 내용</label>
-        <textarea id="pNeeds" placeholder="예: 검사 항목 확대, 의뢰 편의성 개선, 수익 구조 검토"></textarea>
+        <textarea id="pNeeds" placeholder="예: 개원 초기 운영 정착, 타사 의뢰 단계적 전환, 수거·결과 확인·현장 대응 개선"></textarea>
         <label for="pAction">후속 조치 및 일정</label>
-        <textarea id="pAction" placeholder="예: 다음 주 방문하여 검사 목록과 예상 수익 검토"></textarea>
+        <textarea id="pAction" placeholder="예: 다음 방문에서 운영 조건 확인, 전환 범위 합의, 내부 확인 후 실행 일정 확정"></textarea>
       </div>
 
       <div class="card mt-16">
         <h3>2. 제안 단가 및 적용 조건</h3>
         <p class="meta">재단에서 승인된 기준 단가와 할인율만 입력해 주세요. 승인되지 않은 조건은 확정 제안으로 사용하지 않습니다.</p>
         <div class="grid grid3">
-          <div><label for="pOfferItem">제안 대상 검사·서비스</label><input id="pOfferItem" placeholder="예: 신규 개원 기본 검사 구성"></div>
+          <div><label for="pOfferItem">제안 범위·지원 항목</label><input id="pOfferItem" placeholder="예: 개원 준비 지원, 거래 전환 및 초기 운영 안정화"></div>
           <div><label for="pBasePrice">기준 단가 (원)</label><input id="pBasePrice" type="number" min="0" step="1" placeholder="승인 기준 단가"></div>
           <div><label for="pDiscountRate">승인 할인율 (%)</label><input id="pDiscountRate" type="number" min="0" max="100" step="0.1" placeholder="승인된 할인율"></div>
           <div><label>할인 금액</label><div class="value-box" id="pDiscountAmountDisplay">기준 단가와 할인율 입력 후 계산</div></div>
@@ -361,7 +361,7 @@
         <label for="pOfferConditions">할인·계약 적용 조건</label>
         <textarea id="pOfferConditions" placeholder="예: 대상 검사, 월 의뢰량, 계약 기간, 할인 적용 범위 등"></textarea>
         <label for="pSupport">지원·도입 계획</label>
-        <textarea id="pSupport" placeholder="예: 검사 목록 안내, 의뢰 절차 교육, 결과 확인 및 후속 방문"></textarea>
+        <textarea id="pSupport" placeholder="예: 수거·결과 확인 조건 점검, 직원 안내, 담당자 연락 체계 및 초기 운영 점검"></textarea>
         <label class="check mt-12"><input type="checkbox" id="pIncludeFlyer" checked> 제안서 요약(복사·Word)에 1P 홍보물 핵심 요약을 포함</label>
         <label class="check mt-12"><input type="checkbox" id="pIncludeImage" checked> 첨부 자료에서 추출한 이미지를 제안서에 포함</label>
       </div>
@@ -376,7 +376,7 @@
       <p class="status" id="proposalStatus" role="status"></p>
       <div class="card mt-12" id="proposalPreviewCard" hidden>
         <h3>A4 제안서 미리보기</h3>
-        <p class="meta">표지 → 제안 요약 → 확인된 근거 → 검사 정보 → 제안 단가 → 도입 계획 → 참고 자료 순서의 <strong>7페이지</strong> 문서입니다. ‘PDF 저장’을 누르면 이 화면 그대로 저장됩니다.</p>
+        <p class="meta">신규 개원·타사 거래 전환은 <strong>3페이지</strong>(맞춤 제안 → 운영 지원 가치 → 실행계획·협의 조건)로 구성됩니다. 기존 거래처 지원·관리는 기존 <strong>7페이지</strong> 구성을 사용합니다. ‘PDF 저장’을 누르면 미리보기 그대로 저장됩니다.</p>
         <div id="proposalPreview" class="proposal-scaler"></div>
       </div>
       <p class="meta">실제 검사 가능 여부, 가격 및 계약 조건은 내부 확인 후 사용해 주세요.</p>
@@ -541,6 +541,6 @@
   }
 })();
 </script>
-<script type="module" src="main.js?v=20261027r"></script>
+<script type="module" src="main.js?v=20261027s"></script>
 </body>
 </html>
