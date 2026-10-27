@@ -13,7 +13,7 @@ import { state, emptyAnalysis, saveAnalysis, loadAnalysis, saveFlyer, loadFlyer,
 
 import { extractFiles } from "./extract.js?v=20261027e";
 import { createMedicalIllustration } from "./medical-illustration.js?v=20261027g";
-import { wireAging } from "./aging.js?v=20261027q";
+import { wireAging } from "./aging.js?v=20261027r";
 import { analyze } from "./analyze.js";
 import { sampleUnits, sampleFileReport } from "./demo.js";
 
