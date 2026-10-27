@@ -573,12 +573,29 @@ async function readFiles() {
       } else {
         throw new Error(file.name + "은 지원하지 않는 형식입니다. .xlsx 또는 .csv 파일로 첨부해 주세요. 구형 .xls는 .xlsx로 다시 저장해 주세요.");
       }
-      // 요청사항: 워크시트의 첫 번째 행은 여유 레코드이므로 먼저 제외합니다.
-      const detected = detectHeader(workbook.rows.slice(1));
       const filenameCustomer = customerFromFilename(file.name);
-      const initialClientMapping = detected.detectedClient >= 0
-        ? detected.detectedClient
-        : (filenameCustomer ? -2 : -1);
+      const isCustomerItemReport = /검사항목별/i.test(file.name) && !!filenameCustomer;
+      let detected;
+      if (isCustomerItemReport) {
+        // 씨젠 '검사항목별' 보고서는 첫 두 행이 여유/안내 행이고 데이터는 3행부터입니다.
+        // 거래처명은 파일명에 있으므로 거래처 열을 찾지 않고 C열=검사명, D열=건수로 읽습니다.
+        detected = {
+          headerRow: -1,
+          headers: ["열 1", "열 2", "검사명", "건수"],
+          rows: workbook.rows.slice(2).filter((row) => row.some((cell) => cleanCell(cell))),
+          detectedClient: -2,
+          detectedItem: 2,
+          detectedCount: 3,
+        };
+      } else {
+        // 일반 양식은 첫 행을 여유 레코드로 제외한 뒤 헤더 자동 인식합니다.
+        detected = detectHeader(workbook.rows.slice(1));
+      }
+      const initialClientMapping = isCustomerItemReport
+        ? -2
+        : (detected.detectedClient >= 0
+          ? detected.detectedClient
+          : (filenameCustomer ? -2 : -1));
       parsedFiles.push({
         name: file.name,
         period: parseMonthFromName(file.name),
