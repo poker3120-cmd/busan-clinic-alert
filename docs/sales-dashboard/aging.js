@@ -212,7 +212,8 @@ function detectHeader(matrix) {
     detectedClient: best.client,
     detectedItem: best.item,
     detectedCount: best.count,
-    rows: matrix.slice(best.index + 1).filter((row) => row.some((cell) => cleanCell(cell))),
+    // 헤더 다음 첫 데이터 행은 여유 레코드이므로 비교 대상에서 제외합니다.
+    rows: matrix.slice(best.index + 2).filter((row) => row.some((cell) => cleanCell(cell))),
   };
 }
 
