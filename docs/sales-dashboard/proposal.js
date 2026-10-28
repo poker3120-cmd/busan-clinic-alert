@@ -41,10 +41,10 @@ const SALES_PROFILES = {
     ],
     checks: ["수거 일정", "결과 확인", "직원 안내"],
     steps: [
-      { time: "개원 전", title: "운영 조건 확인", body: "" },
-      { time: "준비 단계", title: "업무 절차 안내", body: "" },
-      { time: "개원일", title: "서비스 시작", body: "" },
-      { time: "초기 운영", title: "운영 점검", body: "" }
+      { time: "개원 전", title: "운영 조건 확인", body: "개원일, 운영시간과 검체 수거 동선을 확인합니다." },
+      { time: "준비 단계", title: "업무 절차 안내", body: "검사 의뢰와 결과 확인 방법, 문의 연락 체계를 안내합니다." },
+      { time: "개원일", title: "서비스 시작", body: "협의된 일정과 운영 조건에 맞춰 검사업무를 시작합니다." },
+      { time: "초기 운영", title: "운영 점검", body: "초기 문의와 현장 불편을 확인하고 필요한 조치를 협의합니다." }
     ]
   },
   support: {
@@ -63,10 +63,10 @@ const SALES_PROFILES = {
     ],
     checks: ["수거 일정", "문의 대응", "결과 확인"],
     steps: [
-      { time: "방문", title: "요청사항 확인", body: "" },
-      { time: "확인", title: "지원 범위 협의", body: "" },
-      { time: "조치", title: "결과 공유", body: "" },
-      { time: "후속", title: "완료 여부 점검", body: "" }
+      { time: "방문", title: "요청사항 확인", body: "수거·결과 확인·전산 연계 등 실제 불편을 정리합니다." },
+      { time: "확인", title: "지원 범위 협의", body: "담당 부서와 적용 가능 범위 및 일정을 확인합니다." },
+      { time: "조치", title: "결과 공유", body: "진행 상황과 조치 결과를 거래처 담당자에게 안내합니다." },
+      { time: "후속", title: "완료 여부 점검", body: "현장에서 개선 여부를 확인하고 추가 요청을 정리합니다." }
     ]
   },
   renewal: {
@@ -85,10 +85,10 @@ const SALES_PROFILES = {
     ],
     checks: ["거래 흐름", "담당자 의견", "개선 과제"],
     steps: [
-      { time: "정기 점검", title: "거래 현황 확인", body: "" },
-      { time: "과제 선정", title: "개선 항목 협의", body: "" },
-      { time: "지원 진행", title: "후속 조치", body: "" },
-      { time: "재점검", title: "변화 확인", body: "" }
+      { time: "정기 점검", title: "거래 현황 확인", body: "월별 의뢰 흐름과 주요 검사 항목의 변화를 확인합니다." },
+      { time: "과제 선정", title: "개선 항목 협의", body: "원장님과 실무 담당자의 의견을 바탕으로 우선 과제를 정합니다." },
+      { time: "지원 진행", title: "후속 조치", body: "합의한 개선 과제와 지원 사항을 관련 담당자와 진행합니다." },
+      { time: "재점검", title: "변화 확인", body: "진행 결과와 추가로 필요한 지원을 함께 점검합니다." }
     ]
   },
   conversion: {
@@ -107,10 +107,10 @@ const SALES_PROFILES = {
     ],
     checks: ["수거 일정", "결과 확인", "전산 연계"],
     steps: [
-      { time: "사전 협의", title: "현재 운영 확인", body: "" },
-      { time: "범위 확정", title: "전환 조건 협의", body: "" },
-      { time: "전환 시작", title: "서비스 적용", body: "" },
-      { time: "초기 운영", title: "결과 확인", body: "" }
+      { time: "사전 협의", title: "현재 운영 확인", body: "현재 의뢰 항목, 수거 일정, 결과 확인과 전산 연계를 확인합니다." },
+      { time: "범위 확정", title: "전환 조건 협의", body: "전환할 항목, 적용 일정과 필요한 사전 준비를 합의합니다." },
+      { time: "전환 시작", title: "서비스 적용", body: "확정된 범위부터 순차 적용하고 담당자 연락 체계를 운영합니다." },
+      { time: "초기 운영", title: "결과 확인", body: "초기 의뢰 과정의 문의와 불편을 확인해 필요한 조정을 협의합니다." }
     ]
   }
 };
@@ -326,30 +326,39 @@ function businessOnePage(input) {
   '</section>';
 }
 
-function businessCoverPage(input, total) {
+function businessCoverPage(input, total, options = {}) {
   const profile = salesProfile(input.type);
   const title = TYPE_TITLES[input.type] || "거래처 협력 제안";
   const clinic = safe(input.clinic, "거래처명 미입력");
-  const manager = safe(input.manager, "원장님");
+  const manager = safe(input.manager, "담당자");
   const date = formatKoreanDate(input.date) || safe(input.date, "");
-  const focusCards = profile.points.slice(0, 3).map((point) =>
-    '<div class="pd-cover-stat"><b>' + escapeHtml(point.title) + '</b><span>' + escapeHtml(point.body) + '</span></div>'
+  const image = options.image && options.image.dataUrl ? options.image : null;
+  const focusCards = profile.points.slice(0, 3).map((point, index) =>
+    '<div class="pd-cover-stat"><b><i>' + String(index + 1).padStart(2, "0") + '</i> ' + escapeHtml(point.title) + '</b><span>' + escapeHtml(point.body) + '</span></div>'
   ).join("");
-
+  const heroImage = image
+    ? '<figure class="pd-business-hero-figure"><img src="' + escapeHtml(image.dataUrl) + '" alt="' + escapeHtml(safe(image.name, "첨부 검사자료 이미지")) + '"><figcaption>' + escapeHtml(safe(image.caption, "첨부 검사자료")) + '</figcaption></figure>'
+    : '<div class="pd-business-hero-art" aria-hidden="true"><span>SEEGene</span><b>검사 운영<br>파트너십</b><i>BUSAN BRANCH 3</i></div>';
+  const situation = safe(input.situation, "");
+  const situationCard = situation
+    ? '<div class="pd-business-brief-card"><span>협의가 필요한 운영 조건</span><p>' + escapeHtml(situation) + '</p></div>'
+    : "";
   return '<section class="proposal-page pd-cover pd-business-cover">' +
     '<div class="pd-cover-shape" aria-hidden="true"></div><div class="pd-cover-dots" aria-hidden="true"></div>' +
     '<div class="pd-cover-top"><img class="pd-cover-logo" src="ci-seegene.png" alt="재단법인 씨젠의료재단"><span class="pd-cover-branch">부산3지점</span></div>' +
-    '<div class="pd-cover-main"><p class="pd-cover-kicker">BUSINESS PROPOSAL · 협력 제안</p>' +
+    '<div class="pd-cover-main"><p class="pd-cover-kicker">BUSINESS PROPOSAL · CUSTOMER SOLUTION</p>' +
     '<h1 class="pd-cover-title">' + escapeHtml(title) + '</h1>' +
     '<p class="pd-cover-lead">' + escapeHtml(profile.lead) + '</p>' +
     '<p class="pd-cover-client">' + escapeHtml(clinic) + ' <span>귀중</span></p></div>' +
-    '<div class="pd-cover-brief">' +
-      '<div><span>거래처 현황 및 검토 과제</span><p>' + escapeHtml(safe(input.situation, profile.situation)) + '</p></div>' +
-      '<div><span>이번 제안의 핵심</span><p>' + escapeHtml(safe(input.needs, profile.needs)) + '</p></div>' +
+    '<div class="pd-business-hero">' +
+      '<div class="pd-business-hero-copy"><span class="pd-business-eyebrow">PROPOSED VALUE</span><h2>현장 운영에 맞춘<br>실행 가능한 제안</h2>' +
+      '<p>' + escapeHtml(safe(input.needs, profile.needs)) + '</p></div>' +
+      heroImage +
     '</div>' +
-    '<div class="pd-cover-section-label">협력 추진 방향</div><div class="pd-cover-stats">' + focusCards + '</div>' +
+    (situationCard ? '<div class="pd-business-brief">' + situationCard + '</div>' : '') +
+    '<div class="pd-cover-section-label">이번 제안에서 제공할 가치</div><div class="pd-cover-stats">' + focusCards + '</div>' +
     '<div class="pd-cover-meta">' +
-      '<div><span>담당자</span><b>' + escapeHtml(manager) + '</b></div>' +
+      '<div><span>담당</span><b>' + escapeHtml(manager) + '</b></div>' +
       '<div><span>작성일</span><b>' + escapeHtml(date) + '</b></div>' +
       '<div><span>제안 범위</span><b>' + escapeHtml(safe(input.item, profile.item)) + '</b></div>' +
       '<div><span>적용 기간</span><b>' + escapeHtml(safe(input.period, "협의 후 확정")) + '</b></div>' +
@@ -357,24 +366,49 @@ function businessCoverPage(input, total) {
   '</section>';
 }
 
-function businessValuePage(input, index, total) {
+function businessValuePage(input, analysis, index, total) {
   const profile = salesProfile(input.type);
+  const a = analysis || { keyPoints: [], infoRows: [], metrics: [], targets: [], sources: [] };
   const points = profile.points.map((point, i) =>
-    '<article class="pd-business-value"><span class="pd-business-value-no">' + (i + 1) + '</span>' +
+    '<article class="pd-business-value"><span class="pd-business-value-no">' + String(i + 1).padStart(2, "0") + '</span>' +
       '<div><h3>' + escapeHtml(point.title) + '</h3><p>' + escapeHtml(point.body) + '</p></div></article>'
   ).join("");
+  const facts = (a.keyPoints || []).filter((p) => safe(p && p.text)).slice(0, 4);
+  const metrics = (a.metrics || []).filter((m) => safe(m && m.value)).slice(0, 4);
+  const rows = (a.infoRows || []).filter((r) => safe(r && r.field) && safe(r && r.value)).slice(0, 8);
+  const targets = (a.targets || []).filter((v) => safe(v)).slice(0, 8);
+  const factHtml = facts.length
+    ? '<div class="pd-business-source-points">' + facts.map((p, i) =>
+        '<article><span>' + String(i + 1).padStart(2, "0") + '</span><div><p>' + escapeHtml(p.text) + '</p>' +
+        (p.source ? '<small>출처: ' + escapeHtml(p.source) + '</small>' : '') + '</div></article>'
+      ).join("") + '</div>'
+    : '<p class="pd-business-empty-note">검사자료를 첨부하면 자료에 기재된 핵심 내용을 이 영역에 반영합니다.</p>';
+  const metricHtml = metrics.length
+    ? '<div class="pd-business-metrics">' + metrics.map((m) =>
+        '<article><span>' + escapeHtml(safe(m.label, "자료 수치")) + '</span><b>' + escapeHtml(m.value) + '</b></article>'
+      ).join("") + '</div>'
+    : "";
+  const tableHtml = rows.length
+    ? '<div class="pd-business-info-table">' + rows.map((r) =>
+        '<div><span>' + escapeHtml(r.field) + '</span><b>' + escapeHtml(r.value) + '</b></div>'
+      ).join("") + '</div>'
+    : "";
+  const targetHtml = targets.length
+    ? '<div class="pd-business-targets">' + targets.map((v) => '<span>' + escapeHtml(String(v)) + '</span>').join("") + '</div>'
+    : "";
   const checks = profile.checks.map((item) => '<span class="pd-business-chip">' + escapeHtml(item) + '</span>').join("");
-
-  return '<section class="proposal-page">' +
-    sectionHead("01", profile.valueTitle, profile.valueLead) +
-    '<div class="pd-body"><div class="pd-business-grid">' + points + '</div>' +
-    '<div class="pd-block"><h3 class="pd-sub">거래처와 사전 확인할 운영 조건</h3>' +
-      '<div class="pd-business-chips">' + checks + '</div>' +
-      '<p class="pd-business-note">수거 횟수·시간, 긴급 의뢰 대응, 결과 확인·전산 연계 및 교육 지원은 거래처 운영 조건과 내부 가능 범위를 확인한 뒤 제안합니다.</p>' +
-    '</div>' +
-    '<div class="pd-business-callout"><span>부산3지점 맞춤 제안 포인트</span><p>' +
-      escapeHtml(safe(input.needs, profile.needs)) + '</p></div></div>' +
-    pageFoot(index, total) + '</section>';
+  return '<section class="proposal-page pd-business-detail-page">' +
+    sectionHead("01", "운영 가치와 검사자료 핵심", "현장 운영을 개선하는 지원 방향과 첨부 자료에서 확인한 내용을 함께 정리했습니다.") +
+    '<div class="pd-body pd-business-detail-body">' +
+      '<div class="pd-business-grid">' + points + '</div>' +
+      (metricHtml ? '<div class="pd-business-data-block"><h3>자료에 명시된 주요 수치</h3>' + metricHtml + '</div>' : '') +
+      '<div class="pd-business-data-block"><h3>검사자료 핵심 내용</h3>' + factHtml + '</div>' +
+      (tableHtml ? '<div class="pd-business-data-block"><h3>검사 정보</h3>' + tableHtml + '</div>' : '') +
+      (targetHtml ? '<div class="pd-business-data-block"><h3>자료에 기재된 적용 대상</h3>' + targetHtml + '</div>' : '') +
+      '<div class="pd-business-callout"><span>거래처 운영 조건 확인</span><p>' + escapeHtml("수거 일정 · 검사 의뢰 절차 · 결과 확인 방식 · 전산 연계 범위") + '</p>' +
+      '<div class="pd-business-chips">' + checks + '</div></div>' +
+      (a.sources && a.sources.length ? '<p class="pd-business-source-list">참고: ' + escapeHtml(a.sources.slice(0, 3).join(" · ")) + '</p>' : '') +
+    '</div>' + pageFoot(index, total) + '</section>';
 }
 
 function businessActionPage(input, index, total) {
@@ -401,18 +435,20 @@ function businessActionPage(input, index, total) {
   const support = safe(input.support, profile.support);
   const action = safe(input.action, profile.action);
 
-  return '<section class="proposal-page">' +
-    sectionHead("02", "도입·전환 실행계획 및 협의 조건", "담당자가 실행할 작업, 확인할 조건, 다음 협의 사항까지 연결합니다.") +
+  return '<section class="proposal-page pd-business-action-page">' +
+    sectionHead("02", "도입부터 안정화까지", "운영 조건을 확인하고 합의한 범위부터 단계적으로 적용합니다.") +
     '<div class="pd-body pd-business-action-body">' +
-      '<div class="pd-block"><h3 class="pd-sub">실행 일정 및 진행 순서</h3><ol class="pd-timeline pd-business-timeline">' + steps + '</ol></div>' +
-      '<div class="pd-block"><h3 class="pd-sub">제안 범위 및 적용 조건</h3><div class="pd-business-terms">' + conditionCards + '</div></div>' +
+      '<div class="pd-block"><h3 class="pd-sub">진행 일정</h3><ol class="pd-timeline pd-business-timeline">' + steps + '</ol></div>' +
+      '<div class="pd-block"><h3 class="pd-sub">적용 범위와 협의 조건</h3><div class="pd-business-terms">' + conditionCards + '</div></div>' +
       '<div class="pd-business-action-grid">' +
-        '<div class="pd-business-action-card"><h3>담당 지원 계획</h3><p>' + escapeHtml(support) + '</p></div>' +
-        '<div class="pd-business-action-card"><h3>다음 협의 및 후속 조치</h3><p>' + escapeHtml(action) + '</p></div>' +
+        '<div class="pd-business-action-card"><h3>담당 지원</h3><p>' + escapeHtml(support) + '</p></div>' +
+        '<div class="pd-business-action-card"><h3>다음 단계</h3><p>' + escapeHtml(action) + '</p></div>' +
       '</div>' +
-      '<p class="pd-business-disclaimer">수거 가능 시간·횟수, 긴급검사 대응, 결과 전달 방식, 전산 연계 및 가격·계약 조건은 실제 적용 가능 범위와 내부 승인 사항을 확인한 뒤 확정합니다.</p>' +
+      '<div class="pd-business-close-banner"><b>현장에 맞는 검사 운영을 함께 준비하겠습니다.</b><span>재단법인 씨젠의료재단 부산3지점</span></div>' +
     '</div>' + pageFoot(index, total) + '</section>';
 }
+
+/* ---------- 2) 제안 요약 ---------- */
 
 /* ---------- 2) 제안 요약 ---------- */
 
@@ -750,8 +786,13 @@ export function renderProposalPages(input, analysis, options = {}) {
   const a = analysis || { metrics: [], keyPoints: [], infoRows: [], targets: [], sources: [] };
 
   if (isOnePageProposalType(input?.type)) {
-    const total = 1;
-    return { pages: [businessOnePage(input)], total };
+    const total = 3;
+    const pages = [
+      businessCoverPage(input, total, options),
+      businessValuePage(input, a, 1, total),
+      businessActionPage(input, 2, total),
+    ];
+    return { pages, total };
   }
 
   const total = 7;
