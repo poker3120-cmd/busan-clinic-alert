@@ -48,6 +48,52 @@ const SALES_PROFILES = {
       { time: "운영 안정화", title: "초기 운영 리뷰", body: "실제 운영 결과를 바탕으로 추가 지원과 후속 방문 필요 여부를 협의합니다." }
     ]
   },
+  support: {
+    lead: "기존 거래처의 운영상 불편과 요청사항을 정기적으로 확인하고, 실제 필요한 지원을 연결해 거래 만족도와 협력 안정성을 높이는 제안입니다.",
+    situation: "거래가 유지되는 것에 그치지 않고, 수거·결과 확인·문의 대응·직원 안내 등 현장 운영에서 불편하거나 개선이 필요한 부분을 지속적으로 확인할 필요가 있습니다.",
+    needs: "거래처 요청사항을 기록하고 담당 부서와 확인한 뒤 조치 결과까지 공유하는 지원 체계를 마련합니다.",
+    item: "기존 거래처 운영 지원 및 현장 불편 개선",
+    support: "거래처의 운영 불편과 지원 요청을 접수해 우선순위를 정리하고, 수거 일정·결과 확인·전산 연계·직원 안내 등 실제 적용 가능한 지원을 관련 부서와 확인합니다.",
+    action: "다음 방문 시 현재 불편사항과 지원 요청을 확인하고, 조치 담당자·확인 일정·완료 여부를 기록해 후속 공유합니다.",
+    valueTitle: "거래처 운영을 뒷받침하는 지속 지원",
+    valueLead: "요청을 단순히 접수하는 데 그치지 않고, 현장 확인부터 조치 결과 공유까지 이어지는 협력 방식을 제안합니다.",
+    points: [
+      { title: "현장 요청사항 관리", body: "수거·의뢰·결과 확인 과정에서 반복되는 불편을 파악하고, 요청 내용과 우선순위를 정리합니다." },
+      { title: "담당자 중심 소통", body: "문의 경로와 조치 담당을 명확히 하고, 진행 상황과 해결 여부를 거래처에 다시 공유합니다." },
+      { title: "운영 조건 점검", body: "수거 시간·횟수, 긴급 의뢰, 결과 확인·전산 연계 등 거래처 운영에 필요한 조건을 정기적으로 확인합니다." },
+      { title: "직원 업무 적응 지원", body: "요청에 따라 의뢰 절차 안내, 담당 직원 교육 또는 소규모 안내를 검토하고 가능한 범위에서 지원합니다." }
+    ],
+    checks: ["수거 일정·동선", "문의·이슈 조치", "결과 확인·전산 연계", "직원 안내·교육"],
+    steps: [
+      { time: "정기 방문", title: "운영상 불편 확인", body: "최근 불편·문의·요청사항을 확인하고 반복 이슈와 우선순위를 정리합니다." },
+      { time: "방문 후", title: "담당 부서·조치 범위 확인", body: "요청 내용을 관련 담당자와 검토하고 가능한 조치와 예상 일정을 확인합니다." },
+      { time: "조치 진행", title: "결과 공유 및 확인", body: "진행 상황과 조치 결과를 거래처에 알리고 미완료 항목을 추적합니다." },
+      { time: "다음 방문", title: "재발 여부·추가 지원 점검", body: "문제가 재발하는지 확인하고 다음 관리 과제를 합의합니다." }
+    ]
+  },
+  renewal: {
+    lead: "기존 협력 관계를 바탕으로 거래처의 변화와 요구를 살피고, 필요한 운영 개선과 추가 협력 기회를 함께 발굴하는 제안입니다.",
+    situation: "기존 거래 관계를 안정적으로 유지하려면 거래량·의뢰 흐름·불편사항의 변화를 확인하고, 원장님과 실무 담당자의 요구에 맞춘 후속 관리가 필요합니다.",
+    needs: "거래처 현황을 주기적으로 점검해 이탈 위험을 조기에 파악하고, 실제 필요에 맞는 운영 개선·추가 협력 과제를 합의합니다.",
+    item: "기존 거래처 협력 강화 및 관계 유지 관리",
+    support: "현재 거래 현황과 변화, 요청사항 및 주요 담당자 의견을 점검합니다. 추가 지원·검사 관련 제안은 거래처의 실제 필요와 내부 운영·승인 가능 범위를 확인한 후 진행합니다.",
+    action: "거래처별 관리 과제와 다음 접촉 일정을 정하고, 합의한 개선 과제의 진행 상황을 다음 방문에서 점검합니다.",
+    valueTitle: "지속 거래와 협력 확대를 위한 맞춤 관리",
+    valueLead: "일률적인 방문보다 거래처별 변화와 우선 과제를 기준으로 접촉 목적과 후속 조치를 분명히 합니다.",
+    points: [
+      { title: "거래 흐름 변화 조기 확인", body: "월별 의뢰 흐름과 주요 항목 변화를 살피고, 감소나 중단이 보이면 원인과 대응 필요성을 확인합니다." },
+      { title: "원장·실무 키맨 관계 관리", body: "의사결정자와 실무 담당자의 요구를 구분해 확인하고, 약속한 지원과 조치 결과를 꾸준히 공유합니다." },
+      { title: "거래처별 개선 과제 설정", body: "수거·결과 확인·업무 편의 등 실질적인 불편을 우선순위로 정해 담당자와 개선 과제를 합의합니다." },
+      { title: "추가 협력 기회 발굴", body: "진료 특성 및 거래처 요구에 맞는 추가 협력 항목을 검토하되, 필요성과 적용 가능성을 확인한 뒤 제안합니다." }
+    ],
+    checks: ["월별 거래 흐름", "주요 담당자·키맨", "반복 불편·이탈 위험", "추가 협력 필요성"],
+    steps: [
+      { time: "월간 점검", title: "거래 흐름·요청사항 확인", body: "월별 의뢰 변화와 거래처 의견을 확인하고 변동 원인을 기록합니다." },
+      { time: "관리 과제 선정", title: "우선순위·대응방안 합의", body: "거래 유지에 중요한 과제부터 선정하고 담당자와 조치 방향을 합의합니다." },
+      { time: "후속 접촉", title: "합의한 과제 실행", body: "관련 부서 확인과 필요한 지원을 연결하고 처리 상황을 공유합니다." },
+      { time: "재점검", title: "결과 확인·다음 과제 설정", body: "개선 여부와 추가 요청을 확인하고 다음 접촉 목적과 일정을 정합니다." }
+    ]
+  },
   conversion: {
     lead: "현재 거래 구조와 운영 조건을 먼저 확인하고, 가능한 범위부터 단계적으로 전환해 업무 공백과 초기 혼선을 줄이는 제안입니다.",
     situation: "기존 수탁사 이용 현황과 거래처의 운영 조건을 확인한 뒤, 전환 가능 범위와 전환 과정의 유의사항을 구체화할 필요가 있습니다.",
@@ -75,6 +121,10 @@ const SALES_PROFILES = {
 
 function isAcquisitionType(type) {
   return type === "opening" || type === "conversion";
+}
+
+function isOnePageProposalType(type) {
+  return ["opening", "conversion", "support", "renewal"].includes(type);
 }
 
 function salesProfile(type) {
@@ -277,7 +327,7 @@ function businessOnePage(input) {
       '<div class="pd-onepage-chips">' + chips + '</div>' +
     '</section>' +
     '<section class="pd-onepage-section">' +
-      '<div class="pd-onepage-sectionhead"><span>03</span><div><h2>도입·전환 실행 순서</h2><p>담당자 협의부터 적용 이후 점검까지 단계적으로 진행합니다.</p></div></div>' +
+      '<div class="pd-onepage-sectionhead"><span>03</span><div><h2>' + (isAcquisitionType(input.type) ? "도입·전환 실행 순서" : "지원·관리 실행 순서") + '</h2><p>' + (isAcquisitionType(input.type) ? "담당자 협의부터 적용 이후 점검까지 단계적으로 진행합니다." : "현황 점검부터 요청 조치, 결과 공유와 다음 관리까지 이어갑니다.") + '</p></div></div>' +
       '<div class="pd-onepage-steps">' + steps + '</div>' +
     '</section>' +
     '<div class="pd-onepage-bottom">' +
@@ -716,7 +766,7 @@ function closingPage(analysis, index, total) {
 export function renderProposalPages(input, analysis, options = {}) {
   const a = analysis || { metrics: [], keyPoints: [], infoRows: [], targets: [], sources: [] };
 
-  if (isAcquisitionType(input?.type)) {
+  if (isOnePageProposalType(input?.type)) {
     const total = 1;
     return { pages: [businessOnePage(input)], total };
   }
@@ -842,6 +892,6 @@ function acquisitionProposalToPlainText(input) {
 }
 
 export function proposalToPlainText(input, analysis) {
-  if (isAcquisitionType(input?.type)) return acquisitionProposalToPlainText(input);
+  if (isOnePageProposalType(input?.type)) return acquisitionProposalToPlainText(input);
   return legacyProposalToPlainText(input, analysis);
 }
