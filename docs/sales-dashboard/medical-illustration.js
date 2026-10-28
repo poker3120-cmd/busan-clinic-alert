@@ -100,6 +100,28 @@ const TOPICS = [
     `
   },
   {
+    key: "stomach",
+    label: "위·헬리코박터",
+    match: /헬리코박터|h\.?\s*pylori|pylori|위암|위염|위장|위점막|소화성\s*궤양|gastric|stomach|ulcer|helicobacter/i,
+    svg: \`
+      <g>
+        <path d="M346 72 C340 115 348 158 333 190 C318 220 279 237 263 274 C247 311 269 349 310 363 C353 379 414 365 454 338 C503 306 529 261 511 218 C502 194 484 182 463 185 C445 186 435 203 432 223 C426 249 407 271 381 274 C360 276 344 260 345 239 C348 203 375 173 374 139 C374 114 366 88 363 72 Z"
+          fill="#f2c0c3" stroke="#a83b55" stroke-width="7" stroke-linejoin="round"/>
+        <path d="M368 100 C367 143 379 166 362 194 C344 224 315 237 302 271 C288 308 316 333 354 336 C392 338 433 318 461 291"
+          fill="none" stroke="#d97c8b" stroke-width="17" stroke-linecap="round"/>
+        <path d="M365 102 C368 133 371 157 360 179" fill="none" stroke="#fff0f1" stroke-width="5" stroke-linecap="round"/>
+      </g>
+      <g stroke="#a33a52" stroke-width="3.5" stroke-linecap="round" fill="#d9a04b">
+        <rect x="470" y="110" width="50" height="15" rx="7.5" transform="rotate(25 495 117)"/>
+        <path d="M470 111 Q450 103 449 88 M486 119 Q479 138 463 141 M505 122 Q525 133 529 149" fill="none"/>
+        <rect x="510" y="157" width="46" height="14" rx="7" transform="rotate(-18 533 164)"/>
+        <path d="M511 157 Q492 148 490 135 M541 169 Q557 184 554 197" fill="none"/>
+        <rect x="465" y="185" width="44" height="14" rx="7" transform="rotate(12 487 192)"/>
+        <path d="M465 185 Q450 171 454 159 M500 196 Q515 207 529 203" fill="none"/>
+      </g>
+    \`
+  },
+  {
     key: "cell",
     label: "분자·유전자",
     match: /유전자|분자|세포|바이러스|감염|면역|염증|종양표지자|마커|유전|암|종양|PCR|DNA|RNA|분자진단|mutation|genetic|molecular|virus|bacteria|infection/i,
@@ -119,28 +141,6 @@ const TOPICS = [
           <path d="M343 250 L410 250"/><path d="M315 290 L440 290"/>
           <path d="M342 329 L413 329"/><path d="M373 369 L382 369"/>
         </g>
-      </g>
-    \`
-  },
-  {
-    key: "stomach",
-    label: "위·헬리코박터",
-    match: /헬리코박터|h\.?\s*pylori|pylori|위암|위염|위장|위점막|소화성\s*궤양|gastric|stomach|ulcer|helicobacter/i,
-    svg: \`
-      <g>
-        <path d="M346 72 C340 115 348 158 333 190 C318 220 279 237 263 274 C247 311 269 349 310 363 C353 379 414 365 454 338 C503 306 529 261 511 218 C502 194 484 182 463 185 C445 186 435 203 432 223 C426 249 407 271 381 274 C360 276 344 260 345 239 C348 203 375 173 374 139 C374 114 366 88 363 72 Z"
-          fill="#f2c0c3" stroke="#a83b55" stroke-width="7" stroke-linejoin="round"/>
-        <path d="M368 100 C367 143 379 166 362 194 C344 224 315 237 302 271 C288 308 316 333 354 336 C392 338 433 318 461 291"
-          fill="none" stroke="#d97c8b" stroke-width="17" stroke-linecap="round"/>
-        <path d="M365 102 C368 133 371 157 360 179" fill="none" stroke="#fff0f1" stroke-width="5" stroke-linecap="round"/>
-      </g>
-      <g stroke="#a33a52" stroke-width="3.5" stroke-linecap="round" fill="#d9a04b">
-        <rect x="470" y="110" width="50" height="15" rx="7.5" transform="rotate(25 495 117)"/>
-        <path d="M470 111 Q450 103 449 88 M486 119 Q479 138 463 141 M505 122 Q525 133 529 149" fill="none"/>
-        <rect x="510" y="157" width="46" height="14" rx="7" transform="rotate(-18 533 164)"/>
-        <path d="M511 157 Q492 148 490 135 M541 169 Q557 184 554 197" fill="none"/>
-        <rect x="465" y="185" width="44" height="14" rx="7" transform="rotate(12 487 192)"/>
-        <path d="M465 185 Q450 171 454 159 M500 196 Q515 207 529 203" fill="none"/>
       </g>
     \`
   },
