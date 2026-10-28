@@ -29,7 +29,7 @@ import {
 
 import {
   renderProposalHtml, proposalToPlainText,
-} from "./proposal.js?v=20261027a";
+} from "./proposal.js?v=20261028a";
 
 import {
   fitScaler, printFlyer, printHtml, exportFlyerPng, exportFlyerImagePdf,
