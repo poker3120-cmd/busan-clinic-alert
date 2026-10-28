@@ -1721,6 +1721,94 @@ textarea.mono { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; 
   .pd-business-cover .pd-cover-brief { grid-template-columns:1fr; }
 }
 
+
+/* ---------- 3페이지 영업 제안서: 비주얼 히어로·근거·실행계획 ---------- */
+.pd-business-cover .pd-cover-main { margin-top: 42px; }
+.pd-business-cover .pd-cover-client { margin-top: 20px; }
+.pd-business-hero {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(220px,.92fr);
+  align-items:stretch;
+  gap:18px;
+  margin-top:22px;
+  padding:18px;
+  border:1px solid #ecd5db;
+  border-radius:14px;
+  background:linear-gradient(125deg,#fff8fa 0%,#fff 56%,#f9e9ed 100%);
+  box-shadow:0 8px 20px rgba(127,16,36,.06);
+  min-height:220px;
+}
+.pd-business-hero-copy { min-width:0; display:flex; flex-direction:column; justify-content:center; }
+.pd-business-eyebrow { display:block; margin-bottom:9px; color:#c41230; font-size:9px; letter-spacing:.16em; font-weight:900; }
+.pd-business-hero-copy h2 { margin:0; color:#7f1024; font-size:23px; line-height:1.35; letter-spacing:-.035em; font-weight:900; }
+.pd-business-hero-copy p { margin:12px 0 0; color:#51434a; font-size:11.5px; line-height:1.75; overflow-wrap:anywhere; }
+.pd-business-hero-figure {
+  min-width:0; margin:0; display:flex; flex-direction:column; justify-content:center;
+  overflow:hidden; border:1px solid rgba(127,16,36,.12); border-radius:10px; background:#fff;
+}
+.pd-business-hero-figure img { display:block; width:100%; height:178px; object-fit:contain; padding:6px; background:#fff; }
+.pd-business-hero-figure figcaption { padding:7px 10px; color:#78666d; font-size:8.5px; line-height:1.4; border-top:1px solid #f0e4e7; overflow-wrap:anywhere; }
+.pd-business-hero-art {
+  display:flex; flex-direction:column; justify-content:center; align-items:flex-start;
+  min-height:180px; padding:20px 23px; border-radius:10px; color:#fff;
+  background:radial-gradient(circle at 82% 18%,rgba(255,255,255,.25),transparent 32%),linear-gradient(135deg,#771126,#c41230 62%,#e65c76);
+  position:relative; overflow:hidden;
+}
+.pd-business-hero-art:after { content:""; position:absolute; width:170px; height:170px; right:-52px; bottom:-65px; border:1px solid rgba(255,255,255,.28); border-radius:50%; box-shadow:0 0 0 18px rgba(255,255,255,.05),0 0 0 38px rgba(255,255,255,.04); }
+.pd-business-hero-art span { font-size:9px; font-weight:800; letter-spacing:.18em; opacity:.84; }
+.pd-business-hero-art b { display:block; margin-top:14px; font-size:25px; line-height:1.35; font-weight:900; letter-spacing:-.03em; }
+.pd-business-hero-art i { margin-top:17px; font-size:8px; font-style:normal; font-weight:800; letter-spacing:.16em; opacity:.8; }
+.pd-business-cover .pd-cover-brief { display:grid; grid-template-columns:1fr; gap:8px; margin-top:10px; }
+.pd-business-cover .pd-business-brief-card { padding:9px 12px; border:1px solid #ead7dc; border-left:3px solid #c41230; border-radius:8px; background:rgba(255,255,255,.9); }
+.pd-business-cover .pd-business-brief-card span { display:block; margin-bottom:3px; color:#a3122e; font-size:9px; font-weight:900; }
+.pd-business-cover .pd-business-brief-card p { margin:0; color:#463c42; font-size:9.5px; line-height:1.5; overflow-wrap:anywhere; }
+.pd-business-cover .pd-cover-section-label { margin-top:14px; color:#a3122e; font-size:10px; font-weight:900; }
+.pd-business-cover .pd-cover-stats { margin-top:7px; gap:8px; }
+.pd-business-cover .pd-cover-stat { padding:9px 10px; }
+.pd-business-cover .pd-cover-stat b { font-size:10.5px; line-height:1.4; }
+.pd-business-cover .pd-cover-stat b i { font-style:normal; color:#c41230; font-size:9px; margin-right:3px; }
+.pd-business-cover .pd-cover-stat span { font-size:9px; line-height:1.45; }
+.pd-business-cover .pd-cover-meta { margin-bottom:24px; padding:12px 15px; }
+.pd-business-detail-body { gap:13px; padding-top:14px; }
+.pd-business-detail-body .pd-business-grid { gap:8px; }
+.pd-business-detail-body .pd-business-value { padding:10px 11px; }
+.pd-business-detail-body .pd-business-value h3 { margin-bottom:3px; font-size:11px; }
+.pd-business-detail-body .pd-business-value p { font-size:9.5px; line-height:1.55; }
+.pd-business-data-block { min-width:0; padding:12px 14px; border:1px solid #eadfe2; border-radius:10px; background:#fff; }
+.pd-business-data-block > h3 { margin:0 0 9px; color:#7f1024; font-size:11px; font-weight:900; }
+.pd-business-source-points { display:grid; grid-template-columns:1fr; gap:7px; }
+.pd-business-source-points article { display:flex; gap:9px; align-items:flex-start; min-width:0; padding:8px 9px; background:#fff9fa; border-radius:7px; }
+.pd-business-source-points article > span { display:inline-flex; flex:0 0 22px; width:22px; height:22px; align-items:center; justify-content:center; border-radius:6px; color:#fff; background:#8e122b; font-size:8px; font-weight:900; }
+.pd-business-source-points article p { margin:0; color:#42363c; font-size:9.5px; line-height:1.55; white-space:pre-line; overflow-wrap:anywhere; }
+.pd-business-source-points article small { display:block; margin-top:4px; color:#85747b; font-size:8px; line-height:1.4; overflow-wrap:anywhere; }
+.pd-business-metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+.pd-business-metrics article { min-width:0; padding:10px 11px; border-radius:8px; border-top:3px solid #c41230; background:#fff6f8; }
+.pd-business-metrics article span { display:block; color:#806c73; font-size:8.5px; font-weight:800; }
+.pd-business-metrics article b { display:block; margin-top:4px; color:#7f1024; font-size:12px; line-height:1.4; overflow-wrap:anywhere; }
+.pd-business-info-table { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 14px; }
+.pd-business-info-table > div { display:grid; grid-template-columns:minmax(70px,.8fr) minmax(0,1.5fr); gap:8px; padding:7px 0; border-bottom:1px solid #f0e5e8; min-width:0; }
+.pd-business-info-table span { color:#8a747c; font-size:8.5px; font-weight:800; }
+.pd-business-info-table b { color:#372b30; font-size:9px; line-height:1.45; font-weight:700; overflow-wrap:anywhere; }
+.pd-business-targets { display:flex; flex-wrap:wrap; gap:6px; }
+.pd-business-targets span { padding:5px 8px; border-radius:20px; background:#fae9ed; color:#7f1024; font-size:8.5px; font-weight:800; }
+.pd-business-empty-note { margin:0; padding:12px 13px; border-radius:8px; background:#faf7f8; color:#75666c; font-size:9.5px; line-height:1.55; }
+.pd-business-source-list { margin:0; color:#8a7a80; font-size:8px; line-height:1.45; overflow-wrap:anywhere; }
+.pd-business-action-body { gap:14px; padding-top:16px; }
+.pd-business-action-page .pd-business-timeline li { padding:11px 13px; }
+.pd-business-action-page .pd-business-step-top strong { color:#39282f; font-size:11px; }
+.pd-business-action-page .pd-business-step-main p { margin:4px 0 0; color:#65565d; font-size:9.5px; line-height:1.55; }
+.pd-business-action-page .pd-business-term { padding:12px 13px; }
+.pd-business-action-page .pd-business-term b { font-size:10.5px; }
+.pd-business-close-banner { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-top:auto; padding:19px 20px; color:#fff; border-radius:11px; background:linear-gradient(110deg,#7f1024,#c41230); }
+.pd-business-close-banner b { font-size:13px; line-height:1.5; }
+.pd-business-close-banner span { flex:0 0 auto; font-size:9px; font-weight:700; opacity:.88; }
+@media (max-width:760px) {
+  .pd-business-hero { grid-template-columns:1fr; }
+  .pd-business-hero-figure img { height:160px; }
+  .pd-business-info-table { grid-template-columns:1fr; }
+  .pd-business-close-banner { align-items:flex-start; flex-direction:column; gap:6px; }
+}
+
 /* ---------- A4 1페이지 신규 영업 제안서 ---------- */
 .pd-business-onepage {
   position: relative;
