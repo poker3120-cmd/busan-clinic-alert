@@ -1917,3 +1917,53 @@ textarea.mono { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; 
   .flyer.fl-brochure .fl-brochure-header,.flyer.fl-brochure .fl-hero,
   .flyer.fl-brochure .fl-content,.flyer.fl-brochure .fl-brochure-footer { padding-left:20px;padding-right:20px; }
 }
+
+/* 고객 전달용 1P 제안서 문구·레이아웃 정리 */
+.pd-onepage-header-meta { justify-content:center; }
+.pd-onepage-header-meta span { font-size:8.5px;letter-spacing:.13em; }
+.pd-onepage-titleblock { padding:18px 0 10px; }
+.pd-onepage-titleblock h1 { font-size:29px; }
+.pd-onepage-kicker { display:none; }
+.pd-onepage-lead { margin-top:5px; }
+.pd-onepage-intro { display:none; }
+.pd-onepage-proposition {
+  margin:2px 0 15px;padding:13px 16px 14px;border-left:4px solid #c41230;
+  background:linear-gradient(100deg,#fff0f3 0%,#fffafa 76%,#fff 100%);
+}
+.pd-onepage-proposition p {
+  margin:0;color:#7f1024;font-size:14px;line-height:1.65;font-weight:800;white-space:pre-line;overflow-wrap:anywhere;
+}
+.pd-onepage-section { margin-top:9px; }
+.pd-onepage-sectionhead { margin-bottom:7px; }
+.pd-onepage-sectionhead > span { width:21px;height:21px;flex-basis:21px;border-radius:3px; }
+.pd-onepage-sectionhead h2 { font-size:12.5px; }
+.pd-onepage-sectionhead p { display:none; }
+.pd-onepage-values { gap:7px; }
+.pd-onepage-value { padding:9px 10px 10px;border-radius:4px;border-top:2px solid #c41230; }
+.pd-onepage-value-no { width:17px;height:17px;font-size:8px;margin-bottom:4px; }
+.pd-onepage-value h3 { font-size:10.2px; }
+.pd-onepage-value p { font-size:8.7px;line-height:1.45; }
+.pd-onepage-steps-section { margin-top:11px; }
+.pd-onepage-flow { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px; }
+.pd-onepage-flow-item {
+  display:flex;align-items:center;gap:7px;min-width:0;padding:9px 8px;
+  border:1px solid #eadde1;border-radius:4px;background:#fff;
+}
+.pd-onepage-flow-item > span {
+  display:flex;align-items:center;justify-content:center;width:20px;height:20px;flex:0 0 20px;
+  background:#c41230;color:#fff;font-size:7.8px;font-weight:900;
+}
+.pd-onepage-flow-item b { color:#493b41;font-size:9px;line-height:1.35;overflow-wrap:anywhere; }
+.pd-onepage-bottom { margin-top:12px;gap:8px; }
+.pd-onepage-bottomcard { padding:9px 11px;border-radius:4px; }
+.pd-onepage-bottomcard span { font-size:9px; }
+.pd-onepage-bottomcard p { font-size:8.8px;line-height:1.45; }
+.pd-onepage-terms { margin-top:8px;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px; }
+.pd-onepage-term { padding:6px 8px;border-radius:4px; }
+.pd-onepage-term span { font-size:7.5px; }
+.pd-onepage-term b { font-size:8.5px; }
+.pd-onepage-footer { padding-top:8px;margin-top:auto;font-size:8px; }
+.pd-onepage-disclaimer { display:none; }
+@media (max-width:760px) {
+  .pd-onepage-flow { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
