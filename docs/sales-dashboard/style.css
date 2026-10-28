@@ -1795,3 +1795,125 @@ textarea.mono { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; 
   .pd-onepage-terms { grid-template-columns:1fr; }
   .pd-onepage-intro,.pd-onepage-bottom { grid-template-columns:1fr; }
 }
+
+
+/* ---------- 1P 홍보물 리디자인: 씨젠 책자형 레드·화이트 그리드 ---------- */
+.flyer.fl-brochure {
+  --accent: #c41230;
+  --accent-dark: #7f1024;
+  --accent-soft: #fff2f4;
+  height: 1123px;
+  padding: 0;
+  background: #fff;
+  color: #27232a;
+  font-family: "Noto Sans KR","Malgun Gothic","Apple SD Gothic Neo",Arial,sans-serif;
+}
+.fl-top-accent { flex: 0 0 8px; height: 8px; background: #c41230; }
+.fl-brochure .fl-brochure-header {
+  display:flex;align-items:center;justify-content:space-between;gap:18px;
+  min-height:64px;padding:13px 34px 12px;border-bottom:1px solid #e8dce0;background:#fff;
+}
+.fl-brand-lockup { display:flex;align-items:center;gap:13px;min-width:0; }
+.fl-brochure .fl-logo { display:block;width:132px;height:auto;max-height:none;object-fit:contain;padding:0;border-radius:0;background:transparent; }
+.fl-brand-divider { width:1px;height:29px;background:#decbd0; }
+.fl-brand-name { display:flex;flex-direction:column;gap:3px;min-width:0; }
+.fl-brand-name b { color:#7f1024;font-size:8px;font-weight:900;letter-spacing:.12em; }
+.fl-brand-name span { color:#82777b;font-size:8px;font-weight:700;letter-spacing:.12em; }
+.fl-publication-label {
+  display:flex;align-items:center;gap:7px;flex:0 0 auto;padding:7px 11px;
+  border:1px solid #efcfd6;border-radius:3px;background:#fff9fa;color:#9b102a;font-size:9.5px;font-weight:900;
+}
+.fl-publication-label > span { display:block;width:6px;height:6px;background:#c41230; }
+.fl-brochure .fl-hero {
+  position:relative;display:grid;grid-template-columns:minmax(0,1.16fr) minmax(0,.84fr);
+  gap:20px;align-items:stretch;margin:0;padding:23px 34px 22px;
+  background:linear-gradient(100deg,#fff 0%,#fff 60%,#fff5f7 100%);
+  border-bottom:1px solid #eadde1;overflow:hidden;
+}
+.fl-hero-copy { position:relative;z-index:1;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;min-width:0; }
+.fl-hero-eyebrow { margin:0 0 10px;color:#c41230;font-size:8.5px;font-weight:900;letter-spacing:.16em;line-height:1.4; }
+.fl-brochure .fl-title { margin:0;max-width:100%;font-size:34px;font-weight:900;line-height:1.24;letter-spacing:-.04em;color:#7f1024;overflow-wrap:anywhere; }
+.fl-brochure .fl-title.sm { font-size:29px; }
+.fl-brochure .fl-title.xs { font-size:24px; }
+.fl-brochure .fl-sub { position:static;margin:12px 0 0;color:#51464b;font-size:12px;font-weight:500;line-height:1.7;overflow-wrap:anywhere; }
+.fl-hero-rule { display:flex;gap:4px;align-items:center;margin-top:16px; }
+.fl-hero-rule span { display:block;width:28px;height:3px;background:#c41230; }
+.fl-hero-rule span:nth-child(2) { width:12px;background:#d98998; }
+.fl-hero-rule span:nth-child(3) { width:5px;background:#ead2d8; }
+.fl-hero-art {
+  position:relative;display:flex;flex-direction:column;justify-content:center;min-width:0;min-height:192px;
+  margin:0;padding:20px 15px 13px;border:1px solid #ead7dc;border-left:4px solid #c41230;
+  background:#fff;border-radius:2px;overflow:hidden;
+}
+.fl-hero-art::before { content:"";position:absolute;right:-42px;top:-45px;width:130px;height:130px;border-radius:50%;background:#fff0f3; }
+.fl-hero-art-top { position:absolute;top:9px;left:13px;right:12px;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:8px;color:#a3122e; }
+.fl-hero-art-top span {font-size:7px;font-weight:900;letter-spacing:.1em;}
+.fl-hero-art-top b {font-size:8px;font-weight:900;color:#c41230;}
+.fl-brochure .fl-hero-image {
+  position:relative;z-index:1;display:block;width:100%;height:160px;max-height:160px;object-fit:contain;object-position:center;
+  margin:12px auto 0;background:transparent;mix-blend-mode:multiply;
+}
+.fl-brochure .fl-hero-art figcaption { position:relative;z-index:1;margin:7px 0 0;text-align:right;color:#8f7f85;font-size:8px;line-height:1.4; }
+.fl-hero-art-empty { align-items:center;gap:10px;text-align:center;background:linear-gradient(145deg,#fff,#fff3f5); }
+.fl-empty-mark { width:64px;height:64px;border:2px solid #c41230;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#c41230;font-size:31px;font-weight:900;box-shadow:0 0 0 9px #fff,0 0 0 10px #f0d5db; }
+.fl-hero-art-empty > span { color:#a3122e;font-size:7.5px;font-weight:900;letter-spacing:.15em; }
+.fl-hero-art-empty > b { color:#51464b;font-size:11px;font-weight:800; }
+.fl-brochure .fl-content { flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:15px;padding:17px 34px 8px; }
+.fl-brochure .fl-metrics { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px; }
+.fl-brochure .fl-metric { display:flex;align-items:flex-start;gap:9px;min-width:0;padding:10px 11px;border:1px solid #e8dce0;border-radius:2px;border-top:0;border-left:3px solid #c41230;background:#fff;box-shadow:none; }
+.fl-metric-no { flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:23px;height:23px;background:#fff0f3;color:#a3122e;font-size:8px;font-weight:900; }
+.fl-brochure .fl-metric .v { font-size:19px;font-weight:900;line-height:1.2;color:#7f1024;overflow-wrap:anywhere; }
+.fl-brochure .fl-metric .l { margin-top:3px;font-size:9px;line-height:1.45;color:#74666c;font-weight:700;overflow-wrap:anywhere; }
+.fl-brochure .fl-section-heading { display:flex;align-items:center;gap:9px;margin-bottom:8px; }
+.fl-brochure .fl-section-number { display:flex;align-items:center;justify-content:center;flex:0 0 26px;width:26px;height:26px;background:#c41230;color:#fff;font-size:8.5px;font-weight:900; }
+.fl-brochure .fl-section-heading > div:last-child > span { display:block;margin-bottom:2px;color:#b14a5c;font-size:7px;font-weight:900;letter-spacing:.13em; }
+.fl-brochure .fl-section-heading h2 { margin:0;color:#7f1024;font-size:13px;font-weight:900;line-height:1.3; }
+.fl-brochure .fl-points-section { min-width:0; }
+.fl-brochure .fl-points { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px; }
+.fl-brochure .fl-point { position:relative;display:flex;align-items:flex-start;gap:9px;min-width:0;padding:10px 11px;border:1px solid #e9dfe2;border-radius:2px;background:#fff; }
+.fl-brochure .fl-point-index { display:inline-flex;align-items:center;justify-content:center;flex:0 0 24px;width:24px;height:24px;background:#fff0f3;border:1px solid #f1d9df;color:#a3122e;font-size:9px;font-weight:900; }
+.fl-brochure .fl-point .tx { min-width:0;padding-right:8px; }
+.fl-brochure .fl-point .tx h3 { margin:0;color:#30262b;font-size:10px;line-height:1.45;font-weight:900;overflow-wrap:anywhere; }
+.fl-brochure .fl-point .tx p { margin:4px 0 0;color:#6c6065;font-size:8.7px;line-height:1.55;white-space:pre-line;overflow-wrap:anywhere; }
+.fl-point-arrow { position:absolute;right:8px;top:7px;color:#c9a2ab;font-size:9px; }
+.fl-brochure .fl-reference-grid { display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);gap:14px;min-width:0; }
+.fl-brochure .fl-reference-grid.single { grid-template-columns:minmax(0,1fr); }
+.fl-brochure .fl-info-panel,.fl-brochure .fl-target-panel { min-width:0; }
+.fl-brochure .fl-table { border-collapse:collapse;table-layout:fixed;width:100%;font-size:9px; }
+.fl-brochure .fl-table th,.fl-brochure .fl-table td { border:1px solid #e8dce0;padding:6px 8px;text-align:left;vertical-align:top;line-height:1.45;overflow-wrap:anywhere; }
+.fl-brochure .fl-table th { width:82px;background:#fff0f3;color:#7f1024;font-size:8.5px;font-weight:900;white-space:normal; }
+.fl-brochure .fl-table td.v { color:#43383e;background:#fff; }
+.fl-brochure .fl-targets { display:flex;flex-wrap:wrap;gap:6px; }
+.fl-brochure .fl-target { display:inline-flex;align-items:center;gap:6px;padding:6px 8px;border:1px solid #ead6db;border-radius:2px;background:#fffafb;color:#7f1024;font-size:8.5px;line-height:1.4;font-weight:800; }
+.fl-brochure .fl-target i { display:inline-block;width:5px;height:5px;background:#c41230;flex:0 0 auto; }
+.fl-brochure .fl-note { display:flex;align-items:flex-start;gap:10px;margin:0;padding:10px 12px;border:1px solid #eed9de;border-left:4px solid #c41230;border-radius:2px;background:#fff8f9;color:#51464b;font-size:9px;line-height:1.55;white-space:pre-line; }
+.fl-note-symbol { display:flex;align-items:center;justify-content:center;flex:0 0 18px;width:18px;height:18px;background:#c41230;color:#fff;font-size:10px;font-weight:900; }
+.fl-note b { display:block;margin-bottom:2px;color:#a3122e;font-size:7px;letter-spacing:.12em; }
+.fl-note p { margin:0;white-space:pre-line;overflow-wrap:anywhere; }
+.fl-brochure .fl-brochure-footer { display:flex;align-items:center;justify-content:space-between;gap:15px;min-height:65px;padding:12px 34px 17px;border-top:2px solid #c41230;background:#fff; }
+.fl-footer-brand { display:flex;align-items:stretch;gap:9px;min-width:0; }
+.fl-footer-redline { width:4px;background:#c41230;flex:0 0 4px; }
+.fl-footer-brand > div { display:flex;flex-direction:column;gap:4px;min-width:0; }
+.fl-footer-brand b { color:#7f1024;font-size:10px;font-weight:900;line-height:1.4; }
+.fl-footer-brand span:not(.fl-footer-redline) { color:#6f6267;font-size:8.5px;line-height:1.4;overflow-wrap:anywhere;white-space:pre-line; }
+.fl-footer-disclaimer { max-width:310px;color:#94878c;text-align:right;font-size:7px;line-height:1.45;white-space:pre-line;overflow-wrap:anywhere; }
+.flyer.fl-brochure.dense-1 .fl-title { font-size:30px; }
+.flyer.fl-brochure.dense-2 .fl-content { gap:11px;padding:13px 30px 6px; }
+.flyer.fl-brochure.dense-2 .fl-hero { padding:18px 30px; }
+.flyer.fl-brochure.dense-2 .fl-brochure-header { padding-left:30px;padding-right:30px; }
+.flyer.fl-brochure.dense-2 .fl-points { gap:5px; }
+.flyer.fl-brochure.dense-2 .fl-point { padding:7px 8px; }
+.flyer.fl-brochure.dense-2 .fl-reference-grid { gap:9px; }
+.flyer.fl-brochure.dense-2 .fl-table th,.flyer.fl-brochure.dense-2 .fl-table td { padding:4px 6px; }
+.flyer.fl-brochure.dense-3 .fl-content { gap:8px;padding:10px 26px 5px; }
+.flyer.fl-brochure.dense-3 .fl-hero { padding:13px 26px;gap:14px; }
+.flyer.fl-brochure.dense-3 .fl-brochure-header { min-height:54px;padding:9px 26px; }
+.flyer.fl-brochure.dense-3 .fl-title { font-size:25px; }
+.flyer.fl-brochure.dense-3 .fl-hero-image { height:130px;max-height:130px; }
+.flyer.fl-brochure.dense-3 .fl-point .tx p { font-size:8px; }
+.flyer.fl-brochure.dense-3 .fl-metric { padding:7px 8px; }
+
+@media (max-width:760px) {
+  .flyer.fl-brochure .fl-brochure-header,.flyer.fl-brochure .fl-hero,
+  .flyer.fl-brochure .fl-content,.flyer.fl-brochure .fl-brochure-footer { padding-left:20px;padding-right:20px; }
+}
