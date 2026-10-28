@@ -26,6 +26,7 @@ const ORG = "재단법인 씨젠의료재단 부산3지점";
 /* 신규 개원·타사 전환 영업은 검사 설명보다 운영 가치와 전환 실행에 초점을 둡니다. */
 const SALES_PROFILES = {
   opening: {
+    heroTitle: "개원 일정에 맞춘 검사 운영 준비",
     lead: "개원 일정에 맞춰 검사 의뢰부터 결과 확인까지 필요한 운영 준비를 함께 점검합니다.",
     situation: "개원 일정과 진료 흐름에 맞춘 운영 준비가 필요합니다.",
     needs: "개원 준비부터 직원 안내와 초기 운영 점검까지 필요한 절차를 함께 준비합니다.",
@@ -48,6 +49,7 @@ const SALES_PROFILES = {
     ]
   },
   support: {
+    heroTitle: "현장 요청을 확인하고 조치까지 연결",
     lead: "현장의 요청을 확인하고 필요한 지원을 연결해 업무 불편을 줄이겠습니다.",
     situation: "운영 중 발생하는 불편과 지원 요청을 확인합니다.",
     needs: "문의 접수에서 끝나지 않고 조치 상황과 결과를 공유하는 지원을 제공합니다.",
@@ -70,6 +72,7 @@ const SALES_PROFILES = {
     ]
   },
   renewal: {
+    heroTitle: "거래 흐름을 점검하고 개선 기회 발굴",
     lead: "거래 흐름과 현장의 의견을 살펴 지속적인 협력과 개선 기회를 찾습니다.",
     situation: "거래 현황과 현장의 요구를 주기적으로 확인합니다.",
     needs: "거래 변화와 요청사항을 바탕으로 운영 개선과 추가 협력 기회를 검토합니다.",
@@ -92,6 +95,7 @@ const SALES_PROFILES = {
     ]
   },
   conversion: {
+    heroTitle: "수거부터 결과 확인까지 단계적 전환",
     lead: "검체 수거, 결과 확인과 전산 연계 등 실제 운영 조건을 확인하고 원활한 전환을 준비합니다.",
     situation: "현재 이용 중인 서비스와 운영 조건을 확인해 전환 범위와 일정을 협의합니다.",
     needs: "1일 2회 수거, 조직병리 자체 운영 등 거래처에 필요한 서비스 강점을 중심으로 전환 조건을 협의합니다.",
@@ -351,7 +355,7 @@ function businessCoverPage(input, total, options = {}) {
     '<p class="pd-cover-lead">' + escapeHtml(profile.lead) + '</p>' +
     '<p class="pd-cover-client">' + escapeHtml(clinic) + ' <span>귀중</span></p></div>' +
     '<div class="pd-business-hero">' +
-      '<div class="pd-business-hero-copy"><span class="pd-business-eyebrow">PROPOSED VALUE</span><h2>현장 운영에 맞춘<br>실행 가능한 제안</h2>' +
+      '<div class="pd-business-hero-copy"><span class="pd-business-eyebrow">PROPOSED VALUE</span><h2>' + escapeHtml(profile.heroTitle || "현장 운영에 맞춘 실행 가능한 제안") + '</h2>' +
       '<p>' + escapeHtml(safe(input.needs, profile.needs)) + '</p></div>' +
       heroImage +
     '</div>' +
