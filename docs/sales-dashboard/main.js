@@ -65,13 +65,33 @@ function getImageById(id) {
 
 /* 검사 주제에 맞는 개념도를 기본 히어로로 사용하고, 첨부자료 속 도식·그래프는 보조 이미지로 보존합니다. */
 function getBestFlyerImage() {
-  const topicText = [
+  // 제목과 파일명을 먼저 판정해, 자료 묶음의 다른 검사 키워드가 이미지를 덮어쓰지 않게 합니다.
+  const candidateTexts = [
     state.analysis?.title || "",
+    ...(state.files || []).map((file) => file.name || ""),
     state.analysis?.subtitle || "",
-    (state.files || []).map((file) => file.name || "").join(" "),
-    String(state.rawText || "").slice(0, 12000),
-  ].join("\n");
-  const illustration = createMedicalIllustration(topicText);
+  ].filter((value) => String(value).trim());
+
+  let illustration = null;
+  for (const sourceText of candidateTexts) {
+    const candidate = createMedicalIllustration(sourceText);
+    if (candidate && candidate.topicKey !== "clinical") {
+      illustration = candidate;
+      break;
+    }
+  }
+
+  // 제목과 파일명으로 주제를 찾지 못했을 때만 본문 전체를 확인합니다.
+  if (!illustration) {
+    illustration = createMedicalIllustration(String(state.rawText || "").slice(0, 12000));
+  }
+
+  // 주제별 개념도가 전혀 맞지 않으면 눈·세포처럼 보이는 추상 원형 그림 대신
+  // 검사 결과지와 검체 튜브 형태의 중립적인 검사 안내 그래픽을 사용합니다.
+  if (!illustration || illustration.topicKey === "clinical") {
+    illustration = createMedicalIllustration("");
+  }
+
   const existing = state.images.find((img) => img.id === illustration.id);
   if (existing) return existing;
   state.images.push(illustration);
