@@ -63,12 +63,8 @@ function getImageById(id) {
   return state.images.find((img) => img.id === id) || null;
 }
 
-/* 추출한 개별 이미지가 없을 때는 PDF 전체 페이지를 중복 삽입하지 않고
-   검사명·원문 키워드에 맞는 로컬 의료 개념도를 자동 생성해 사용합니다. */
+/* 검사 주제에 맞는 개념도를 기본 히어로로 사용하고, 첨부자료 속 도식·그래프는 보조 이미지로 보존합니다. */
 function getBestFlyerImage() {
-  const actual = state.images.find((img) => !img.fullPage && !img.generated);
-  if (actual) return actual;
-
   const topicText = [
     state.analysis?.title || "",
     state.analysis?.subtitle || "",
@@ -84,12 +80,45 @@ function getBestFlyerImage() {
 
 function refreshFlyerImage() {
   const f = state.flyer || defaultFlyer();
-  flyerImage = getImageById(f.imageId);
-  if (f.imageId && !flyerImage) {
+  const selected = getImageById(f.imageId);
+  if (f.imageId && !selected) {
     // 저장 후 이미지가 사라진 경우 (이미지는 세션 전용)
     f.imageId = null;
     flyerImage = null;
+    return;
   }
+  if (!selected) {
+    flyerImage = null;
+    return;
+  }
+
+  const likelyBrandAsset = (img) =>
+    /(?:^|[/_-])(?:logo|brand|seegene|ci)(?:[/_.-]|$)/i.test(String(img.name || "")) ||
+    /(?:^|[/_-])(?:logo|brand|seegene|ci)(?:[/_.-]|$)/i.test(String(img.source || ""));
+
+  const candidates = state.images.filter((img) => {
+    if (!img || img.id === selected.id || img.fullPage) return false;
+    if (likelyBrandAsset(img)) return false;
+    if (img.width > 0 && img.height > 0) {
+      const ratio = img.width / img.height;
+      if (ratio > 2.35 || ratio < 0.42) return false;
+      if (img.width * img.height < 36000) return false;
+    }
+    return true;
+  });
+
+  // PPTX의 image1.*는 표지 로고인 경우가 많아, 대안이 충분하면 뒤쪽 도식을 우선합니다.
+  const mediaNamed = candidates.filter((img) => !/^image1\.(png|jpe?g|gif|webp)$/i.test(String(img.name || "")));
+  const ordered = mediaNamed.length ? mediaNamed : candidates;
+  const extraImages = ordered.slice(0, 2).map((img) => ({
+    dataUrl: img.dataUrl,
+    name: img.name || "첨부 자료 이미지",
+    source: img.source || "",
+    width: img.width || 0,
+    height: img.height || 0,
+  }));
+
+  flyerImage = { ...selected, extraImages };
 }
 
 function setStatus(el, message, kind = "") {
