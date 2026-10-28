@@ -9,7 +9,7 @@ import {
 
 import { state, emptyAnalysis, saveAnalysis, loadAnalysis, saveFlyer, loadFlyer,
   saveTraining, loadTraining, saveProposal, loadProposal,
-  clearMaterials, resetFlyer, resetTraining, defaultFlyer, defaultTraining } from "./state.js";
+  clearMaterials, resetFlyer, resetTraining, defaultFlyer, defaultTraining } from "./state.js?v=20261028b";
 
 import { extractFiles } from "./extract.js?v=20261027e";
 import { createMedicalIllustration } from "./medical-illustration.js?v=20261027g";
@@ -20,7 +20,7 @@ import { sampleUnits, sampleFileReport } from "./demo.js";
 import {
   normalizeFlyer, renderFlyerHtml, renderFlyerEditor,
   findBestDense, findBestFit, measureFlyerHeight, flyerToPlainText,
-} from "./flyer.js?v=20261028c";
+} from "./flyer.js?v=20261028d";
 
 import {
   normalizeTraining, renderTrainingHtml, renderTrainingEditor,
