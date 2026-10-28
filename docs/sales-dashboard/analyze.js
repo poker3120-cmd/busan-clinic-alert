@@ -445,6 +445,30 @@ export function makeSubtitle(segments, keyPoints, title, exclude = []) {
   return truncate(fallback || "", 110);
 }
 
+/** 첨부 자료의 문헌 인용을 그대로 보존합니다. 수가·검사일정 같은 숫자 행은 참고문헌으로 취급하지 않습니다. */
+export function extractReferences(units) {
+  const found = [];
+  const seen = new Set();
+  const citationSignal = /et\s+al\.?|doi\s*:|doi\.org|\bPMID\b|\bPubMed\b|\b(?:Clin|J|Gut|Hepatol|Cancer|Med|Proteomics|Diagnostics|Dis\s+Markers)\.?\b|\b(?:19|20)\d{2}\b/i;
+
+  (units || []).forEach((unit) => {
+    (unit.lines || []).forEach((line) => {
+      let text = cleanLine(line && line.text);
+      if (text.length < 28 || text.length > 260) return;
+      if (!/\b(?:19|20)\d{2}\b/.test(text) && !/doi\s*:|doi\.org|\bPMID\b/i.test(text)) return;
+      if (!citationSignal.test(text)) return;
+      if (/검사수가|수가\s*\(|보험정보|검사일정|작성일|개원일/.test(text)) return;
+      text = text.replace(/^\d+\s*[.)]\s*/, "").replace(/\s+/g, " ").trim();
+      const key = text.toLowerCase().replace(/[^\p{L}\p{N}]/gu, "");
+      if (!key || seen.has(key)) return;
+      seen.add(key);
+      found.push({ text: truncate(text, 220), source: unit.file || "첨부 자료" });
+    });
+  });
+
+  return found.slice(0, 4);
+}
+
 /* ---------- 진입점 ---------- */
 
 export function analyze(units) {
@@ -503,6 +527,7 @@ export function analyze(units) {
   analysis.infoRows = infoRows;
   analysis.targets = extractTargets(segments).map((item) => item.label);
   analysis.sources = unique(segments.map((segment) => segment.source)).slice(0, 12);
+  analysis.references = extractReferences(units);
   analysis.charCount = segments.reduce((sum, segment) => sum + segment.text.length, 0);
   analysis.generatedAt = new Date().toISOString();
 
