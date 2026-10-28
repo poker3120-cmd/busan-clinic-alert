@@ -338,7 +338,7 @@ function businessCoverPage(input, total, options = {}) {
   ).join("");
   const heroImage = image
     ? '<figure class="pd-business-hero-figure"><img src="' + escapeHtml(image.dataUrl) + '" alt="' + escapeHtml(safe(image.name, "첨부 검사자료 이미지")) + '"><figcaption>' + escapeHtml(safe(image.caption, "첨부 검사자료")) + '</figcaption></figure>'
-    : '<div class="pd-business-hero-art" aria-hidden="true"><span>SEEGene</span><b>검사 운영<br>파트너십</b><i>BUSAN BRANCH 3</i></div>';
+    : '<div class="pd-business-hero-art" aria-hidden="true"><span>SEEGENE</span><b>검사 운영<br>파트너십</b><i>BUSAN BRANCH 3</i></div>';
   const situation = safe(input.situation, "");
   const situationCard = situation
     ? '<div class="pd-business-brief-card"><span>협의가 필요한 운영 조건</span><p>' + escapeHtml(situation) + '</p></div>'
