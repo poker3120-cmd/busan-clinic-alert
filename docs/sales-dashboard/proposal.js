@@ -211,6 +211,88 @@ function coverPage(input, analysis, total) {
 
 /* ---------- 신규 개원·타사 전환 영업 제안서: 1~2페이지 ---------- */
 
+function businessOnePage(input) {
+  const profile = salesProfile(input.type);
+  const title = TYPE_TITLES[input.type] || "거래처 협력 제안";
+  const clinic = safe(input.clinic, "거래처명 미입력");
+  const manager = safe(input.manager, "원장님");
+  const date = formatKoreanDate(input.date) || safe(input.date, "");
+  const valueCards = profile.points.slice(0, 3).map((point, index) =>
+    '<article class="pd-onepage-value">' +
+      '<span class="pd-onepage-value-no">' + (index + 1) + '</span>' +
+      '<h3>' + escapeHtml(point.title) + '</h3>' +
+      '<p>' + escapeHtml(point.body) + '</p>' +
+    '</article>'
+  ).join("");
+  const chips = profile.checks.map((item) =>
+    '<span class="pd-onepage-chip">' + escapeHtml(item) + '</span>'
+  ).join("");
+  const steps = profile.steps.map((step, index) =>
+    '<article class="pd-onepage-step">' +
+      '<span class="pd-onepage-step-no">' + String(index + 1).padStart(2, "0") + '</span>' +
+      '<b>' + escapeHtml(step.title) + '</b>' +
+      '<span class="pd-onepage-step-time">' + escapeHtml(step.time) + '</span>' +
+      '<p>' + escapeHtml(step.body) + '</p>' +
+    '</article>'
+  ).join("");
+  const hasPrice = input.proposed !== null && input.proposed !== undefined && input.hasBase && input.hasRate;
+  const conditions = [
+    { label: "제안 범위", value: safe(input.item, profile.item) },
+    { label: "적용 기간", value: safe(input.period, "협의 후 확정") },
+    { label: "적용 조건", value: safe(input.conditions, "운영 조건·내부 승인 후 확정") }
+  ];
+  if (hasPrice) {
+    conditions.push({ label: "승인 할인율 / 제안 단가", value: String(input.rate) + "% / " + won(input.proposed) });
+  }
+  const terms = conditions.map((item) =>
+    '<div class="pd-onepage-term"><span>' + escapeHtml(item.label) + '</span><b>' + escapeHtml(item.value) + '</b></div>'
+  ).join("");
+  const situation = safe(input.situation, profile.situation);
+  const needs = safe(input.needs, profile.needs);
+  const support = safe(input.support, profile.support);
+  const action = safe(input.action, profile.action);
+
+  return '<section class="proposal-page pd-business-onepage">' +
+    '<div class="pd-onepage-accent" aria-hidden="true"></div>' +
+    '<header class="pd-onepage-header">' +
+      '<img class="pd-onepage-logo" src="ci-seegene.png" alt="재단법인 씨젠의료재단">' +
+      '<div class="pd-onepage-header-meta"><span>BUSAN BRANCH 3</span><b>거래처 맞춤 협력 제안</b></div>' +
+    '</header>' +
+    '<div class="pd-onepage-titleblock">' +
+      '<p class="pd-onepage-kicker">BUSINESS PROPOSAL</p>' +
+      '<h1>' + escapeHtml(title) + '</h1>' +
+      '<p class="pd-onepage-lead">' + escapeHtml(profile.lead) + '</p>' +
+      '<div class="pd-onepage-client"><strong>' + escapeHtml(clinic) + '</strong><span>귀중</span></div>' +
+    '</div>' +
+    '<div class="pd-onepage-intro">' +
+      '<div><span>거래처 현황 · 검토 과제</span><p>' + escapeHtml(situation) + '</p></div>' +
+      '<div><span>맞춤 제안 방향</span><p>' + escapeHtml(needs) + '</p></div>' +
+    '</div>' +
+    '<section class="pd-onepage-section">' +
+      '<div class="pd-onepage-sectionhead"><span>01</span><div><h2>' + escapeHtml(profile.valueTitle) + '</h2><p>' + escapeHtml(profile.valueLead) + '</p></div></div>' +
+      '<div class="pd-onepage-values">' + valueCards + '</div>' +
+    '</section>' +
+    '<section class="pd-onepage-section pd-onepage-ops">' +
+      '<div class="pd-onepage-sectionhead"><span>02</span><div><h2>현장에서 확인할 운영 지원 항목</h2><p>실제 적용 가능 범위와 거래처 운영 조건을 확인한 뒤 확정합니다.</p></div></div>' +
+      '<div class="pd-onepage-chips">' + chips + '</div>' +
+    '</section>' +
+    '<section class="pd-onepage-section">' +
+      '<div class="pd-onepage-sectionhead"><span>03</span><div><h2>도입·전환 실행 순서</h2><p>담당자 협의부터 적용 이후 점검까지 단계적으로 진행합니다.</p></div></div>' +
+      '<div class="pd-onepage-steps">' + steps + '</div>' +
+    '</section>' +
+    '<div class="pd-onepage-bottom">' +
+      '<div class="pd-onepage-bottomcard"><span>담당 지원 계획</span><p>' + escapeHtml(support) + '</p></div>' +
+      '<div class="pd-onepage-bottomcard"><span>다음 협의 · 후속 조치</span><p>' + escapeHtml(action) + '</p></div>' +
+    '</div>' +
+    '<section class="pd-onepage-terms">' + terms + '</section>' +
+    '<footer class="pd-onepage-footer">' +
+      '<span>재단법인 씨젠의료재단 부산3지점</span>' +
+      '<span>' + escapeHtml(manager) + ' · ' + escapeHtml(date) + '</span>' +
+    '</footer>' +
+    '<p class="pd-onepage-disclaimer">※ 수거·긴급검사·결과 확인·전산 연계·지원 범위 및 가격·계약 조건은 실제 적용 가능 여부와 내부 승인 확인 후 확정합니다.</p>' +
+  '</section>';
+}
+
 function businessCoverPage(input, total) {
   const profile = salesProfile(input.type);
   const title = TYPE_TITLES[input.type] || "거래처 협력 제안";
@@ -635,13 +717,8 @@ export function renderProposalPages(input, analysis, options = {}) {
   const a = analysis || { metrics: [], keyPoints: [], infoRows: [], targets: [], sources: [] };
 
   if (isAcquisitionType(input?.type)) {
-    const total = 3;
-    const pages = [
-      businessCoverPage(input, total),
-      businessValuePage(input, 1, total),
-      businessActionPage(input, 2, total),
-    ];
-    return { pages, total };
+    const total = 1;
+    return { pages: [businessOnePage(input)], total };
   }
 
   const total = 7;
@@ -734,51 +811,33 @@ function acquisitionProposalToPlainText(input) {
   const manager = safe(input.manager, "원장님");
   const date = formatKoreanDate(input.date) || safe(input.date, "");
   const lines = [
-    "재단법인 씨젠의료재단 부산3지점 맞춤 협력 제안서",
+    "재단법인 씨젠의료재단 부산3지점 · 거래처 맞춤 협력 제안",
     TYPE_TITLES[input.type] || "거래처 협력 제안",
+    clinic + " 귀중",
+    "담당자: " + manager + " / 작성일: " + date,
     "",
-    "거래처: " + clinic + " / 담당자: " + manager + " / 작성일: " + date,
-    "제안 범위: " + safe(input.item, profile.item),
-    "",
-    "1. 거래처 현황 및 제안 방향",
+    "1. 거래처 현황 및 맞춤 제안",
     safe(input.situation, profile.situation),
-    "",
-    "핵심 제안",
     safe(input.needs, profile.needs),
     "",
     "2. 협력 가치 및 운영 지원"
   ];
-  profile.points.forEach((point, i) => {
-    lines.push((i + 1) + ". " + point.title, point.body);
+  profile.points.slice(0, 3).forEach((point, index) => {
+    lines.push((index + 1) + ". " + point.title + " - " + point.body);
   });
-  lines.push(
-    "",
-    "사전 확인할 운영 조건",
-    ...profile.checks.map((item) => "· " + item),
-    "※ 수거·긴급 대응·결과 확인·전산 연계·교육 지원은 거래처 조건과 내부 가능 범위를 확인한 뒤 확정합니다.",
-    "",
-    "3. 실행 일정 및 협의 조건"
-  );
-  profile.steps.forEach((step, i) => {
-    lines.push((i + 1) + ". " + step.time + " - " + step.title, step.body);
+  lines.push("", "사전 확인 항목: " + profile.checks.join(" · "), "", "3. 도입·전환 실행 순서");
+  profile.steps.forEach((step, index) => {
+    lines.push((index + 1) + ". " + step.time + " / " + step.title + " - " + step.body);
   });
-  lines.push("", "제안 범위 및 조건");
-  lines.push("제안 범위: " + safe(input.item, profile.item));
-  if (input.proposed !== null && input.proposed !== undefined && input.hasBase && input.hasRate) {
-    lines.push(
-      "기준 단가: " + won(input.basePrice),
-      "승인 할인율: " + input.rate + "%",
-      "할인 금액: " + won(input.discount),
-      "제안 단가: " + won(input.proposed)
-    );
-  } else {
-    lines.push("가격 조건: 내부 승인 및 협의 후 확정");
-  }
+  lines.push("", "담당 지원 계획: " + safe(input.support, profile.support));
+  lines.push("후속 조치: " + safe(input.action, profile.action));
+  lines.push("", "제안 범위: " + safe(input.item, profile.item));
   lines.push("적용 기간: " + safe(input.period, "협의 후 확정"));
-  lines.push("적용 조건: " + safe(input.conditions, "거래처 운영 조건과 내부 승인 후 확정"));
-  lines.push("", "담당 지원 계획", safe(input.support, profile.support));
-  lines.push("", "다음 협의 및 후속 조치", safe(input.action, profile.action));
-  lines.push("", "※ 본 제안은 협의용 초안이며, 수거·긴급검사·전산 연계·지원 범위·가격 및 계약 조건은 적용 가능 여부와 내부 승인을 확인한 뒤 확정합니다.");
+  lines.push("적용 조건: " + safe(input.conditions, "운영 조건·내부 승인 후 확정"));
+  if (input.proposed !== null && input.proposed !== undefined && input.hasBase && input.hasRate) {
+    lines.push("기준 단가: " + won(input.basePrice) + " / 승인 할인율: " + input.rate + "% / 제안 단가: " + won(input.proposed));
+  }
+  lines.push("", "※ 수거·긴급검사·결과 확인·전산 연계·지원 범위 및 가격·계약 조건은 실제 적용 가능 여부와 내부 승인 확인 후 확정합니다.");
   return lines.join("\n");
 }
 
