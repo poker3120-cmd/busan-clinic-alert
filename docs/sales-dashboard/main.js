@@ -80,12 +80,18 @@ function getBestFlyerImage() {
 
 function refreshFlyerImage() {
   const f = state.flyer || defaultFlyer();
-  const selected = getImageById(f.imageId);
-  if (f.imageId && !selected) {
-    // 저장 후 이미지가 사라진 경우 (이미지는 세션 전용)
-    f.imageId = null;
-    flyerImage = null;
-    return;
+  let selected = getImageById(f.imageId);
+
+  // 추출 이미지는 새로고침 후 세션에서 사라질 수 있습니다.
+  // 선택된 이미지가 없으면 현재 검사 주제의 자동 생성 개념도를 다시 연결합니다.
+  if (!selected) {
+    const generated = getBestFlyerImage();
+    if (generated) {
+      selected = generated;
+      f.imageId = generated.id;
+      f.imageCaption = truncate(generated.name || "", 40);
+      if (state.flyer) saveFlyer();
+    }
   }
   if (!selected) {
     flyerImage = null;
