@@ -382,7 +382,7 @@ function businessValuePage(input, analysis, index, total) {
         '<article><span>' + String(i + 1).padStart(2, "0") + '</span><div><p>' + escapeHtml(p.text) + '</p>' +
         (p.source ? '<small>출처: ' + escapeHtml(p.source) + '</small>' : '') + '</div></article>'
       ).join("") + '</div>'
-    : '<p class="pd-business-empty-note">검사자료를 첨부하면 자료에 기재된 핵심 내용을 이 영역에 반영합니다.</p>';
+    : '<p class="pd-business-empty-note">검사 항목별 적용 범위와 세부 조건은 자료 확인 및 상담을 거쳐 안내드립니다.</p>';
   const metricHtml = metrics.length
     ? '<div class="pd-business-metrics">' + metrics.map((m) =>
         '<article><span>' + escapeHtml(safe(m.label, "자료 수치")) + '</span><b>' + escapeHtml(m.value) + '</b></article>'
@@ -423,7 +423,7 @@ function businessActionPage(input, index, total) {
   const scopeCards = [
     {label:"제안 범위", value:safe(input.item, profile.item)},
     {label:"적용 기간", value:safe(input.period, "협의 후 확정")},
-    {label:"적용 조건", value:safe(input.conditions, "거래처 운영 조건 및 내부 승인 후 확정")}
+    {label:"적용 조건", value:safe(input.conditions, "세부 운영 조건 협의 후 확정")}
   ];
   if (hasPrice) {
     scopeCards.unshift({label:"기준 단가",value:won(input.basePrice)});
