@@ -6,7 +6,7 @@
 <meta name="description" content="부산3지점 통합 영업 대시보드 - PDF·PPT 자료를 분석해 A4 1페이지 홍보물과 영업 제안서를 자동으로 만듭니다. 모든 파일 처리는 브라우저 안에서만 이루어집니다.">
 <title>부산3지점 통합 영업 대시보드 | 1P 홍보물 · 제안서 자동생성</title>
 <link rel="icon" href="ci-seegene.png">
-<link rel="stylesheet" href="style.css?v=20261028c">
+<link rel="stylesheet" href="style.css?v=20261028d">
 </head>
 <body>
 
@@ -321,7 +321,7 @@
     <!-- ================= 제안서 ================= -->
     <section class="page" id="proposal">
       <h2>제안서 작성</h2>
-      <p class="subtitle">신규 개원·타사 거래 전환은 3페이지 영업 제안서로, 기존 거래처 지원·관리는 검사자료 중심 제안서로 만듭니다. 생성된 문서는 수정 가능한 초안입니다.</p>
+      <p class="subtitle">신규 개원·거래 전환·기존 거래처 지원을 3페이지 영업 제안서로 구성합니다. 첨부 검사자료의 이미지와 확인된 정보는 해당 영역에 반영하고, 생성된 문서는 수정 가능한 초안으로 저장할 수 있습니다.</p>
 
       <div class="card">
         <h3>1. 거래처 정보</h3>
@@ -368,7 +368,7 @@
 
       <div class="toolbar mt-16">
         <button type="button" class="btn" data-action="gen-proposal">제안서 초안 만들기</button>
-        <button type="button" class="btn" data-action="export-proposal-pdf">PDF 저장 (A4 · 다페이지)</button>
+        <button type="button" class="btn" data-action="export-proposal-pdf">PDF 저장 (A4 · 3페이지)</button>
         <button type="button" class="btn secondary" data-action="print-proposal">인쇄 / PDF로 저장</button>
         <button type="button" class="btn secondary" data-action="download-doc">Word 저장</button>
         <button type="button" class="btn secondary" data-action="copy-proposal">내용 복사</button>
@@ -376,7 +376,7 @@
       <p class="status" id="proposalStatus" role="status"></p>
       <div class="card mt-12" id="proposalPreviewCard" hidden>
         <h3>A4 제안서 미리보기</h3>
-        <p class="meta">모든 제안 유형은 고객에게 바로 전달할 수 있는 <strong>A4 1페이지</strong>로 구성됩니다. 내부 작성용 문구를 줄이고, 제안 내용·서비스 강점·진행 순서만 담습니다.</p>
+        <p class="meta"><strong>A4 3페이지</strong> 구성: 제안 요약, 운영 가치·첨부자료 핵심, 실행계획·협의 조건 순서입니다.</p>
         <div id="proposalPreview" class="proposal-scaler"></div>
       </div>
       <p class="meta">실제 검사 가능 여부, 가격 및 계약 조건은 내부 확인 후 사용해 주세요.</p>
@@ -541,6 +541,6 @@
   }
 })();
 </script>
-<script type="module" src="main.js?v=20261028e"></script>
+<script type="module" src="main.js?v=20261028f"></script>
 </body>
 </html>
