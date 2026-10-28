@@ -36,7 +36,8 @@ const TOPICS = [
         <path d="M404 137 C422 181 423 231 401 287" fill="none" stroke="#eaa0a8" stroke-width="8" stroke-linecap="round" opacity=".85"/>
         <path d="M403 217 C454 213 499 231 539 268" fill="none" stroke="#9e3047" stroke-width="7" stroke-linecap="round" opacity=".8"/>
         <path d="M402 218 C360 204 330 181 312 154" fill="none" stroke="#9e3047" stroke-width="7" stroke-linecap="round" opacity=".8"/>
-        <g fill="#f5c6a6" opacity=".95"><circle cx="268" cy="198" r="8"/><circle cx="288" cy="220" r="5"/><circle cx="345" cy="249" r="7"/><circle cx="476" cy="183" r="6"/><circle cx="520" cy="216" r="8"/><circle cx="590" cy="246" r="6"/></g>
+        <path d="M402 218 C438 186 465 166 504 160 M402 218 C448 231 482 258 516 292 M402 218 C384 253 365 275 341 290 M402 218 C409 260 419 288 440 311" fill="none" stroke="#f3c4a9" stroke-width="6" stroke-linecap="round" opacity=".9"/>
+        <path d="M504 160 L533 151 M516 292 L545 304 M341 290 L315 309 M440 311 L452 332" fill="none" stroke="#f3c4a9" stroke-width="4" stroke-linecap="round" opacity=".9"/>
       </g>`
   },
   {
