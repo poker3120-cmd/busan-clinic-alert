@@ -101,21 +101,48 @@ const TOPICS = [
   },
   {
     key: "cell",
-    label: "세포",
-    match: /암|종양|유전자|분자|세포|바이러스|감염|면역|염증|종양표지자|마커|유전/i,
-    svg: `
-      <g stroke-width="5">
-        <circle cx="298" cy="183" r="75" fill="#f3b2bd" stroke="#c85f7a"/>
-        <circle cx="298" cy="183" r="27" fill="#a94772"/><circle cx="285" cy="168" r="8" fill="#fbe4e8"/>
-        <circle cx="478" cy="245" r="91" fill="#f6d9a8" stroke="#d7a454"/>
-        <circle cx="478" cy="245" r="34" fill="#c77b4d"/><circle cx="466" cy="232" r="10" fill="#fff0d0"/>
-        <circle cx="447" cy="125" r="39" fill="#d5c9ee" stroke="#8f80c0"/>
-        <circle cx="447" cy="125" r="14" fill="#7866a7"/>
-        <circle cx="267" cy="287" r="25" fill="#c7e4e1" stroke="#6aaaa8"/>
-        <circle cx="267" cy="287" r="8" fill="#4e8e92"/>
+    label: "분자·유전자",
+    match: /유전자|분자|세포|바이러스|감염|면역|염증|종양표지자|마커|유전|암|종양|PCR|DNA|RNA|분자진단|mutation|genetic|molecular|virus|bacteria|infection/i,
+    svg: \`
+      <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M285 78 C470 125 285 181 470 230 S285 337 470 402" stroke="#b31e3d" stroke-width="15"/>
+        <path d="M470 78 C285 125 470 181 285 230 S470 337 285 402" stroke="#d996a5" stroke-width="15"/>
+        <g stroke="#b45b70" stroke-width="5">
+          <path d="M330 94 L425 94"/><path d="M300 132 L455 132"/>
+          <path d="M330 171 L425 171"/><path d="M333 210 L422 210"/>
+          <path d="M335 250 L420 250"/><path d="M301 290 L454 290"/>
+          <path d="M334 329 L421 329"/><path d="M370 369 L385 369"/>
+        </g>
+        <g stroke="#f7dfe5" stroke-width="3">
+          <path d="M338 94 L417 94"/><path d="M313 132 L442 132"/>
+          <path d="M337 171 L419 171"/><path d="M340 210 L415 210"/>
+          <path d="M343 250 L410 250"/><path d="M315 290 L440 290"/>
+          <path d="M342 329 L413 329"/><path d="M373 369 L382 369"/>
+        </g>
       </g>
-      <g fill="none" stroke="#c77c91" stroke-width="3" opacity=".8"><path d="M240 140 L258 155 L244 174 M336 193 L354 209 L344 228 M432 274 L413 293 L424 310 M514 198 L538 185 L548 205"/></g>
-    `
+    \`
+  },
+  {
+    key: "stomach",
+    label: "위·헬리코박터",
+    match: /헬리코박터|h\.?\s*pylori|pylori|위암|위염|위장|위점막|소화성\s*궤양|gastric|stomach|ulcer|helicobacter/i,
+    svg: \`
+      <g>
+        <path d="M346 72 C340 115 348 158 333 190 C318 220 279 237 263 274 C247 311 269 349 310 363 C353 379 414 365 454 338 C503 306 529 261 511 218 C502 194 484 182 463 185 C445 186 435 203 432 223 C426 249 407 271 381 274 C360 276 344 260 345 239 C348 203 375 173 374 139 C374 114 366 88 363 72 Z"
+          fill="#f2c0c3" stroke="#a83b55" stroke-width="7" stroke-linejoin="round"/>
+        <path d="M368 100 C367 143 379 166 362 194 C344 224 315 237 302 271 C288 308 316 333 354 336 C392 338 433 318 461 291"
+          fill="none" stroke="#d97c8b" stroke-width="17" stroke-linecap="round"/>
+        <path d="M365 102 C368 133 371 157 360 179" fill="none" stroke="#fff0f1" stroke-width="5" stroke-linecap="round"/>
+      </g>
+      <g stroke="#a33a52" stroke-width="3.5" stroke-linecap="round" fill="#d9a04b">
+        <rect x="470" y="110" width="50" height="15" rx="7.5" transform="rotate(25 495 117)"/>
+        <path d="M470 111 Q450 103 449 88 M486 119 Q479 138 463 141 M505 122 Q525 133 529 149" fill="none"/>
+        <rect x="510" y="157" width="46" height="14" rx="7" transform="rotate(-18 533 164)"/>
+        <path d="M511 157 Q492 148 490 135 M541 169 Q557 184 554 197" fill="none"/>
+        <rect x="465" y="185" width="44" height="14" rx="7" transform="rotate(12 487 192)"/>
+        <path d="M465 185 Q450 171 454 159 M500 196 Q515 207 529 203" fill="none"/>
+      </g>
+    \`
   },
   {
     key: "blood",
@@ -160,15 +187,38 @@ export function createMedicalIllustration(sourceText = "") {
   const text = String(sourceText || "");
   const topic = TOPICS.find((candidate) => candidate.match.test(text)) || {
     key: "clinical",
-    label: "검사 원리",
-    svg: `
-      <g fill="none" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M226 257 C255 182 318 151 369 190 S452 292 503 222 S571 151 601 196" stroke="#c55069"/>
-        <path d="M223 286 C268 312 307 309 342 274 S411 181 448 219 S517 308 578 269" stroke="#df9b54"/>
+    label: "검사 안내",
+    svg: \`
+      <g>
+        <rect x="88" y="76" width="248" height="324" rx="20" fill="#fff" stroke="#ead5da" stroke-width="5"/>
+        <rect x="112" y="103" width="115" height="12" rx="6" fill="#c41230"/>
+        <rect x="112" y="129" width="175" height="7" rx="3.5" fill="#d8c2c8"/>
+        <rect x="112" y="145" width="151" height="7" rx="3.5" fill="#e4d7db"/>
+        <rect x="112" y="184" width="198" height="105" rx="10" fill="#fff5f7" stroke="#f0dce1" stroke-width="3"/>
+        <g fill="#c41230">
+          <rect x="133" y="240" width="18" height="33" rx="3"/>
+          <rect x="164" y="220" width="18" height="53" rx="3"/>
+          <rect x="195" y="230" width="18" height="43" rx="3"/>
+          <rect x="226" y="203" width="18" height="70" rx="3"/>
+          <rect x="257" y="214" width="18" height="59" rx="3"/>
+        </g>
+        <path d="M127 273 H292" stroke="#a67c87" stroke-width="3"/>
+        <rect x="112" y="310" width="198" height="48" rx="7" fill="#fff" stroke="#ead5da" stroke-width="2"/>
+        <path d="M126 326 H201 M126 340 H181" stroke="#cdb8bf" stroke-width="5" stroke-linecap="round"/>
+        <circle cx="280" cy="334" r="13" fill="#e3f1e9" stroke="#55936e" stroke-width="3"/>
+        <path d="M273 334 L278 339 L287 328" fill="none" stroke="#55936e" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
       </g>
-      <g fill="#fff" stroke-width="6"><circle cx="232" cy="257" r="29" stroke="#c55069"/><circle cx="369" cy="190" r="29" stroke="#c55069"/><circle cx="503" cy="222" r="29" stroke="#c55069"/><circle cx="601" cy="196" r="29" stroke="#c55069"/></g>
-      <g fill="#c55069"><circle cx="232" cy="257" r="9"/><circle cx="369" cy="190" r="9"/><circle cx="503" cy="222" r="9"/><circle cx="601" cy="196" r="9"/></g>
-    `
+      <g>
+        <path d="M444 104 L444 239 Q444 272 475 272 Q506 272 506 239 L506 104" fill="#fff" stroke="#a83b55" stroke-width="6" stroke-linejoin="round"/>
+        <path d="M450 198 L450 239 Q450 264 475 264 Q500 264 500 239 L500 198 Z" fill="#c41230" opacity=".88"/>
+        <path d="M435 103 H515" stroke="#7f1024" stroke-width="12" stroke-linecap="round"/>
+        <path d="M456 220 Q475 231 494 219" fill="none" stroke="#f5b8c3" stroke-width="4"/>
+        <rect x="433" y="294" width="85" height="9" rx="4.5" fill="#ead5da"/>
+        <rect x="445" y="313" width="61" height="9" rx="4.5" fill="#ead5da"/>
+      </g>
+      <path d="M352 175 C375 175 395 175 417 175" fill="none" stroke="#c41230" stroke-width="4" stroke-linecap="round"/>
+      <path d="M405 165 L418 175 L405 185" fill="none" stroke="#c41230" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    \`
   };
   const safeKey = topic.key.replace(/[^a-z0-9-]/gi, "-");
   return {
