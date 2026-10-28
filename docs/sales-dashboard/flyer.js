@@ -27,9 +27,10 @@ export function normalizeFlyer(flyer) {
   const infoRows = (base.infoRows || [])
     .map((r) => ({ field: str(r.field), value: str(r.value) }))
     .filter((r) => r.value)
-    .slice(0, 6);
+    .slice(0, 8);
 
-  const targets = (base.targets || []).map((t) => str(t)).filter(Boolean).slice(0, 8);
+  const targets = (base.targets || []).map((t) => str(t)).filter(Boolean).slice(0, 6);
+  const references = (base.references || []).map((r) => str(r)).filter(Boolean).slice(0, 4);
 
   return {
     ...base,
@@ -45,6 +46,7 @@ export function normalizeFlyer(flyer) {
     points,
     infoRows,
     targets,
+    references,
   };
 }
 
@@ -95,19 +97,10 @@ export function renderFlyerHtml(flyer, image, denseLevel = 0) {
     '<div class="fl-hero-corner" aria-hidden="true"></div>' +
   '</section>';
 
-  const metrics = f.metrics.length
-    ? '<section class="fl-metrics" aria-label="핵심 지표">' + f.metrics.map((m, i) =>
-        '<div class="fl-metric"><span class="fl-metric-no">' + String(i + 1).padStart(2, "0") + '</span>' +
-          '<div><div class="v">' + escapeHtml(m.value || "—") + '</div>' +
-          (m.label ? '<div class="l">' + escapeHtml(m.label) + '</div>' : '') +
-          '</div></div>'
-      ).join("") + '</section>'
-    : '';
-
   const points = f.points.length
     ? '<section class="fl-points-section">' +
-        '<div class="fl-section-heading"><div class="fl-section-number">02</div><div>' +
-          '<span>KEY POINTS</span><h2>핵심 포인트</h2></div></div>' +
+        '<div class="fl-section-heading"><div class="fl-section-number">01</div><div>' +
+          '<span>TEST HIGHLIGHTS</span><h2>검사 핵심 특징</h2></div></div>' +
         '<div class="fl-points">' + f.points.map((p, i) =>
           '<article class="fl-point">' +
             '<span class="fl-point-index">' + (p.icon || String(i + 1).padStart(2, "0")) + '</span>' +
@@ -115,26 +108,41 @@ export function renderFlyerHtml(flyer, image, denseLevel = 0) {
               (p.title ? '<h3>' + escapeHtml(p.title) + '</h3>' : '') +
               (p.desc ? '<p>' + escapeHtml(p.desc) + '</p>' : '') +
             '</div>' +
-            '<span class="fl-point-arrow" aria-hidden="true">↗</span>' +
           '</article>'
         ).join("") + '</div>' +
       '</section>'
     : '';
 
-  const infoTable = f.infoRows.length
+  const metrics = f.metrics.length
+    ? '<section class="fl-evidence-section">' +
+        '<div class="fl-section-heading"><div class="fl-section-number">02</div><div>' +
+          '<span>SUPPORTING EVIDENCE</span><h2>자료에서 확인한 주요 수치</h2></div></div>' +
+        '<div class="fl-metrics" aria-label="자료에 기재된 핵심 지표">' + f.metrics.slice(0, 4).map((m, i) =>
+          '<div class="fl-metric"><span class="fl-metric-no">' + String(i + 1).padStart(2, "0") + '</span>' +
+            '<div><div class="v">' + escapeHtml(m.value || "—") + '</div>' +
+            (m.label ? '<div class="l">' + escapeHtml(m.label) + '</div>' : '') +
+            '</div></div>'
+        ).join("") + '</div>' +
+      '</section>'
+    : '';
+
+  const infoRows = f.infoRows.slice(0, 7);
+  const infoTable = infoRows.length
     ? '<section class="fl-info-panel">' +
         '<div class="fl-section-heading"><div class="fl-section-number">03</div><div>' +
-          '<span>QUICK REFERENCE</span><h2>검사 정보</h2></div></div>' +
-        '<table class="fl-table"><tbody>' + f.infoRows.map((r) =>
-          '<tr><th>' + escapeHtml(r.field || "항목") + '</th><td class="v">' + escapeHtml(r.value) + '</td></tr>'
-        ).join("") + '</tbody></table>' +
+          '<span>TEST INFORMATION</span><h2>검사 정보</h2></div></div>' +
+        '<div class="fl-spec-table-wrap"><table class="fl-spec-table"><thead><tr>' +
+          infoRows.map((r) => '<th>' + escapeHtml(r.field || "항목") + '</th>').join("") +
+        '</tr></thead><tbody><tr>' +
+          infoRows.map((r) => '<td>' + escapeHtml(r.value) + '</td>').join("") +
+        '</tr></tbody></table></div>' +
       '</section>'
     : '';
 
   const targets = f.targets.length
     ? '<section class="fl-target-panel">' +
         '<div class="fl-section-heading"><div class="fl-section-number">04</div><div>' +
-          '<span>APPLICATION</span><h2>이런 경우 활용합니다</h2></div></div>' +
+          '<span>APPLICATION</span><h2>활용 대상 · 임상적 고려사항</h2></div></div>' +
         '<div class="fl-targets">' + f.targets.map((t) =>
           '<span class="fl-target"><i aria-hidden="true"></i>' + escapeHtml(t) + '</span>'
         ).join("") + '</div>' +
@@ -142,11 +150,17 @@ export function renderFlyerHtml(flyer, image, denseLevel = 0) {
     : '';
 
   const lower = (infoTable || targets)
-    ? '<section class="fl-reference-grid ' + ((!infoTable || !targets) ? "single" : "") + '">' + infoTable + targets + '</section>'
+    ? '<section class="fl-lower-content">' + targets + infoTable + '</section>'
     : '';
 
   const note = f.note
     ? '<aside class="fl-note"><span class="fl-note-symbol">!</span><div><b>CHECK POINT</b><p>' + escapeHtml(f.note) + '</p></div></aside>'
+    : '';
+
+  const references = f.references.length
+    ? '<section class="fl-citations"><div class="fl-citations-head"><span>REFERENCE</span><b>참고문헌</b></div><ol>' +
+        f.references.slice(0, 3).map((reference) => '<li>' + escapeHtml(truncate(reference, 170)) + '</li>').join("") +
+      '</ol></section>'
     : '';
 
   const footer = '<footer class="fl-brochure-footer">' +
@@ -159,7 +173,7 @@ export function renderFlyerHtml(flyer, image, denseLevel = 0) {
 
   return '<div class="flyer fl-brochure ' + dense + '">' +
     '<div class="fl-top-accent"></div>' + head +
-    '<div class="fl-content">' + metrics + points + lower + note + '</div>' +
+    '<div class="fl-content">' + points + metrics + lower + note + references + '</div>' +
     footer +
   '</div>';
 }
@@ -247,8 +261,9 @@ export function flyerToPlainText(flyer) {
       : "",
     "",
     f.infoRows.length ? f.infoRows.map((r) => `${r.field}: ${r.value}`).join("\n") : "",
-    f.targets.length ? `\n적용 대상: ${f.targets.join(", ")}` : "",
-    f.note ? `\n${f.note}` : "",
+    f.targets.length ? `\n활용 대상: ${f.targets.join(", ")}` : "",
+    f.note ? `\n유의사항: ${f.note}` : "",
+    f.references.length ? `\n참고문헌\n${f.references.map((r, i) => (i + 1) + ". " + r).join("\n")}` : "",
     "",
     f.footerOrg,
     f.footerContact,
@@ -378,6 +393,7 @@ export function renderFlyerEditor(flyer, images) {
       ${inputRow("기관명", "footerOrg", { value: f.footerOrg })}
       ${inputRow("담당자 · 연락처", "footerContact", { value: f.footerContact, placeholder: "예: 부산3지점 김○○ 051-000-0000" })}
       ${inputRow("유의사항", "footerNote", { value: f.footerNote, textarea: true, rows: 4 })}
+      ${inputRow("참고문헌 (한 줄에 하나)", "referencesText", { value: f.references.join("\n"), placeholder: "첨부 자료의 문헌만 입력", textarea: true, rows: 3 })}
     </details>
   `;
 }
