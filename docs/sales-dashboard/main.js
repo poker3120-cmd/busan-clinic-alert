@@ -14,13 +14,13 @@ import { state, emptyAnalysis, saveAnalysis, loadAnalysis, saveFlyer, loadFlyer,
 import { extractFiles } from "./extract.js?v=20261027e";
 import { createMedicalIllustration } from "./medical-illustration.js?v=20261027g";
 import { wireAging } from "./aging.js?v=20261027r";
-import { analyze } from "./analyze.js";
+import { analyze } from "./analyze.js?v=20261028b";
 import { sampleUnits, sampleFileReport } from "./demo.js";
 
 import {
   normalizeFlyer, renderFlyerHtml, renderFlyerEditor,
   findBestDense, findBestFit, measureFlyerHeight, flyerToPlainText,
-} from "./flyer.js?v=20261028b";
+} from "./flyer.js?v=20261028c";
 
 import {
   normalizeTraining, renderTrainingHtml, renderTrainingEditor,
@@ -274,6 +274,45 @@ function parseRawTextToUnits(raw) {
 }
 
 /** 분석 결과를 홍보물 초안으로 변환합니다. */
+function splitFlyerPoint(value, index) {
+  const text = String(value || "").replace(/\s+/g, " ").trim();
+  if (!text) return { icon: String(index + 1), title: "", desc: "" };
+
+  const colon = text.match(/^(.{2,32}?)\s*[:：]\s*(.{4,})$/);
+  if (colon) {
+    return {
+      icon: String(index + 1),
+      title: truncate(colon[1].trim(), 32),
+      desc: truncate(colon[2].trim(), 105),
+    };
+  }
+
+  const clause = text.match(/^(.{8,38}?)[,，;；—–]\s*(.{8,})$/);
+  if (clause) {
+    return {
+      icon: String(index + 1),
+      title: truncate(clause[1].trim(), 34),
+      desc: truncate(clause[2].trim(), 105),
+    };
+  }
+
+  if (text.length <= 38) {
+    return { icon: String(index + 1), title: text, desc: "" };
+  }
+
+  const target = Math.min(31, Math.max(20, Math.floor(text.length * 0.42)));
+  let splitAt = text.indexOf(" ", target);
+  if (splitAt < 16 || splitAt > 42) splitAt = text.lastIndexOf(" ", target);
+  if (splitAt < 16) splitAt = 30;
+
+  return {
+    icon: String(index + 1),
+    title: truncate(text.slice(0, splitAt).trim(), 36),
+    desc: truncate(text.slice(splitAt).trim(), 105),
+  };
+}
+
+/** 분석 자료를 회사 배포형 검사 안내 1P에 맞는 밀도와 순서로 재구성합니다. */
 function buildFlyerFromAnalysis() {
   const a = state.analysis || emptyAnalysis();
   const f = defaultFlyer();
@@ -282,38 +321,78 @@ function buildFlyerFromAnalysis() {
   f.subtitle = a.subtitle || "";
   f.kicker = "검사 안내";
 
-  const metrics = a.metrics.slice(0, 3).map((m) => ({
-    value: m.value,
-    label: m.label,
-  }));
-  while (metrics.length < 3) metrics.push({ value: "", label: "" });
+  // 실제 자료에 기재된 연구·성능 수치만 강조 지표로 사용합니다.
+  // 코드·수가·본인부담 등 운영정보는 아래 검사 정보 표에 배치합니다.
+  const metricRank = ["AUC", "민감도", "특이도", "정확도", "양성일치율", "음성일치율", "검출률"];
+  const metrics = (a.metrics || [])
+    .filter((m) => m && String(m.value || "").trim() && !/코드|수가|부담|일정|결과 보고/i.test(String(m.label || "")))
+    .sort((left, right) => {
+      const l = metricRank.findIndex((label) => String(left.label || "").includes(label));
+      const r = metricRank.findIndex((label) => String(right.label || "").includes(label));
+      return (l < 0 ? 99 : l) - (r < 0 ? 99 : r);
+    })
+    .slice(0, 4)
+    .map((m) => ({ value: String(m.value), label: String(m.label || "자료 수치") }));
   f.metrics = metrics;
 
-  const points = a.keyPoints.slice(0, 3).map((p, i) => {
-    const [head, ...rest] = String(p.text).split(/[:：]/);
-    const hasColon = rest.length > 0 && head.length <= 22;
-    return {
-      icon: String(i + 1),
-      title: truncate(hasColon ? head : p.text, hasColon ? 40 : 46),
-      desc: hasColon ? truncate(rest.join(":").trim(), 90) : "",
-    };
-  });
-  if (!points.length) {
-    points.push({ icon: "1", title: "", desc: "" });
+  // 한 문장짜리 항목도 제목과 설명으로 분리합니다.
+  f.points = (a.keyPoints || [])
+    .filter((point) => point && String(point.text || "").trim())
+    .slice(0, 4)
+    .map((point, index) => splitFlyerPoint(point.text, index));
+
+  const normalizeField = (value) => String(value || "")
+    .replace(/[\s·/()[\]:：_-]/g, "")
+    .toLowerCase();
+  const priority = [
+    /^(검사코드|검사코드번호|보험코드|edicode|edi코드)/,
+    /^(검사명|항목명|검사항목)/,
+    /^(검체|시료|검체종류)/,
+    /^(검사방법|방법|분석법|측정방법)/,
+    /^(검사일정|검사일|시행일|운영일)/,
+    /^(보험정보|보험|급여|수가정보|수가|검사수가|본인부담)/,
+    /^(소요시간|결과보고|결과통보|검사결과)/,
+    /^(보관|유의사항|의뢰방법)/,
+  ];
+  const rawRows = (a.infoRows || [])
+    .filter((row) => row && String(row.field || "").trim() && String(row.value || "").trim())
+    .map((row) => ({ field: String(row.field).trim(), value: String(row.value).trim() }));
+  const seenFields = new Set();
+  const rows = rawRows
+    .filter((row) => {
+      const key = normalizeField(row.field);
+      if (!key || seenFields.has(key)) return false;
+      seenFields.add(key);
+      return true;
+    })
+    .sort((left, right) => {
+      const score = (row) => {
+        const field = normalizeField(row.field);
+        const index = priority.findIndex((pattern) => pattern.test(field));
+        return index < 0 ? priority.length : index;
+      };
+      return score(left) - score(right);
+    });
+
+  // 제목이 검사명으로 확인되는 경우 보조 행으로 추가합니다.
+  if (f.title && !rows.some((row) => /검사명|항목명|검사항목/.test(normalizeField(row.field)))) {
+    rows.unshift({ field: "검사명", value: f.title });
   }
-  f.points = points;
+  f.infoRows = rows.slice(0, 7);
+  f.targets = (a.targets || []).slice(0, 6);
 
-  f.infoRows = a.infoRows.map((r) => ({ field: r.field, value: r.value }));
-  f.targets = a.targets.slice();
+  const usedInPoints = f.points.map((point) => point.title + " " + point.desc);
+  const noteCandidate = (a.keyPoints || [])
+    .map((point) => String(point && point.text || "").trim())
+    .find((text) => text && !usedInPoints.some((used) => used.includes(text.slice(0, 18))));
+  f.note = truncate(noteCandidate || "", 150);
 
-  // 안내 문구는 홍보물에 이미 들어간 포인트(0~2)와 겹치지 않는 내용으로 채웁니다.
-  // (같은 문장이 포인트와 안내 문구에 두 번 나오면 지저분해집니다.)
-  const usedInPoints = a.keyPoints.slice(0, 3).map((p) => p.text);
-  const noteCandidate = a.keyPoints.slice(3).map((p) => p.text)
-    .find((text) => text && !usedInPoints.some((used) => used.includes(text.slice(0, 14))));
-  f.note = truncate(noteCandidate || "", 120);
+  // 참고문헌은 분석기가 추출한 원문만 사용합니다.
+  f.references = (a.references || [])
+    .map((reference) => typeof reference === "string" ? reference : String(reference && reference.text || "").trim())
+    .filter(Boolean)
+    .slice(0, 4);
 
-  // 추출된 사진·도식이 있으면 우선 사용하고, 없으면 검사 주제별 개념도를 만듭니다.
   const flyerImageChoice = getBestFlyerImage();
   f.imageId = flyerImageChoice ? flyerImageChoice.id : null;
   f.imageCaption = flyerImageChoice ? truncate(flyerImageChoice.name || "", 40) : "";
@@ -373,7 +452,11 @@ function syncEditorToState(target) {
   const f = state.flyer;
   const singular = target.dataset.flyer;
   if (singular === "targetsText") {
-    f.targets = target.value.split(/[,，\n]/).map((t) => t.trim()).filter(Boolean);
+    f.targets = target.value.split(/[,，\n]/).map((t) => t.trim()).filter(Boolean).slice(0, 6);
+    return true;
+  }
+  if (singular === "referencesText") {
+    f.references = target.value.split(/\r?\n/).map((t) => t.trim()).filter(Boolean).slice(0, 4);
     return true;
   }
   if (singular) {
