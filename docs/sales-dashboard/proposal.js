@@ -8,10 +8,10 @@ import { escapeHtml, formatNumber, formatKoreanDate } from "./utils.js";
 /* ---------- 제안 유형별 문구 ---------- */
 
 export const TYPE_TITLES = {
-  opening: "개원 초기 검사 운영 지원 제안",
-  conversion: "타사 거래 전환 및 운영 안정화 제안",
-  support: "거래처 운영 지원 제안",
-  renewal: "기존 거래처 협력 강화 제안",
+  opening: "개원 검사 운영 지원",
+  conversion: "검사 의뢰 전환",
+  support: "거래처 운영 지원",
+  renewal: "협력 강화",
 };
 
 const TYPE_LEADS = {
@@ -26,99 +26,94 @@ const ORG = "재단법인 씨젠의료재단 부산3지점";
 /* 신규 개원·타사 전환 영업은 검사 설명보다 운영 가치와 전환 실행에 초점을 둡니다. */
 const SALES_PROFILES = {
   opening: {
-    lead: "개원 전 준비부터 초기 운영 정착까지, 검사 업무가 진료 흐름에 자연스럽게 이어지도록 지원하는 제안입니다.",
-    situation: "개원 일정에 맞춰 검사 의뢰·검체 수거·결과 확인 절차를 준비하고, 개원 초기 운영 혼선을 줄일 필요가 있습니다.",
-    needs: "개원 일정에 맞춘 업무 준비, 현장 직원 안내, 개원 초기 운영 점검을 한 흐름으로 정리합니다.",
-    item: "개원 초기 검사 운영 준비 및 현장 정착 지원",
-    support: "개원 일정과 운영시간을 확인한 뒤 수거 일정, 의뢰·결과 확인 흐름, 담당자 연락 체계를 함께 점검합니다. 지원 범위와 가능 일정은 사전 확인 후 확정합니다.",
-    action: "개원 예정일과 진료과·운영시간을 확인하고, 수거 동선·결과 확인 방식·담당자 교육 일정을 협의합니다.",
-    valueTitle: "개원 초기 운영을 안정적으로 준비하는 협업",
-    valueLead: "진료과와 운영 조건을 바탕으로 개원 전에 확인할 항목과 개원 후 점검할 항목을 나눕니다.",
+    lead: "개원 일정에 맞춰 검사 의뢰부터 결과 확인까지 필요한 운영 준비를 함께 점검합니다.",
+    situation: "개원 일정과 진료 흐름에 맞춘 운영 준비가 필요합니다.",
+    needs: "개원 준비부터 직원 안내와 초기 운영 점검까지 필요한 절차를 함께 준비합니다.",
+    item: "개원 검사 운영 지원",
+    support: "운영시간, 수거 동선, 의뢰·결과 확인 방식과 담당자 연락 체계를 사전에 확인합니다.",
+    action: "개원 예정일과 운영 조건을 확인한 뒤 준비 일정과 담당자를 협의합니다.",
+    valueTitle: "개원 준비부터 초기 운영까지",
+    valueLead: "필요한 준비를 미리 확인하고, 개원 후 업무 흐름이 자리 잡도록 지원합니다.",
     points: [
-      { title: "개원 전 운영조건 확인", body: "개원 일정, 진료과, 운영시간, 검체 발생 흐름과 수거 동선을 사전에 확인해 준비 항목을 정리합니다." },
-      { title: "직원이 바로 쓸 수 있는 절차 안내", body: "검사 의뢰, 검체 준비, 결과 확인, 문의 연락처 등 실제 현장에서 필요한 업무 흐름을 정리합니다." },
-      { title: "담당자 소통 경로 정리", body: "일반 문의와 긴급 문의의 연락 경로, 이슈 전달 방식, 후속 확인 담당을 명확히 합니다." },
-      { title: "개원 초기 집중 점검", body: "초기 의뢰 과정에서 생기는 누락·문의·운영상 불편을 확인하고, 조치가 필요한 사항을 담당자와 함께 정리합니다." }
+      { title: "개원 일정에 맞춘 준비", body: "운영시간·수거 동선·결과 확인 절차를 사전에 협의합니다." },
+      { title: "직원 업무 안내", body: "의뢰 절차와 문의 연락 체계를 정리해 현장 혼선을 줄입니다." },
+      { title: "초기 운영 점검", body: "개원 후 문의와 업무상 불편을 확인하고 필요한 조치를 연결합니다." }
     ],
-    checks: ["수거 가능 시간·횟수", "결과 확인·전산 연계", "긴급 의뢰 대응 범위", "직원 교육·소규모 안내"],
+    checks: ["수거 일정", "결과 확인", "직원 안내"],
     steps: [
-      { time: "개원 전", title: "운영 조건 사전 확인", body: "개원일, 진료과, 운영시간, 수거 동선과 결과 확인 방식을 협의합니다." },
-      { time: "개원 준비", title: "업무 흐름 및 담당자 안내", body: "의뢰 절차, 검체 취급, 결과 확인, 문의 연락 체계를 정리하고 직원 안내 일정을 잡습니다." },
-      { time: "개원 초기", title: "현장 이슈 확인", body: "의뢰 누락·문의·업무 불편을 확인하고 필요한 조치를 담당자와 정리합니다." },
-      { time: "운영 안정화", title: "초기 운영 리뷰", body: "실제 운영 결과를 바탕으로 추가 지원과 후속 방문 필요 여부를 협의합니다." }
+      { time: "개원 전", title: "운영 조건 확인", body: "" },
+      { time: "준비 단계", title: "업무 절차 안내", body: "" },
+      { time: "개원일", title: "서비스 시작", body: "" },
+      { time: "초기 운영", title: "운영 점검", body: "" }
     ]
   },
   support: {
-    lead: "기존 거래처의 운영상 불편과 요청사항을 정기적으로 확인하고, 실제 필요한 지원을 연결해 거래 만족도와 협력 안정성을 높이는 제안입니다.",
-    situation: "거래가 유지되는 것에 그치지 않고, 수거·결과 확인·문의 대응·직원 안내 등 현장 운영에서 불편하거나 개선이 필요한 부분을 지속적으로 확인할 필요가 있습니다.",
-    needs: "거래처 요청사항을 기록하고 담당 부서와 확인한 뒤 조치 결과까지 공유하는 지원 체계를 마련합니다.",
-    item: "기존 거래처 운영 지원 및 현장 불편 개선",
-    support: "거래처의 운영 불편과 지원 요청을 접수해 우선순위를 정리하고, 수거 일정·결과 확인·전산 연계·직원 안내 등 실제 적용 가능한 지원을 관련 부서와 확인합니다.",
-    action: "다음 방문 시 현재 불편사항과 지원 요청을 확인하고, 조치 담당자·확인 일정·완료 여부를 기록해 후속 공유합니다.",
-    valueTitle: "거래처 운영을 뒷받침하는 지속 지원",
-    valueLead: "요청을 단순히 접수하는 데 그치지 않고, 현장 확인부터 조치 결과 공유까지 이어지는 협력 방식을 제안합니다.",
+    lead: "현장의 요청을 확인하고 필요한 지원을 연결해 업무 불편을 줄이겠습니다.",
+    situation: "운영 중 발생하는 불편과 지원 요청을 확인합니다.",
+    needs: "문의 접수에서 끝나지 않고 조치 상황과 결과를 공유하는 지원을 제공합니다.",
+    item: "거래처 운영 지원",
+    support: "수거·결과 확인·전산 연계·직원 안내 등 거래처의 요청을 확인하고 적용 가능한 지원을 연결합니다.",
+    action: "다음 방문에서 불편사항과 지원 요청을 확인하고 조치 결과를 공유합니다.",
+    valueTitle: "필요한 지원을 빠르게 연결",
+    valueLead: "요청사항을 확인하고 해결 여부까지 후속 관리합니다.",
     points: [
-      { title: "현장 요청사항 관리", body: "수거·의뢰·결과 확인 과정에서 반복되는 불편을 파악하고, 요청 내용과 우선순위를 정리합니다." },
-      { title: "담당자 중심 소통", body: "문의 경로와 조치 담당을 명확히 하고, 진행 상황과 해결 여부를 거래처에 다시 공유합니다." },
-      { title: "운영 조건 점검", body: "수거 시간·횟수, 긴급 의뢰, 결과 확인·전산 연계 등 거래처 운영에 필요한 조건을 정기적으로 확인합니다." },
-      { title: "직원 업무 적응 지원", body: "요청에 따라 의뢰 절차 안내, 담당 직원 교육 또는 소규모 안내를 검토하고 가능한 범위에서 지원합니다." }
+      { title: "현장 요청 확인", body: "반복되는 불편과 필요한 지원을 파악합니다." },
+      { title: "담당자 연결", body: "관련 담당자와 조치 범위를 확인하고 진행 상황을 공유합니다." },
+      { title: "조치 결과 확인", body: "완료 여부와 추가로 필요한 사항을 확인합니다." }
     ],
-    checks: ["수거 일정·동선", "문의·이슈 조치", "결과 확인·전산 연계", "직원 안내·교육"],
+    checks: ["수거 일정", "문의 대응", "결과 확인"],
     steps: [
-      { time: "정기 방문", title: "운영상 불편 확인", body: "최근 불편·문의·요청사항을 확인하고 반복 이슈와 우선순위를 정리합니다." },
-      { time: "방문 후", title: "담당 부서·조치 범위 확인", body: "요청 내용을 관련 담당자와 검토하고 가능한 조치와 예상 일정을 확인합니다." },
-      { time: "조치 진행", title: "결과 공유 및 확인", body: "진행 상황과 조치 결과를 거래처에 알리고 미완료 항목을 추적합니다." },
-      { time: "다음 방문", title: "재발 여부·추가 지원 점검", body: "문제가 재발하는지 확인하고 다음 관리 과제를 합의합니다." }
+      { time: "방문", title: "요청사항 확인", body: "" },
+      { time: "확인", title: "지원 범위 협의", body: "" },
+      { time: "조치", title: "결과 공유", body: "" },
+      { time: "후속", title: "완료 여부 점검", body: "" }
     ]
   },
   renewal: {
-    lead: "기존 협력 관계를 바탕으로 거래처의 변화와 요구를 살피고, 필요한 운영 개선과 추가 협력 기회를 함께 발굴하는 제안입니다.",
-    situation: "기존 거래 관계를 안정적으로 유지하려면 거래량·의뢰 흐름·불편사항의 변화를 확인하고, 원장님과 실무 담당자의 요구에 맞춘 후속 관리가 필요합니다.",
-    needs: "거래처 현황을 주기적으로 점검해 이탈 위험을 조기에 파악하고, 실제 필요에 맞는 운영 개선·추가 협력 과제를 합의합니다.",
-    item: "기존 거래처 협력 강화 및 관계 유지 관리",
-    support: "현재 거래 현황과 변화, 요청사항 및 주요 담당자 의견을 점검합니다. 추가 지원·검사 관련 제안은 거래처의 실제 필요와 내부 운영·승인 가능 범위를 확인한 후 진행합니다.",
-    action: "거래처별 관리 과제와 다음 접촉 일정을 정하고, 합의한 개선 과제의 진행 상황을 다음 방문에서 점검합니다.",
-    valueTitle: "지속 거래와 협력 확대를 위한 맞춤 관리",
-    valueLead: "일률적인 방문보다 거래처별 변화와 우선 과제를 기준으로 접촉 목적과 후속 조치를 분명히 합니다.",
+    lead: "거래 흐름과 현장의 의견을 살펴 지속적인 협력과 개선 기회를 찾습니다.",
+    situation: "거래 현황과 현장의 요구를 주기적으로 확인합니다.",
+    needs: "거래 변화와 요청사항을 바탕으로 운영 개선과 추가 협력 기회를 검토합니다.",
+    item: "거래처 협력 강화",
+    support: "거래 흐름, 주요 담당자 의견과 운영상 불편을 확인하고 실제 필요한 지원을 협의합니다.",
+    action: "거래 변화와 요청사항을 검토하고 다음 관리 일정과 개선 과제를 협의합니다.",
+    valueTitle: "지속적인 협력과 개선",
+    valueLead: "거래처의 변화와 필요에 맞춰 관리 과제를 구체화합니다.",
     points: [
-      { title: "거래 흐름 변화 조기 확인", body: "월별 의뢰 흐름과 주요 항목 변화를 살피고, 감소나 중단이 보이면 원인과 대응 필요성을 확인합니다." },
-      { title: "원장·실무 키맨 관계 관리", body: "의사결정자와 실무 담당자의 요구를 구분해 확인하고, 약속한 지원과 조치 결과를 꾸준히 공유합니다." },
-      { title: "거래처별 개선 과제 설정", body: "수거·결과 확인·업무 편의 등 실질적인 불편을 우선순위로 정해 담당자와 개선 과제를 합의합니다." },
-      { title: "추가 협력 기회 발굴", body: "진료 특성 및 거래처 요구에 맞는 추가 협력 항목을 검토하되, 필요성과 적용 가능성을 확인한 뒤 제안합니다." }
+      { title: "거래 흐름 점검", body: "월별 의뢰 변화와 주요 항목을 확인합니다." },
+      { title: "담당자 소통", body: "원장님과 실무 담당자의 의견 및 요청을 확인합니다." },
+      { title: "개선 기회 발굴", body: "운영상 불편과 추가 협력 필요성을 검토합니다." }
     ],
-    checks: ["월별 거래 흐름", "주요 담당자·키맨", "반복 불편·이탈 위험", "추가 협력 필요성"],
+    checks: ["거래 흐름", "담당자 의견", "개선 과제"],
     steps: [
-      { time: "월간 점검", title: "거래 흐름·요청사항 확인", body: "월별 의뢰 변화와 거래처 의견을 확인하고 변동 원인을 기록합니다." },
-      { time: "관리 과제 선정", title: "우선순위·대응방안 합의", body: "거래 유지에 중요한 과제부터 선정하고 담당자와 조치 방향을 합의합니다." },
-      { time: "후속 접촉", title: "합의한 과제 실행", body: "관련 부서 확인과 필요한 지원을 연결하고 처리 상황을 공유합니다." },
-      { time: "재점검", title: "결과 확인·다음 과제 설정", body: "개선 여부와 추가 요청을 확인하고 다음 접촉 목적과 일정을 정합니다." }
+      { time: "정기 점검", title: "거래 현황 확인", body: "" },
+      { time: "과제 선정", title: "개선 항목 협의", body: "" },
+      { time: "지원 진행", title: "후속 조치", body: "" },
+      { time: "재점검", title: "변화 확인", body: "" }
     ]
   },
   conversion: {
-    lead: "현재 거래 구조와 운영 조건을 먼저 확인하고, 가능한 범위부터 단계적으로 전환해 업무 공백과 초기 혼선을 줄이는 제안입니다.",
-    situation: "기존 수탁사 이용 현황과 거래처의 운영 조건을 확인한 뒤, 전환 가능 범위와 전환 과정의 유의사항을 구체화할 필요가 있습니다.",
-    needs: "기존 의뢰 흐름을 존중하면서 전환 대상, 적용 일정, 운영상 확인사항을 구분하고 전환 후 초기 점검까지 계획합니다.",
-    item: "검사 의뢰 거래 전환 및 초기 안정화 지원",
-    support: "현재 이용 현황과 전환 희망 범위를 먼저 확인하고, 수거·의뢰·결과 확인·전산 연계 조건을 점검합니다. 실제 전환 범위와 일정은 관련 부서 확인 후 확정합니다.",
-    action: "현재 의뢰 항목과 운영상 불편을 확인하고, 전환 대상·적용 일정·필요 확인사항을 정리하는 후속 미팅을 진행합니다.",
-    valueTitle: "전환 범위와 운영 리스크를 관리하는 협업",
-    valueLead: "일괄 전환을 전제로 하지 않고, 거래처와 확인한 범위 안에서 실행 순서와 점검 항목을 합의합니다.",
+    lead: "검체 수거, 결과 확인과 전산 연계 등 실제 운영 조건을 확인하고 원활한 전환을 준비합니다.",
+    situation: "현재 이용 중인 서비스와 운영 조건을 확인해 전환 범위와 일정을 협의합니다.",
+    needs: "1일 2회 수거, 조직병리 자체 운영 등 거래처에 필요한 서비스 강점을 중심으로 전환 조건을 협의합니다.",
+    item: "검사 의뢰 전환",
+    support: "현재 수거·의뢰·결과 확인 흐름을 확인하고, 전환 범위와 적용 조건은 관련 부서와 협의해 확정합니다.",
+    action: "현재 운영 조건과 개선 희망사항을 확인하고 전환 범위 및 시작 일정을 협의합니다.",
+    valueTitle: "씨젠의 서비스와 운영 지원",
+    valueLead: "거래처에 필요한 조건을 확인하고 실제 적용 가능한 범위부터 함께 준비합니다.",
     points: [
-      { title: "현 거래 구조 먼저 파악", body: "주요 의뢰 항목, 대략적인 의뢰량, 수거 시간, 결과 확인 방식과 현재 불편사항을 확인합니다." },
-      { title: "전환 범위 단계별 설정", body: "전환 가능 항목과 추가 확인이 필요한 항목을 구분하고, 전환 순서와 시작 조건을 합의합니다." },
-      { title: "업무 공백 방지", body: "검체 준비·접수·결과 확인·문의 연락 흐름을 사전에 맞춰 전환 시 혼선을 줄입니다." },
-      { title: "전환 후 초기 점검", body: "초기 문의와 운영상 문제를 기록하고, 조치 담당과 완료 여부를 확인해 안정적인 정착을 돕습니다." }
+      { title: "검체 수거", body: "거래처 운영시간과 동선에 맞춰 수거 조건을 협의합니다." },
+      { title: "결과 확인·전산 연계", body: "현재 결과 확인 방식과 전산 연계 가능 범위를 확인합니다." },
+      { title: "전환 초기 지원", body: "적용 일정과 연락 체계를 정리하고 초기 운영을 점검합니다." }
     ],
-    checks: ["전환 대상·계약 조건", "수거 시간·검체 흐름", "결과 확인·전산 연계", "긴급 의뢰·초기 대응"],
+    checks: ["수거 일정", "결과 확인", "전산 연계"],
     steps: [
-      { time: "1단계", title: "현재 이용 현황 진단", body: "주요 의뢰 항목, 운영 불편, 수거·결과 확인 방식과 전환 요구를 파악합니다." },
-      { time: "2단계", title: "전환 항목·조건 확정", body: "전환 가능 범위, 단가·계약 조건, 시스템과 검체 처리 조건을 관련 부서와 확인합니다." },
-      { time: "3단계", title: "전환 일정 및 실행", body: "합의된 범위와 시작일에 맞춰 담당자 연락망과 업무 절차를 정리하고 전환을 진행합니다." },
-      { time: "4단계", title: "전환 후 안정화 점검", body: "초기 문의·누락·결과 확인 이슈를 확인하고, 남은 과제와 조치 일정을 정리합니다." }
+      { time: "사전 협의", title: "현재 운영 확인", body: "" },
+      { time: "범위 확정", title: "전환 조건 협의", body: "" },
+      { time: "전환 시작", title: "서비스 적용", body: "" },
+      { time: "초기 운영", title: "결과 확인", body: "" }
     ]
   }
 };
-
 function isAcquisitionType(type) {
   return type === "opening" || type === "conversion";
 }
@@ -263,83 +258,71 @@ function coverPage(input, analysis, total) {
 
 function businessOnePage(input) {
   const profile = salesProfile(input.type);
-  const title = TYPE_TITLES[input.type] || "거래처 협력 제안";
+  const title = TYPE_TITLES[input.type] || "검사서비스 안내";
   const clinic = safe(input.clinic, "거래처명 미입력");
-  const manager = safe(input.manager, "원장님");
+  const manager = safe(input.manager, "");
   const date = formatKoreanDate(input.date) || safe(input.date, "");
+
   const valueCards = profile.points.slice(0, 3).map((point, index) =>
     '<article class="pd-onepage-value">' +
       '<span class="pd-onepage-value-no">' + (index + 1) + '</span>' +
       '<h3>' + escapeHtml(point.title) + '</h3>' +
-      '<p>' + escapeHtml(point.body) + '</p>' +
+      '<p>' + escapeHtml(truncate(point.body, 78)) + '</p>' +
     '</article>'
   ).join("");
-  const chips = profile.checks.map((item) =>
-    '<span class="pd-onepage-chip">' + escapeHtml(item) + '</span>'
-  ).join("");
-  const steps = profile.steps.map((step, index) =>
-    '<article class="pd-onepage-step">' +
-      '<span class="pd-onepage-step-no">' + String(index + 1).padStart(2, "0") + '</span>' +
+
+  const steps = profile.steps.slice(0, 4).map((step, index) =>
+    '<article class="pd-onepage-flow-item">' +
+      '<span>' + String(index + 1).padStart(2, "0") + '</span>' +
       '<b>' + escapeHtml(step.title) + '</b>' +
-      '<span class="pd-onepage-step-time">' + escapeHtml(step.time) + '</span>' +
-      '<p>' + escapeHtml(step.body) + '</p>' +
     '</article>'
   ).join("");
-  const hasPrice = input.proposed !== null && input.proposed !== undefined && input.hasBase && input.hasRate;
-  const conditions = [
-    { label: "제안 범위", value: safe(input.item, profile.item) },
-    { label: "적용 기간", value: safe(input.period, "협의 후 확정") },
-    { label: "적용 조건", value: safe(input.conditions, "운영 조건·내부 승인 후 확정") }
-  ];
-  if (hasPrice) {
-    conditions.push({ label: "승인 할인율 / 제안 단가", value: String(input.rate) + "% / " + won(input.proposed) });
+
+  const terms = [];
+  if (safe(input.period)) terms.push({ label: "적용 기간", value: safe(input.period) });
+  if (safe(input.conditions)) terms.push({ label: "협의 조건", value: safe(input.conditions) });
+  if (input.proposed !== null && input.proposed !== undefined && input.hasBase && input.hasRate) {
+    terms.push({ label: "제안 단가", value: won(input.proposed) });
   }
-  const terms = conditions.map((item) =>
-    '<div class="pd-onepage-term"><span>' + escapeHtml(item.label) + '</span><b>' + escapeHtml(item.value) + '</b></div>'
-  ).join("");
-  const situation = safe(input.situation, profile.situation);
+  const termHtml = terms.length
+    ? '<div class="pd-onepage-terms">' + terms.map((term) =>
+        '<div class="pd-onepage-term"><span>' + escapeHtml(term.label) + '</span><b>' + escapeHtml(term.value) + '</b></div>'
+      ).join("") + '</div>'
+    : "";
+
   const needs = safe(input.needs, profile.needs);
-  const support = safe(input.support, profile.support);
-  const action = safe(input.action, profile.action);
+  const support = truncate(safe(input.support, profile.support), 125);
+  const action = truncate(safe(input.action, profile.action), 105);
 
   return '<section class="proposal-page pd-business-onepage">' +
     '<div class="pd-onepage-accent" aria-hidden="true"></div>' +
     '<header class="pd-onepage-header">' +
       '<img class="pd-onepage-logo" src="ci-seegene.png" alt="재단법인 씨젠의료재단">' +
-      '<div class="pd-onepage-header-meta"><span>BUSAN BRANCH 3</span><b>거래처 맞춤 협력 제안</b></div>' +
+      '<div class="pd-onepage-header-meta"><span>BUSAN BRANCH 3</span></div>' +
     '</header>' +
     '<div class="pd-onepage-titleblock">' +
-      '<p class="pd-onepage-kicker">BUSINESS PROPOSAL</p>' +
       '<h1>' + escapeHtml(title) + '</h1>' +
       '<p class="pd-onepage-lead">' + escapeHtml(profile.lead) + '</p>' +
       '<div class="pd-onepage-client"><strong>' + escapeHtml(clinic) + '</strong><span>귀중</span></div>' +
     '</div>' +
-    '<div class="pd-onepage-intro">' +
-      '<div><span>거래처 현황 · 검토 과제</span><p>' + escapeHtml(situation) + '</p></div>' +
-      '<div><span>맞춤 제안 방향</span><p>' + escapeHtml(needs) + '</p></div>' +
-    '</div>' +
+    '<div class="pd-onepage-proposition"><p>' + escapeHtml(needs) + '</p></div>' +
     '<section class="pd-onepage-section">' +
-      '<div class="pd-onepage-sectionhead"><span>01</span><div><h2>' + escapeHtml(profile.valueTitle) + '</h2><p>' + escapeHtml(profile.valueLead) + '</p></div></div>' +
+      '<div class="pd-onepage-sectionhead"><span>01</span><div><h2>' + escapeHtml(profile.valueTitle) + '</h2></div></div>' +
       '<div class="pd-onepage-values">' + valueCards + '</div>' +
     '</section>' +
-    '<section class="pd-onepage-section pd-onepage-ops">' +
-      '<div class="pd-onepage-sectionhead"><span>02</span><div><h2>현장에서 확인할 운영 지원 항목</h2><p>실제 적용 가능 범위와 거래처 운영 조건을 확인한 뒤 확정합니다.</p></div></div>' +
-      '<div class="pd-onepage-chips">' + chips + '</div>' +
-    '</section>' +
-    '<section class="pd-onepage-section">' +
-      '<div class="pd-onepage-sectionhead"><span>03</span><div><h2>' + (isAcquisitionType(input.type) ? "도입·전환 실행 순서" : "지원·관리 실행 순서") + '</h2><p>' + (isAcquisitionType(input.type) ? "담당자 협의부터 적용 이후 점검까지 단계적으로 진행합니다." : "현황 점검부터 요청 조치, 결과 공유와 다음 관리까지 이어갑니다.") + '</p></div></div>' +
-      '<div class="pd-onepage-steps">' + steps + '</div>' +
+    '<section class="pd-onepage-section pd-onepage-steps-section">' +
+      '<div class="pd-onepage-sectionhead"><span>02</span><div><h2>진행 순서</h2></div></div>' +
+      '<div class="pd-onepage-flow">' + steps + '</div>' +
     '</section>' +
     '<div class="pd-onepage-bottom">' +
-      '<div class="pd-onepage-bottomcard"><span>담당 지원 계획</span><p>' + escapeHtml(support) + '</p></div>' +
-      '<div class="pd-onepage-bottomcard"><span>다음 협의 · 후속 조치</span><p>' + escapeHtml(action) + '</p></div>' +
+      '<div class="pd-onepage-bottomcard"><span>지원 내용</span><p>' + escapeHtml(support) + '</p></div>' +
+      '<div class="pd-onepage-bottomcard"><span>다음 단계</span><p>' + escapeHtml(action) + '</p></div>' +
     '</div>' +
-    '<section class="pd-onepage-terms">' + terms + '</section>' +
+    termHtml +
     '<footer class="pd-onepage-footer">' +
       '<span>재단법인 씨젠의료재단 부산3지점</span>' +
-      '<span>' + escapeHtml(manager) + ' · ' + escapeHtml(date) + '</span>' +
+      '<span>' + escapeHtml([manager, date].filter(Boolean).join(" · ")) + '</span>' +
     '</footer>' +
-    '<p class="pd-onepage-disclaimer">※ 수거·긴급검사·결과 확인·전산 연계·지원 범위 및 가격·계약 조건은 실제 적용 가능 여부와 내부 승인 확인 후 확정합니다.</p>' +
   '</section>';
 }
 
@@ -858,36 +841,29 @@ function legacyProposalToPlainText(input, analysis) {
 function acquisitionProposalToPlainText(input) {
   const profile = salesProfile(input.type);
   const clinic = safe(input.clinic, "거래처명 미입력");
-  const manager = safe(input.manager, "원장님");
+  const manager = safe(input.manager, "");
   const date = formatKoreanDate(input.date) || safe(input.date, "");
   const lines = [
-    "재단법인 씨젠의료재단 부산3지점 · 거래처 맞춤 협력 제안",
-    TYPE_TITLES[input.type] || "거래처 협력 제안",
+    "재단법인 씨젠의료재단 부산3지점",
+    TYPE_TITLES[input.type] || "검사서비스 안내",
     clinic + " 귀중",
-    "담당자: " + manager + " / 작성일: " + date,
+    ...([manager, date].filter(Boolean).length ? ["담당자·작성일: " + [manager, date].filter(Boolean).join(" / ")] : []),
     "",
-    "1. 거래처 현황 및 맞춤 제안",
-    safe(input.situation, profile.situation),
     safe(input.needs, profile.needs),
     "",
-    "2. 협력 가치 및 운영 지원"
+    profile.valueTitle
   ];
   profile.points.slice(0, 3).forEach((point, index) => {
-    lines.push((index + 1) + ". " + point.title + " - " + point.body);
+    lines.push((index + 1) + ". " + point.title + " — " + point.body);
   });
-  lines.push("", "사전 확인 항목: " + profile.checks.join(" · "), "", "3. 도입·전환 실행 순서");
-  profile.steps.forEach((step, index) => {
-    lines.push((index + 1) + ". " + step.time + " / " + step.title + " - " + step.body);
-  });
-  lines.push("", "담당 지원 계획: " + safe(input.support, profile.support));
-  lines.push("후속 조치: " + safe(input.action, profile.action));
-  lines.push("", "제안 범위: " + safe(input.item, profile.item));
-  lines.push("적용 기간: " + safe(input.period, "협의 후 확정"));
-  lines.push("적용 조건: " + safe(input.conditions, "운영 조건·내부 승인 후 확정"));
+  lines.push("", "진행 순서: " + profile.steps.map((step) => step.title).join(" → "));
+  lines.push("", "지원 내용: " + safe(input.support, profile.support));
+  lines.push("다음 단계: " + safe(input.action, profile.action));
+  if (safe(input.period)) lines.push("적용 기간: " + safe(input.period));
+  if (safe(input.conditions)) lines.push("협의 조건: " + safe(input.conditions));
   if (input.proposed !== null && input.proposed !== undefined && input.hasBase && input.hasRate) {
-    lines.push("기준 단가: " + won(input.basePrice) + " / 승인 할인율: " + input.rate + "% / 제안 단가: " + won(input.proposed));
+    lines.push("제안 단가: " + won(input.proposed));
   }
-  lines.push("", "※ 수거·긴급검사·결과 확인·전산 연계·지원 범위 및 가격·계약 조건은 실제 적용 가능 여부와 내부 승인 확인 후 확정합니다.");
   return lines.join("\n");
 }
 
