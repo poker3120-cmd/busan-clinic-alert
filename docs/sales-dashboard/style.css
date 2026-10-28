@@ -2055,3 +2055,169 @@ textarea.mono { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; 
 @media (max-width:760px) {
   .pd-onepage-flow { grid-template-columns:repeat(2,minmax(0,1fr)); }
 }
+
+
+/* ---------- Company-standard dense medical flyer ---------- */
+.fl-brochure .fl-content {
+  display:flex;
+  flex-direction:column;
+  gap:11px;
+  padding:13px 28px 7px;
+}
+.fl-brochure .fl-points-section,
+.fl-brochure .fl-evidence-section,
+.fl-brochure .fl-lower-content,
+.fl-brochure .fl-citations { min-width:0; }
+.fl-brochure .fl-section-heading { margin-bottom:6px; }
+.fl-brochure .fl-section-heading > div:last-child > span {
+  font-size:6.8px;
+  margin-bottom:1px;
+}
+.fl-brochure .fl-section-heading h2 { font-size:11.5px; }
+.fl-brochure .fl-section-number { flex-basis:22px; width:22px; height:22px; font-size:7.5px; }
+.fl-brochure .fl-points { grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; }
+.fl-brochure .fl-point { padding:8px 9px; gap:7px; }
+.fl-brochure .fl-point-index { flex-basis:20px; width:20px; height:20px; font-size:8px; }
+.fl-brochure .fl-point .tx h3 { font-size:9.4px; line-height:1.35; }
+.fl-brochure .fl-point .tx p { font-size:8.2px; line-height:1.42; margin-top:3px; }
+.fl-brochure .fl-evidence-section .fl-metrics {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(115px,1fr));
+  gap:7px;
+}
+.fl-brochure .fl-evidence-section .fl-metric {
+  min-width:0;
+  padding:8px 9px;
+  gap:7px;
+  border:1px solid #e8dce0;
+  border-left:3px solid #c41230;
+  border-top:0;
+  border-radius:2px;
+  background:#fffafb;
+  box-shadow:none;
+}
+.fl-brochure .fl-evidence-section .fl-metric-no {
+  flex-basis:19px; width:19px; height:19px; font-size:7px;
+}
+.fl-brochure .fl-evidence-section .fl-metric .v {
+  font-size:15px; line-height:1.15; color:#7f1024;
+}
+.fl-brochure .fl-evidence-section .fl-metric .l {
+  margin-top:2px; font-size:8px; line-height:1.35;
+}
+.fl-brochure .fl-lower-content {
+  display:flex;
+  flex-direction:column;
+  gap:9px;
+}
+.fl-brochure .fl-spec-table-wrap { width:100%; min-width:0; }
+.fl-brochure .fl-spec-table {
+  width:100%;
+  table-layout:fixed;
+  border-collapse:collapse;
+  border:1px solid #dfc9cf;
+}
+.fl-brochure .fl-spec-table th {
+  padding:6px 3px;
+  border:1px solid #c41230;
+  background:#b5122d;
+  color:#fff;
+  text-align:center;
+  vertical-align:middle;
+  font-size:7.5px;
+  font-weight:900;
+  line-height:1.25;
+  overflow-wrap:anywhere;
+}
+.fl-brochure .fl-spec-table td {
+  padding:7px 4px;
+  border:1px solid #e8dce0;
+  background:#fff;
+  color:#3e3338;
+  text-align:center;
+  vertical-align:top;
+  font-size:8px;
+  font-weight:700;
+  line-height:1.4;
+  overflow-wrap:anywhere;
+}
+.fl-brochure .fl-target-panel .fl-targets { gap:5px; }
+.fl-brochure .fl-target-panel .fl-target {
+  padding:4px 7px;
+  font-size:7.8px;
+}
+.fl-brochure .fl-note {
+  padding:7px 9px;
+  gap:7px;
+  font-size:8px;
+  line-height:1.4;
+}
+.fl-brochure .fl-note-symbol { flex-basis:16px; width:16px; height:16px; font-size:8px; }
+.fl-brochure .fl-note b { font-size:6.5px; }
+.fl-brochure .fl-citations {
+  padding-top:6px;
+  border-top:1px solid #e7d8dc;
+}
+.fl-brochure .fl-citations-head {
+  display:flex;
+  align-items:baseline;
+  gap:7px;
+  margin-bottom:3px;
+}
+.fl-brochure .fl-citations-head span {
+  color:#a3122e;
+  font-size:6px;
+  font-weight:900;
+  letter-spacing:.12em;
+}
+.fl-brochure .fl-citations-head b {
+  color:#7f1024;
+  font-size:8.2px;
+  font-weight:900;
+}
+.fl-brochure .fl-citations ol {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:2px;
+  margin:0;
+  padding-left:15px;
+  color:#6f6268;
+  font-size:6.4px;
+  line-height:1.3;
+}
+.fl-brochure .fl-citations li { padding-left:1px; overflow-wrap:anywhere; }
+.fl-brochure .fl-brochure-footer {
+  min-height:55px;
+  padding:9px 28px 12px;
+  gap:10px;
+}
+.fl-brochure .fl-footer-brand b { font-size:8.5px; }
+.fl-brochure .fl-footer-brand span { font-size:7.4px; }
+.fl-brochure .fl-footer-disclaimer { max-width:295px; font-size:6.8px; line-height:1.35; }
+.fl-brochure.dense-1 .fl-content { gap:9px; padding-top:11px; }
+.fl-brochure.dense-1 .fl-point { padding:7px 8px; }
+.fl-brochure.dense-1 .fl-point .tx p { font-size:7.8px; }
+.fl-brochure.dense-1 .fl-evidence-section .fl-metric .v { font-size:14px; }
+.fl-brochure.dense-2 .fl-content { gap:7px; padding:9px 24px 5px; }
+.fl-brochure.dense-2 .fl-points { gap:5px; }
+.fl-brochure.dense-2 .fl-point { padding:6px 7px; gap:6px; }
+.fl-brochure.dense-2 .fl-point .tx h3 { font-size:8.7px; }
+.fl-brochure.dense-2 .fl-point .tx p { font-size:7.2px; line-height:1.3; }
+.fl-brochure.dense-2 .fl-section-heading { margin-bottom:4px; }
+.fl-brochure.dense-2 .fl-section-heading h2 { font-size:10.5px; }
+.fl-brochure.dense-2 .fl-spec-table th { font-size:6.8px; padding:5px 2px; }
+.fl-brochure.dense-2 .fl-spec-table td { font-size:7px; padding:5px 3px; }
+.fl-brochure.dense-2 .fl-citations ol { font-size:5.8px; line-height:1.22; }
+.fl-brochure.dense-3 .fl-content { gap:6px; padding:8px 22px 4px; }
+.fl-brochure.dense-3 .fl-point { padding:5px 6px; }
+.fl-brochure.dense-3 .fl-point .tx h3 { font-size:8.1px; }
+.fl-brochure.dense-3 .fl-point .tx p { font-size:6.7px; line-height:1.22; }
+.fl-brochure.dense-3 .fl-evidence-section .fl-metric { padding:6px 7px; }
+.fl-brochure.dense-3 .fl-evidence-section .fl-metric .v { font-size:12px; }
+.fl-brochure.dense-3 .fl-evidence-section .fl-metric .l { font-size:6.8px; }
+.fl-brochure.dense-3 .fl-spec-table th { font-size:6.2px; padding:4px 2px; }
+.fl-brochure.dense-3 .fl-spec-table td { font-size:6.5px; padding:4px 2px; }
+.fl-brochure.dense-3 .fl-citations ol { font-size:5.3px; line-height:1.15; }
+@media print {
+  .fl-brochure .fl-content { padding-bottom:4px; }
+}
