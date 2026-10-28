@@ -3,7 +3,7 @@
    화면 미리보기와 PDF 내보내기가 같은 HTML을 사용합니다.
    ========================================================= */
 
-import { escapeHtml, formatNumber, formatKoreanDate } from "./utils.js";
+import { escapeHtml, formatNumber, formatKoreanDate, truncate } from "./utils.js";
 
 /* ---------- 제안 유형별 문구 ---------- */
 
