@@ -26,6 +26,7 @@ export function emptyAnalysis() {
     infoRows: [],
     targets: [],
     sources: [],
+    references: [],
     charCount: 0,
     generatedAt: "",
   };
