@@ -879,8 +879,9 @@ function legacyProposalToPlainText(input, analysis) {
 }
 
 
-function acquisitionProposalToPlainText(input) {
+function acquisitionProposalToPlainText(input, analysis) {
   const profile = salesProfile(input.type);
+  const a = analysis || { keyPoints: [], infoRows: [], metrics: [], targets: [], sources: [] };
   const clinic = safe(input.clinic, "거래처명 미입력");
   const manager = safe(input.manager, "");
   const date = formatKoreanDate(input.date) || safe(input.date, "");
@@ -890,6 +891,7 @@ function acquisitionProposalToPlainText(input) {
     clinic + " 귀중",
     ...([manager, date].filter(Boolean).length ? ["담당자·작성일: " + [manager, date].filter(Boolean).join(" / ")] : []),
     "",
+    "제안 핵심",
     safe(input.needs, profile.needs),
     "",
     profile.valueTitle
@@ -897,6 +899,25 @@ function acquisitionProposalToPlainText(input) {
   profile.points.slice(0, 3).forEach((point, index) => {
     lines.push((index + 1) + ". " + point.title + " — " + point.body);
   });
+  const metrics = (a.metrics || []).filter((m) => safe(m && m.value)).slice(0, 4);
+  if (metrics.length) {
+    lines.push("", "자료에 명시된 수치");
+    metrics.forEach((m) => lines.push("· " + safe(m.label, "자료 수치") + ": " + safe(m.value)));
+  }
+  const keyPoints = (a.keyPoints || []).filter((point) => safe(point && point.text)).slice(0, 4);
+  if (keyPoints.length) {
+    lines.push("", "검사자료 핵심 내용");
+    keyPoints.forEach((point, index) => lines.push((index + 1) + ". " + safe(point.text) + (point.source ? " [출처: " + point.source + "]" : "")));
+  }
+  const infoRows = (a.infoRows || []).filter((row) => safe(row && row.field) && safe(row && row.value)).slice(0, 8);
+  if (infoRows.length) {
+    lines.push("", "검사 정보");
+    infoRows.forEach((row) => lines.push("· " + safe(row.field) + ": " + safe(row.value)));
+  }
+  if ((a.targets || []).length) {
+    lines.push("", "자료에 기재된 적용 대상");
+    (a.targets || []).slice(0, 8).forEach((target) => lines.push("· " + String(target)));
+  }
   lines.push("", "진행 순서: " + profile.steps.map((step) => step.title).join(" → "));
   lines.push("", "지원 내용: " + safe(input.support, profile.support));
   lines.push("다음 단계: " + safe(input.action, profile.action));
@@ -905,10 +926,14 @@ function acquisitionProposalToPlainText(input) {
   if (input.proposed !== null && input.proposed !== undefined && input.hasBase && input.hasRate) {
     lines.push("제안 단가: " + won(input.proposed));
   }
+  if ((a.sources || []).length) {
+    lines.push("", "참고 자료");
+    (a.sources || []).slice(0, 5).forEach((source, index) => lines.push((index + 1) + ". " + String(source)));
+  }
   return lines.join("\n");
 }
 
 export function proposalToPlainText(input, analysis) {
-  if (isOnePageProposalType(input?.type)) return acquisitionProposalToPlainText(input);
+  if (isOnePageProposalType(input?.type)) return acquisitionProposalToPlainText(input, analysis);
   return legacyProposalToPlainText(input, analysis);
 }
