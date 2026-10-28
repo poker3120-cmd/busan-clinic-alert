@@ -113,6 +113,19 @@ export function renderFlyerHtml(flyer, image, denseLevel = 0) {
       '</section>'
     : '';
 
+  const supportingImages = (image && Array.isArray(image.extraImages) ? image.extraImages : [])
+    .filter((item) => item && item.dataUrl)
+    .slice(0, 2);
+  const supportingVisuals = supportingImages.length
+    ? '<section class="fl-supporting-visuals">' +
+        '<div class="fl-section-heading"><div class="fl-section-number">02</div><div>' +
+          '<span>FROM ATTACHED MATERIALS</span><h2>첨부 자료의 주요 도식 · 그래프</h2></div></div>' +
+        '<div class="fl-supporting-visual-grid">' + supportingImages.map((item, index) =>
+          '<figure><img src="' + escapeHtml(item.dataUrl) + '" alt="첨부 자료 속 도식 또는 그래프 ' + (index + 1) + '">' +
+          '<figcaption>' + escapeHtml(truncate(String(item.name || "").replace(/\.(png|jpe?g|gif|webp)$/i, ""), 34) || ("첨부 자료 그림 " + (index + 1))) + '</figcaption></figure>'
+        ).join("") + '</div></section>'
+    : '';
+
   const metrics = f.metrics.length
     ? '<section class="fl-evidence-section">' +
         '<div class="fl-section-heading"><div class="fl-section-number">02</div><div>' +
@@ -173,7 +186,7 @@ export function renderFlyerHtml(flyer, image, denseLevel = 0) {
 
   return '<div class="flyer fl-brochure ' + dense + '">' +
     '<div class="fl-top-accent"></div>' + head +
-    '<div class="fl-content">' + points + metrics + lower + note + references + '</div>' +
+    '<div class="fl-content">' + points + supportingVisuals + metrics + lower + note + references + '</div>' +
     footer +
   '</div>';
 }
