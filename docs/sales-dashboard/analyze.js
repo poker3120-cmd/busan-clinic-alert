@@ -29,7 +29,15 @@ export function collectSegments(units) {
     const source = unit.file || "첨부 자료";
     const label = unit.label || "";
     (unit.lines || []).forEach((line) => {
-      const cleaned = cleanLine(line.text);
+      const rawLine = String(line && line.text || "").trim();
+      // 논문 참고문헌은 별도 수집하므로 제목·부제·핵심 문장 후보에는 포함하지 않습니다.
+      const hasCitationYear = /\b(?:19|20)\d{2}\b/.test(rawLine);
+      const citationLine = hasCitationYear && (
+        /\bet\s+al\.?|doi\s*:|doi\.org|https?:\/\//i.test(rawLine) ||
+        /^\s*\d+\s*[.)]\s*[^.]{3,120}\b(?:Clin|J\.?|Gut|Hepatol|Cancer|Med|Proteomics|Diagnostics|Helicobacter|Dis\.?\s*Markers)\b[^.]{0,100}\b(?:19|20)\d{2}\b/i.test(rawLine)
+      );
+      if (citationLine) return;
+      const cleaned = cleanLine(rawLine);
       if (cleaned.length < 4) return;
       if (NOISE_RE.test(cleaned)) return;
 
@@ -453,7 +461,8 @@ export function makeSubtitle(segments, keyPoints, title, exclude = []) {
   const fallback = (keyPoints || [])
     .map((point) => point.text)
     .concat(segments.map((segment) => segment.text))
-    .find((text) => text && !isBlocked(text) && text.length >= 12);
+    .find((text) => text && !isBlocked(text) && text.length >= 12 &&
+      !(/\bet\s+al\.?|doi\s*:|doi\.org|https?:\/\/|(?:19|20)\d{2};\d+|^\s*\d+[.)]\s+[A-Z][a-z]+,/i.test(text)));
   return truncate(fallback || "", 110);
 }
 
