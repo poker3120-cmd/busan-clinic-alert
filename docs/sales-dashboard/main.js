@@ -29,7 +29,7 @@ import {
 
 import {
   renderProposalHtml, proposalToPlainText,
-} from "./proposal.js?v=20261028d";
+} from "./proposal.js?v=20261028e";
 
 import {
   fitScaler, printFlyer, printHtml, exportFlyerPng, exportFlyerImagePdf,
@@ -912,7 +912,7 @@ function wireProposal() {
       saveProposal();
       $("proposalPreviewCard").hidden = false;
       renderProposalPreview();
-      setStatus($("proposalStatus"), "A4 제안서 7페이지를 만들었습니다. 미리보기를 확인해 주세요.", "ok");
+      setStatus($("proposalStatus"), "A4 제안서를 만들었습니다. 미리보기를 확인해 주세요.", "ok");
       return;
     }
 
