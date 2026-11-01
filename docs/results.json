@@ -1,13 +1,13 @@
 {
-  "updated_at": "2026-11-01T08:30:12+09:00",
+  "updated_at": "2026-11-02T08:31:53+09:00",
   "summary": {
     "total": 0,
     "search_requests": 44,
-    "raw_count": 199,
+    "raw_count": 313,
     "errors": 0,
     "rejected_region": 0,
-    "rejected_source": 134,
-    "rejected_content": 65,
+    "rejected_source": 220,
+    "rejected_content": 93,
     "uncertain_region": 0,
     "job_site_matches": 0,
     "opening_news_matches": 0
