@@ -1,16 +1,28 @@
 {
-  "updated_at": "2026-11-03T08:34:12+09:00",
+  "updated_at": "2026-11-04T08:36:51+09:00",
   "summary": {
-    "total": 0,
+    "total": 1,
     "search_requests": 44,
-    "raw_count": 369,
+    "raw_count": 250,
     "errors": 0,
     "rejected_region": 0,
-    "rejected_source": 305,
-    "rejected_content": 64,
+    "rejected_source": 193,
+    "rejected_content": 56,
     "uncertain_region": 0,
     "job_site_matches": 0,
-    "opening_news_matches": 0
+    "opening_news_matches": 1
   },
-  "results": []
+  "results": [
+    {
+      "region": "김해시",
+      "source": "경남매일",
+      "title": "김해 부족한 의료 공백 메울 '더복음병원' 개원 길 열어야 - 경남매일",
+      "link": "https://news.google.com/rss/articles/CBMiakFVX3lxTE5ELUVDRHFZUXBfRF9FVUhmN0JUWk50cmFIZ3dYRTFXbnotWHNObU41dEE4UE5EOFpYS3BEdlF5ZUF4LUFqTUpFa3hVOEZIbHdKY29NeDd2MUZCcGRQYVJOeVJPZzVsb2tsUWc?oc=5",
+      "date": "2026-11-03",
+      "timestamp": 1793711624,
+      "opening": true,
+      "date_unknown": false,
+      "region_matched": true
+    }
+  ]
 }
