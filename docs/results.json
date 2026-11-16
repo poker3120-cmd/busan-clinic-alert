@@ -1,16 +1,39 @@
 {
-  "updated_at": "2026-11-15T11:29:12+09:00",
+  "updated_at": "2026-11-16T11:39:31+09:00",
   "summary": {
-    "total": 0,
+    "total": 2,
     "search_requests": 44,
-    "raw_count": 397,
+    "raw_count": 445,
     "errors": 0,
     "rejected_region": 0,
-    "rejected_source": 315,
-    "rejected_content": 82,
+    "rejected_source": 360,
+    "rejected_content": 83,
     "uncertain_region": 0,
     "job_site_matches": 0,
-    "opening_news_matches": 0
+    "opening_news_matches": 2
   },
-  "results": []
+  "results": [
+    {
+      "region": "김해시",
+      "source": "뉴스경남",
+      "title": "김해한솔재활요양병원, 개원 26주년 지역 중증환자 의료·돌봄의 중심으로 새로운 도약 - 뉴스경남",
+      "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE9wVl9PSjktendnbFF1c21MZkJVMjlvY0xJdjJnN1FuckxEZ2kyRnRDLWplMGtDOVF2Y1JCSS0temJLRU9qdTRBQ2dnamF2YlR2OWZiOGJndHdnRmNUYnF5aUc3UUZQOVo3?oc=5",
+      "date": "2026-11-15",
+      "timestamp": 1794706560,
+      "opening": true,
+      "date_unknown": false,
+      "region_matched": true
+    },
+    {
+      "region": "김해시",
+      "source": "경남매일",
+      "title": "김해 부족한 의료 공백 메울 '더복음병원' 개원 길 열어야 - 경남매일",
+      "link": "https://news.google.com/rss/articles/CBMiakFVX3lxTE5ELUVDRHFZUXBfRF9FVUhmN0JUWk50cmFIZ3dYRTFXbnotWHNObU41dEE4UE5EOFpYS3BEdlF5ZUF4LUFqTUpFa3hVOEZIbHdKY29NeDd2MUZCcGRQYVJOeVJPZzVsb2tsUWc?oc=5",
+      "date": "2026-11-03",
+      "timestamp": 1793692800,
+      "opening": true,
+      "date_unknown": false,
+      "region_matched": true
+    }
+  ]
 }
