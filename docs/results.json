@@ -1,16 +1,16 @@
 {
-  "updated_at": "2026-11-19T13:03:12+09:00",
+  "updated_at": "2026-11-20T12:55:13+09:00",
   "summary": {
-    "total": 4,
+    "total": 3,
     "search_requests": 44,
-    "raw_count": 114,
+    "raw_count": 223,
     "errors": 0,
     "rejected_region": 0,
-    "rejected_source": 54,
-    "rejected_content": 56,
-    "uncertain_region": 2,
+    "rejected_source": 150,
+    "rejected_content": 70,
+    "uncertain_region": 1,
     "job_site_matches": 0,
-    "opening_news_matches": 4
+    "opening_news_matches": 3
   },
   "results": [
     {
@@ -42,17 +42,6 @@
       "link": "https://news.google.com/rss/articles/CBMiU0FVX3lxTE9lYXIyWGRVMzNEVzl5LU1TSThZamFQSkh2WmVmY2JvWDQ0cUhXUVQ2R2tKZG02dDBwelNTaHdSYTlNUE9yNDJIajY3bmVsdEViZnh3?oc=5",
       "date": "2026-11-17",
       "timestamp": 1794884834,
-      "opening": true,
-      "date_unknown": false,
-      "region_matched": false
-    },
-    {
-      "region": "지역 확인 필요",
-      "source": "메가경제",
-      "title": "VS라인의원 마곡점 개원... “유행 쫓기보다 내 얼굴에 어울리는 디테일 디자인” - 메가경제",
-      "link": "https://news.google.com/rss/articles/CBMidEFVX3lxTE1CRkVZUlFLZVVNMXRHNzU3ek10RktTM1o2Vy1XY25HXzl6TUhLdFA1T1doX3BlQThEUEUwVHpmbnFuN3lKeTJRdEdJUWdQZmlqdnNtWHAzaGZVNFYzUW1QUFhrbU9LakRXOFZ5bVhKcC1pVy1x0gFyQVVfeXFMTWhRS21Ya3R1WXl4NEZKa2tsYmM5aG9zUGpfRkxLM3VFTzhoUVJSdVQwc1BwY3BVZnc0eE9YUENuc0NwZ195MHdjWWo1S01BU0c4R1dtUGJubUpFV0o2d2pEUmdiNFpjcFNrYkd2eEM5bWtn?oc=5",
-      "date": "2026-10-27",
-      "timestamp": 1793084400,
       "opening": true,
       "date_unknown": false,
       "region_matched": false
