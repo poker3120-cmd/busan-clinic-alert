@@ -1,13 +1,13 @@
 {
-  "updated_at": "2026-11-23T12:38:47+09:00",
+  "updated_at": "2026-11-24T15:53:23+09:00",
   "summary": {
     "total": 3,
     "search_requests": 44,
-    "raw_count": 307,
+    "raw_count": 394,
     "errors": 0,
     "rejected_region": 0,
-    "rejected_source": 221,
-    "rejected_content": 83,
+    "rejected_source": 310,
+    "rejected_content": 81,
     "uncertain_region": 1,
     "job_site_matches": 0,
     "opening_news_matches": 3
@@ -37,9 +37,9 @@
     },
     {
       "region": "지역 확인 필요",
-      "source": "한국공공정책신문",
-      "title": "닥터스피부과 마곡점 신규 개원…피부과 전문의 중심 맞춤형 진료 제공 - 한국공공정책신문",
-      "link": "https://news.google.com/rss/articles/CBMiQ0FVX3lxTFBPVnBURnM0RDl6cFZPXzIxT2ZUQTI1Tm9NdThTRjAwYm85b0FWRWhlalhyWENIMTVwd3hHd0tTdmNoa00?oc=5",
+      "source": "유스연합",
+      "title": "닥터스피부과 마곡점 신규 개원…피부과 전문의 중심 맞춤형 진료 제공 - 유스연합",
+      "link": "https://news.google.com/rss/articles/CBMiU0FVX3lxTE9lYXIyWGRVMzNEVzl5LU1TSThZamFQSkh2WmVmY2JvWDQ0cUhXUVQ2R2tKZG02dDBwelNTaHdSYTlNUE9yNDJIajY3bmVsdEViZnh3?oc=5",
       "date": "2026-11-17",
       "timestamp": 1794884834,
       "opening": true,
