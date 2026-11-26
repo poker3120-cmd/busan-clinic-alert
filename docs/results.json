@@ -1,29 +1,18 @@
 {
-  "updated_at": "2026-11-25T14:20:05+09:00",
+  "updated_at": "2026-11-26T13:51:22+09:00",
   "summary": {
-    "total": 3,
+    "total": 2,
     "search_requests": 44,
-    "raw_count": 352,
+    "raw_count": 264,
     "errors": 0,
     "rejected_region": 0,
-    "rejected_source": 267,
-    "rejected_content": 82,
+    "rejected_source": 182,
+    "rejected_content": 80,
     "uncertain_region": 1,
     "job_site_matches": 0,
-    "opening_news_matches": 3
+    "opening_news_matches": 2
   },
   "results": [
-    {
-      "region": "김해시",
-      "source": "뉴스경남",
-      "title": "김해한솔재활요양병원, 개원 26주년 지역 중증환자 의료·돌봄의 중심으로 새로운 도약 - 뉴스경남",
-      "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE9wVl9PSjktendnbFF1c21MZkJVMjlvY0xJdjJnN1FuckxEZ2kyRnRDLWplMGtDOVF2Y1JCSS0temJLRU9qdTRBQ2dnamF2YlR2OWZiOGJndHdnRmNUYnF5aUc3UUZQOVo3?oc=5",
-      "date": "2026-11-15",
-      "timestamp": 1794706560,
-      "opening": true,
-      "date_unknown": false,
-      "region_matched": true
-    },
     {
       "region": "김해시",
       "source": "경남매일",
